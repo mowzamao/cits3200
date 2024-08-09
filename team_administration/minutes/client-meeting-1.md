@@ -1,4 +1,4 @@
-# CITS3200 Group 20 Client Meeting 1
+# CITS3200 Group 20 Mentor Meeting 1
 
 Meeting Date: 08/08
 
