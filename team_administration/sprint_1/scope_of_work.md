@@ -11,7 +11,7 @@ Version R0.1 12/08/2024 Sophie Mowe. Created
 
 # Preface
 
-This document addresses the requirements of the Sediment Colour system. The intended audience for this document are the designers and the clients of this project.
+This document addresses the requirements of the Sediment Colour system. The intended audience for this document is the designers and the clients of this project.
 
 ## **Team Members**
 
@@ -26,7 +26,7 @@ This document addresses the requirements of the Sediment Colour system. The inte
 | Milestone | Description | Date |
 | :---- | :---- | :---- |
 | *Sprint 1* | Setting up overall project direction. | August 15 |
-| *Sprint 2* | Delivering set of interim goals. | September 18 |
+| *Sprint 2* | Delivering the set of interim goals. | September 18 |
 | *Sprint 3* | Delivery of final system. | October 14 |
 
 # General Goals
@@ -55,12 +55,12 @@ Our new system will be able to produce plots depicting changes in sediment colou
 
 The following describes the general process of the proposed system:
 
-1. The user uploads a list of one or more high-definition colour images of sediment core  
+1. The user uploads a list of one or more high-definition colour images of the sediment core  
 2. The following processes occur for each image:  
    1. Colour and lighting normalisation \- the images are pre-processed to remove artefacts  
    2. Perimeter detection \- Automatic line detection with OpenCV’s LineSegmentDetector class is utilised to determine the perimeter of the sediment core. The image is cropped to the detected sediment core perimeter, ensuring only colours from the sediment core itself are analysed.  
    3. Colour channel conversion \- A toggle will be displayed that allows the user to pick between displaying the results in the RGB or CIELAB colour space. The image will be converted to the chosen colour space.
-   4. Each of the colour channel values are plotted over time, and displayed next to a rendering of the processed sediment core where the scale of the image matches the scale of the time axis.  
+   4. Each of the colour channel values is plotted over time and displayed next to a rendering of the processed sediment core where the scale of the image matches the scale of the time axis.  
 3. The directory to save the results to is determined:  
    1. A file explorer dialogue box will be opened so that the user can choose the directory graphically.  
       1. If the user has not used the application before, the folder will be automatically set to desktop  
@@ -68,7 +68,7 @@ The following describes the general process of the proposed system:
 4. The results are saved by the user.  
    1. The processed sediment core image is saved as a PNG file.
    2. The plot of each colour channel over time is saved as a PNG file.
-   3. The data corresponding to the plot of each colour channel over time is saved as a XLSX file, so that it is compatible with Microsoft Excel.  
+   3. The data corresponding to the plot of each colour channel over time is saved as an XLSX file, which is compatible with Microsoft Excel.  
 5. The application’s user data is updated so that preferences (such as previously processed images and previously chosen save directories) are saved.
 
 ## **Functional Requirements**
@@ -95,11 +95,11 @@ The interface must be graphical, featuring image and plot displays, along with b
 
 ### *Installation*
 
-A user-friendly installation wizard will be used to install the application. This is required so that anyone working on sediment cores at UWA can install  the program without assistance.
+The application will be installed using a user-friendly installation wizard. This is required so that anyone working on sediment cores at UWA can install  the program without assistance.
 
 ### *Images*
 
-Any sediment core image, regardless of quality and centering of the sediment core, should be able to be uploaded and processed. The application must correct for errors and image noise and detect sediment cores.
+Any sediment core image, regardless of quality and centring of the sediment core, should be able to be uploaded and processed. The application must correct for errors and image noise and detect sediment cores.
 
 ### *Documentation*
 
@@ -107,11 +107,11 @@ Thorough documentation, including the mathematical basis for the algorithms used
 
 ### *Hardware Considerations*
 
-The system must run efficiently on an offline Windows operating system. The team will ensure that the image processing pipeline is minimally complex, so that the application can run quickly without requiring specialised hardware like GPUs or high-end CPUs. 
+The system must run efficiently on an offline Windows operating system. The team will ensure that the image processing pipeline is minimally complex so that the application can run quickly without requiring specialised hardware like GPUs or high-end CPUs. 
 
 ### *System Modifications*
 
-Future Windows updates, python releases or updates to packages may render our software obsolete. The team will not provide support beyond October 2024\.
+Future Windows updates, Python releases, or package updates may render our software obsolete. The team will not provide support beyond October 2024.
 
 ### *Security Issues*
 
