@@ -59,16 +59,16 @@ The following describes the general process of the proposed system:
 2. The following processes occur for each image:  
    1. Colour and lighting normalisation \- the images are pre-processed to remove artefacts  
    2. Perimeter detection \- Automatic line detection with OpenCV’s LineSegmentDetector class is utilised to determine the perimeter of the sediment core. The image is cropped to the detected sediment core perimeter, ensuring only colours from the sediment core itself are analysed.  
-   3. Colour channel conversion \- The image is converted from the RGB colour channel to CIELAB (L\*a\*b\*).  
-   4. Each of the L\* a\* and b\* colour values are plotted over time, and displayed next to a rendering of the processed sediment core where the scale of the image matches the scale of the time axis.  
+   3. Colour channel conversion \- A toggle will be displayed that allows the user to pick between displaying the results in the RGB or CIELAB colour space. The image will be converted to the chosen colour space.
+   4. Each of the colour channel values are plotted over time, and displayed next to a rendering of the processed sediment core where the scale of the image matches the scale of the time axis.  
 3. The directory to save the results to is determined:  
    1. A file explorer dialogue box will be opened so that the user can choose the directory graphically.  
       1. If the user has not used the application before, the folder will be automatically set to desktop  
       2. If the user has used the application before, the flower will automatically be set to the previously chosen file location.  
 4. The results are saved by the user.  
-   1. The processed sediment core image is saved as a .png  
-   2. The plot of each colour channel over time is saved as a .png  
-   3. The data corresponding to the plot of each colour channel over time is saved as a .xlsx, so that it is compatible with Microsoft Excel.  
+   1. The processed sediment core image is saved as a PNG file.
+   2. The plot of each colour channel over time is saved as a PNG file.
+   3. The data corresponding to the plot of each colour channel over time is saved as a XLSX file, so that it is compatible with Microsoft Excel.  
 5. The application’s user data is updated so that preferences (such as previously processed images and previously chosen save directories) are saved.
 
 ## **Functional Requirements**
