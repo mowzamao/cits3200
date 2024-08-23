@@ -1,13 +1,21 @@
 
 import pandas as pd
 
+def create_munsell_dictionary(file_path_list:list):
+    munsell_dict = {}
+    munsell_df = create_munsell_dataframe(file_path_list)
+    for key,group in munsell_df.groupby('munsell'):
+        lab  = group[['l*','a*','b*']].values.tolist()[0]
+        rgb = group[['r','g','b']].values.tolist()[0]
+        munsell_dict[key] = {'rgb':rgb,'lab':lab}
+    return munsell_dict
+
 def create_munsell_dataframe(file_path_list:list):
     munsell_df = pd.DataFrame()
     for file_path in file_path_list:
         df = read_munsell_csv_data(file_path)
         df = create_munsell_value_column(df)
         munsell_df = join_dataframes(munsell_df,df)
-    
     return munsell_df
 
 def join_dataframes(munsell_df:pd.DataFrame,df:pd.DataFrame):
@@ -19,6 +27,7 @@ def join_dataframes(munsell_df:pd.DataFrame,df:pd.DataFrame):
         return munsell_df
     else:
         print("Error: join cannot occur as dataframe doesn't have munsell column")
+        return None
 
 def create_munsell_value_column(df:pd.DataFrame):
     df['munsell'] = df['h'].astype(str) + ' ' + df['v'].astype(str) + ' ' + df['c'].astype(str)
@@ -34,10 +43,10 @@ def read_munsell_csv_data(file_path:str):
     except FileNotFoundError:
         print('File Not Found Error: check file path')
         return None
-    
 
 def redundant_columns(df:pd.DataFrame,required_columns:list):
     current_columns = df.columns
     return [column for column in current_columns if column not in required_columns]
 
-create_munsell_dataframe(['munsell_data/real_CIELAB.csv','munsell_data/real_sRGB.csv'])
+munsell_dict = create_munsell_dictionary(['munsell_data/real_CIELAB.csv','munsell_data/real_sRGB.csv'])
+print(munsell_dict['10RP 1 2'])
