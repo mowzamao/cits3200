@@ -1,6 +1,6 @@
 import sys
-from PyQt6.QtWidgets import QApplication
-from app.widgets.MainWindow import MainWindow
+from PyQt6.QtWidgets import {QApplication}
+from app.widgets import MainWindow
 
 def main():
     """Main entry point for the application."""

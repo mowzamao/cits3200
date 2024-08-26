@@ -3,7 +3,9 @@ from PyQt6.QtWidgets import QApplication
 from app.widgets.MainWindow import MainWindow
 
 def main():
-    """Main entry point for the application."""
+    """The initial entry point of the application. 
+        Creates root window.
+    """
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()

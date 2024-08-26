@@ -1,13 +1,12 @@
 import sys
 from PyQt6.QtWidgets import QApplication
-from app.widgets.MainWindow import MainWindow
+from app.main_window import MainWindow
 
 def main():
-    """Main entry point for the application."""
     app = QApplication(sys.argv)
     window = MainWindow()
     window.show()
-    sys.exit(app.exec())
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

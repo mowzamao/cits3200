@@ -1,0 +1,50 @@
+from PyQt6.QtWidgets import QWidget, QHBoxLayout
+
+class ControlPanel(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.init_ui()
+
+    def init_ui(self):
+        """Create the controls panel with buttons for various functions."""
+        self.layout = QHBoxLayout()
+        button_style = self.get_button_style()
+
+        grayscale_button = self.create_button("Convert to Grayscale", button_style)
+        rgb_analysis_button = self.create_button("RGB Analysis", button_style)
+        perimeter_detection_button = self.create_button("Perimeter Detection", button_style)
+        set_calibration_button = self.create_button("Set Calibration Points", button_style)
+        export_data_button = self.create_button("Export Results", button_style)
+        plot_rgb_graph_button = self.create_button("Plot RGB Graph", button_style)
+        plot_greyscale_button = self.create_button("Plot Greyscale Intensity", button_style)
+
+        self.addWidget(grayscale_button)
+        self.addWidget(rgb_analysis_button)
+        self.addWidget(perimeter_detection_button)
+        self.addWidget(set_calibration_button)
+        self.addWidget(export_data_button)
+        self.addWidget(plot_rgb_graph_button)
+        self.addWidget(plot_greyscale_button)
+
+
+    def get_button_style(self):
+        """Return the CSS style for buttons."""
+        return """
+            QPushButton {
+                background-color: red;
+                color: white;
+                border-radius: 10px;
+                padding: 10px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: black;
+            }
+        """
+    
+
+    def create_button(self, text, style):
+        """Create and return a QPushButton with the given text and style."""
+        button = QPushButton(text)
+        button.setStyleSheet(style)
+        return button
