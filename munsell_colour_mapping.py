@@ -26,7 +26,7 @@ def join_dataframes(munsell_df:pd.DataFrame,df:pd.DataFrame):
         munsell_df = pd.merge(munsell_df,df, on = 'munsell', how = 'inner')
         return munsell_df
     else:
-        print("Error: join cannot occur as dataframe doesn't have munsell column")
+        print("Error: join cannot occur,column names don't match")
         return None
 
 def create_munsell_value_column(df:pd.DataFrame):
@@ -37,16 +37,16 @@ def create_munsell_value_column(df:pd.DataFrame):
 def read_munsell_csv_data(file_path:str):
     try:
         df = pd.read_csv(file_path)
-        df.columns = [column.strip().lower() for column in df]
-        df = df.drop(columns=redundant_columns(df,['l*','a*','b*','h','v','c','r','g','b']))
+        df.columns = [column.strip().lower() for column in df.columns]
+        column_subset= required_columns(df.columns,['l*','a*','b*','h','v','c','r','g','b'])
+        df = df[column_subset]
         return df
     except FileNotFoundError:
         print('File Not Found Error: check file path')
         return None
 
-def redundant_columns(df:pd.DataFrame,required_columns:list):
-    current_columns = df.columns
-    return [column for column in current_columns if column not in required_columns]
+def required_columns(current_columns,required_columns):
+    return [column for column in current_columns if column in required_columns]
 
 munsell_dict = create_munsell_dictionary(['munsell_data/real_CIELAB.csv','munsell_data/real_sRGB.csv'])
 print(munsell_dict['10RP 1 2'])
