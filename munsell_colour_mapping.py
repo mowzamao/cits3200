@@ -28,11 +28,20 @@ def create_munsell_dataframe(file_path_list:list,required_columns:list):
     munsell_df(pd.Dataframe): A dataframe where every row contains munsell codes, RGB and L*A*B* values. 
     """
     munsell_df = pd.DataFrame()
+
+    #iterate through all file paths provided by user
     for file_path in file_path_list:
+
+        #read data into dataframe and then drop redundant columns
         df = read_munsell_csv_data(file_path)
         df = df_column_filtering(df,required_columns)
+
+        #create column with the 3 elements of a munsell colour code as one string
         df = create_munsell_value_column(df)
-        munsell_df = join_dataframes(munsell_df,df)
+
+        #add data from file to the munsell dataframe
+        munsell_df = join_dataframes(munsell_df,df) 
+
     return munsell_df
 
 def create_munsell_dictionary(munsell_df:pd.DataFrame):
@@ -46,10 +55,16 @@ def create_munsell_dictionary(munsell_df:pd.DataFrame):
     munsell_dict(dict): A dictionary mapping munsell rock colour codes to RGB and L*A*B* data.
     """
     munsell_dict = {}
+    #loop iterating through every unique munsell colour code
     for key,group in munsell_df.groupby('munsell'):
+
+        #for each colour code define its corresponding RGB and L*A*B* values
         lab  = group[['l*','a*','b*']].values.tolist()[0]
         rgb = group[['r','g','b']].values.tolist()[0]
+
+        #RGB and LAB values for each colour code in the munsell colour dictionary
         munsell_dict[key] = {'rgb':rgb,'lab':lab}
+
     return munsell_dict
 
 def read_munsell_csv_data(file_path:str):
@@ -83,13 +98,20 @@ def df_column_filtering(df:pd.DataFrame,required_columns:list):
     Returns:
     df(pd.Dataframe): Raw munsell rock colour data stored in a pandas dataframe with unnecessary columns dropped. 
     """
+    #clean and reformat column names to make filtering more consistent
     df.columns = [column.strip().lower() for column in df.columns]
+
+    #use list comprehension to store the column name of each required column
     column_subset = [column for column in df.columns if column in required_columns]
+
+    #return a subset of the passed in dataframe having dropped redundant columns
     return df[column_subset]
 
 def create_munsell_value_column(df:pd.DataFrame):
     """
-    Merges 3 columns of data into 1. The new column contains munsell rock colour codes as strings. 
+    Merges 3 columns of data (the 3 elements of a munsell rock colour code) into 1. 
+    The new column contains munsell rock colour codes as strings. The 3 original 
+    columns are dropped from the dataframe. 
 
     Parameters:
     df(pd.Dataframe): Raw munsell rock colour data stored in a pandas dataframe.
@@ -97,7 +119,10 @@ def create_munsell_value_column(df:pd.DataFrame):
     Returns:
     df(pd.Dataframe): Raw munsell rock colour data stored in a pandas dataframe with new munsell colour code column.  
     """
+    #create new munsell colour code column
     df['munsell'] = df['h'].astype(str) + ' ' + df['v'].astype(str) + ' ' + df['c'].astype(str)
+
+    #drop original columns which are now redundant
     df = df.drop(columns = ['h','v','c'])
     return df
 
@@ -114,12 +139,15 @@ def join_dataframes(munsell_df:pd.DataFrame,df:pd.DataFrame):
     Returns: 
     munsell_df(pd.Dataframe): dataframe where every row contains a munsell rock colour code and it's associated RGB and L*A*B* data.
     """
+    #merge condition for the first file processed by the script
     if munsell_df.empty:
         munsell_df = df
         return munsell_df
+    #merge condition for all other files processed by the script
     elif 'munsell' in munsell_df.columns and 'munsell' in df.columns:
         munsell_df = pd.merge(munsell_df,df, on = 'munsell', how = 'inner')
         return munsell_df
+    #error message for dataframes with inconsistent column names
     else:
         print("Error: join cannot occur,column names don't match")
         return None
