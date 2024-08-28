@@ -7,7 +7,7 @@ def get_munsell_dictionary(file_path_list:list,required_columns:list):
 
     Parameters:
     file_path_list(list): The relative file paths for csv files containing munsell colour data.
-    required_columns(list): A list of column names. Each element can be a subset of the data's actual column name. 
+    required_columns(list): A list of column names. Each list element can be a subset of the data's actual column name. 
 
     Returns:
     munsell_dict(dict): A dictionary mapping munsell rock colour codes to RGB and L*A*B* data.
