@@ -1,4 +1,3 @@
-
 import pandas as pd
 
 def get_munsell_dictionary(file_path_list:list,required_columns:list):
@@ -152,5 +151,4 @@ def join_dataframes(munsell_df:pd.DataFrame,df:pd.DataFrame):
         print("Error: join cannot occur,column names don't match")
         return None
 
-munsell_dict = get_munsell_dictionary(['munsell_data/real_CIELAB.csv','munsell_data/real_sRGB.csv'],['l*','a*','b*','h','v','c','r','g','b'])
-print(munsell_dict['10RP 1 2'])
+
