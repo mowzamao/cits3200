@@ -17,3 +17,8 @@ class ImagePanel(QWidget):
         layout.addWidget(image_label)
         
         self.setLayout(layout)
+    
+    def set_image(self, pixmap):
+        """Set the given QPixmap on the image label."""
+        self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
+
