@@ -31,17 +31,17 @@ class Toolbar(QToolBar):
         """Returns the CSS style for buttons."""
         return """
             QToolBar {
-                background-color: #08042F;
+                background-color: white;
                 padding: 4px;
             }
             QToolButton {
-                background-color: #08042F;
+                background-color: green;
                 border-radius: 2px;
                 padding: 10px;
                 font-weight: 650;
             }
             QToolButton:hover {
-                background-color: #0C4F83;
+                background-color: red;
             }
         """
     
