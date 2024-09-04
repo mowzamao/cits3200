@@ -1,33 +1,20 @@
 import cv2
 import numpy as np
 
-
 def import_img(image_path):
     """ Imports an image from a file path"""
     image = cv2.imread(image_path)
     assert image is not None, "No image found at the specified path"
     return image
 
-def get_sediment_cores(filepath):
-    """
-    Basic function to detect coloured sediment cores in an image. Very
-    specific to the images we have been provided: for instance, removes white
-    white and grey areas of the image to make processing easier.
-    Draws bounding boxes around the sediment cores and displays the image with the 
-    bounding boxes. Prints the locations of the sediment cores.
+def show_img(image, title='Image'):
+    """ Displays an image"""
+    cv2.imshow(title, image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
-    Params
-    ------
-        filepath (str): path to the image file
-
-    Returns
-    -------
-        array of arrays of the form [x, y, w, h] where x, y are the coordinates of the 
-        top left corner of the bounding box
-    """
-    image = import_img(filepath)
-    
-    # remove grey and white areas of the image
+def remove_greys(image, show=False):
+    """ Removes grey and white areas of an image"""
     hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
     lower_grey = np.array([0, 0, 50])
     upper_grey = np.array([180, 50, 200])
@@ -38,18 +25,50 @@ def get_sediment_cores(filepath):
     mask_combined = cv2.bitwise_or(mask_grey, mask_white)
     mask_non_grey_white = cv2.bitwise_not(mask_combined)
     image_no_grey_white = cv2.bitwise_and(image, image, mask=mask_non_grey_white)
+    if show == True:
+        show_img(image_no_grey_white, title='Image with Greys and Whites Removed')
+    return image_no_grey_white
 
-    # find contours
-    gray = cv2.cvtColor(image_no_grey_white, cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (101, 101), 0)
+def get_contours(image, show=False):
+    """ Processes and finds contours in an image"""
+    grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    show_img(grey, title='Grey Image')
+    blurred = cv2.GaussianBlur(grey, (101, 101), 0)
+    show_img(blurred, title='Blurred Image')
     _, binary = cv2.threshold(blurred, 127, 255, cv2.THRESH_OTSU)
+    show_img(binary, title='Binary Image')
     contours, _ = cv2.findContours(binary, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+    if show == True:
+        cv2.drawContours(image, contours, -1, (0, 255, 0), 3)
+        show_img(image, title='Contours')
+    return contours
+
+def get_sediment_cores(filepath, show=True, print_results=False):
+    """
+    Basic function to detect coloured sediment cores in an image. Very
+    specific to the images we have been provided: for instance, removes white
+    and grey areas of the image to make processing easier.
+    
+    Params
+    ------
+        filepath (str): path to the image file
+        show (bool): whether to display the image with bounding boxes around the sediment cores
+        print_results (bool): whether to print the locations of the sediment cores
+
+    Returns
+    -------
+        array of arrays of the form [x, y, w, h] where x, y are the coordinates of the 
+        top left corner of the bounding box
+    """
+    image = import_img(filepath)
+    no_greys = remove_greys(image, show=True)
+    contours = get_contours(no_greys, show=True)
 
     # find contours that correspond to sediment cores
     sediment_cores = []
     for contour in contours:
         area = cv2.contourArea(contour)
-        if area > 100000:  
+        if area > 100000: # the sediment cores are big!
             x, y, w, h = cv2.boundingRect(contour)
             if w > h*2 or h > w*2:
                 # Draw the bounding box on the original image
@@ -57,15 +76,15 @@ def get_sediment_cores(filepath):
                 cv2.putText(image, 'Sediment Core Detected', (x, y - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
                 sediment_cores.append([x, y, w, h])
 
-    print(f"Number of sediment cores detected: {len(sediment_cores)}")
-    print(sediment_cores)
+    if print_results == True:
+        print(f"Number of sediment cores detected: {len(sediment_cores)}")
+        print(sediment_cores)
 
-    cv2.imshow('Sediment Core Detection', image)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    if show == True:
+        show_img(image, title='Sediment Core Detection')
     return sediment_cores
 
-sediment_cores = get_sediment_cores('image_processing\image-data\MI-24_04\SCREEN banner 96dpi-3293.jpg')
+sediment_cores = get_sediment_cores('image_processing\image-data\MI-24_03\SCREEN banner 96dpi-3148-2.jpg', print_results=True)
 
 # def select_cm(image):
 """" Selects a region of interest in an image: Use for cropping the image to a cm? """
