@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget,  QHBoxLayout
+from PyQt6.QtWidgets import QWidget,  QBoxLayout
 from PyQt6.QtCore import Qt
 
 from app.utils.RandomDataGenerator import RandomDataGenerator 
@@ -19,11 +19,10 @@ class GraphPanel(QWidget):
         df = source.get_random_dataset()
         ######################################################
 
-
-        layout = QHBoxLayout()
+        layout = QBoxLayout()
         colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
-        layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
+        layers_graph  = LayersGraph(self, width=5, height=5, dpi=100, df = df)
 
-        layout.addWidget(layers_graph,stretch=2)  
-        layout.addWidget(colours_graph, stretch=8)  
+        layout.addWidget(colours_graph, 1, 1)  
+        layout.addWidget(layers_graph, 1, 2)  
         self.setLayout(layout)

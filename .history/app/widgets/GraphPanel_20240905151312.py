@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QWidget,  QHBoxLayout
+from PyQt6.QtWidgets import QWidget,  QGridLayout
 from PyQt6.QtCore import Qt
 
 from app.utils.RandomDataGenerator import RandomDataGenerator 
 from app.widgets.ColoursGraph import ColoursGraph
 from app.widgets.LayersGraph import LayersGraph
+from app.widgets.Toolbar import Toolbar
 
 class GraphPanel(QWidget):
     """The pyqt class that defines the panel containing the colour graphs
@@ -20,10 +21,10 @@ class GraphPanel(QWidget):
         ######################################################
 
 
-        layout = QHBoxLayout()
+        layout = QGridLayout()
         colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
-        layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
+        layers_graph  = LayersGraph(self, width=5, height=5, dpi=100, df = df)
 
-        layout.addWidget(layers_graph,stretch=2)  
-        layout.addWidget(colours_graph, stretch=8)  
+        layout.addWidget(layers_graph, 1, 1)  
+        layout.addWidget(colours_graph,1, 6)  
         self.setLayout(layout)

@@ -6,10 +6,10 @@ class RandomDataGenerator():
     """Creates random RGB data for use in testing the GUI graph"""
 
     def __init__(self):
-        self.core_bounds   = {'min':0.5, 'max':2}        # The length of random cores in metres
-        self.layer_bounds  = {'min':0.001, 'max':0.05}  # The depth of a given layer  in metres
+        self.core_bounds   = {'min':0.5, 'max':1}        # The length of random cores in metres
+        self.layer_bounds  = {'min':0.01, 'max':0.05}  # The depth of a given layer  in metres
         self.noise         = {'mean':0, 'sd':8}
-        self.granularity = 0.01 # The distance between measurements in a generated core
+        self.granularity = 0.05 # The distance between measurements in a generated core
         
         # The bases colours for randomly sampling
         self.colours = [[234,208,168], [182,159,102], [107,84,40], [234,208,168], [182,159,102], [107,84,40], [234,208,168], [182,159,102], [107,84,40], [118,85,43], [255,77,179], [64,41,5]]

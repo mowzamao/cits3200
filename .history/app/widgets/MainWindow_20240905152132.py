@@ -37,7 +37,7 @@ class MainWindow(QMainWindow):
         self.addToolBar(self.toolbar)
         # self.setMenuBar(self.menu)
         self.main_layout.addWidget(self.image_panel, stretch =5)
-        self.main_layout.addWidget(self.graph_panel, stretch =5)
+        self.main_layout.addWidget(self.graph_panel, 1,  stretch =5)
 
     def set_window_properties(self):
         """Set properties for the main window."""

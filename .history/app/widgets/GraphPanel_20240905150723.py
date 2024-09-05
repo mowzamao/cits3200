@@ -19,11 +19,10 @@ class GraphPanel(QWidget):
         df = source.get_random_dataset()
         ######################################################
 
-
         layout = QHBoxLayout()
         colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
-        layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
+        layers_graph  = LayersGraph(self, width=5, height=5, dpi=100, df = df)
 
-        layout.addWidget(layers_graph,stretch=2)  
-        layout.addWidget(colours_graph, stretch=8)  
+        layout.addWidget(colours_graph)  
+        layout.addWidget(layers_graph)  
         self.setLayout(layout)

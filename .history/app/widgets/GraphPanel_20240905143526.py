@@ -14,16 +14,13 @@ class GraphPanel(QWidget):
 
     def init_ui(self):
 
-        ####### Testing with random data, remove for MVP ######
+        #### Testing with random data #####
         source = RandomDataGenerator()
         df = source.get_random_dataset()
-        ######################################################
-
+        ###################################
 
         layout = QHBoxLayout()
-        colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
-        layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
+        plots = ColoursGraph(self, width=5, height=5, dpi=100)
 
-        layout.addWidget(layers_graph,stretch=2)  
-        layout.addWidget(colours_graph, stretch=8)  
+        layout.addWidget(plots)  
         self.setLayout(layout)
