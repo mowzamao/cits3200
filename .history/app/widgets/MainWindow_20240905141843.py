@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
 
 
         self.addToolBar(self.toolbar)
-        # self.setMenuBar(self.menu)
+        self.setMenuBar(self.menu)
         self.main_layout.addWidget(self.image_panel, 1, 0)
         self.main_layout.addWidget(self.graph_panel, 1, 4)
 

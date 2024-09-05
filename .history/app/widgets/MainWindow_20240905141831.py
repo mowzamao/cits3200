@@ -6,7 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap, QAction  
 from PyQt6.QtCore import Qt, QSize
 
-# from app.widgets.Menu import Menu
+from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
@@ -31,11 +31,11 @@ class MainWindow(QMainWindow):
         self.image_panel = ImagePanel()
         self.graph_panel = GraphPanel()
         self.toolbar = Toolbar()
-        # self.menu = Menu()
+        self.menu = Menu()
 
 
         self.addToolBar(self.toolbar)
-        # self.setMenuBar(self.menu)
+        self.setMenuBar(self.menu)
         self.main_layout.addWidget(self.image_panel, 1, 0)
         self.main_layout.addWidget(self.graph_panel, 1, 4)
 

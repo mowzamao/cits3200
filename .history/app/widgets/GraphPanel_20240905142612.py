@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget,  QHBoxLayout
 from PyQt6.QtCore import Qt
-from app.widgets.Plots import Plots
+from app.widgets.Plots.py
 
 class GraphPanel(QWidget):
     """The pyqt class that defines the panel containing the colour graphs

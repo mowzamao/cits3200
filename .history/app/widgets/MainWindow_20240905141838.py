@@ -31,11 +31,11 @@ class MainWindow(QMainWindow):
         self.image_panel = ImagePanel()
         self.graph_panel = GraphPanel()
         self.toolbar = Toolbar()
-        # self.menu = Menu()
+        self.menu = Menu()
 
 
         self.addToolBar(self.toolbar)
-        # self.setMenuBar(self.menu)
+        self.setMenuBar(self.menu)
         self.main_layout.addWidget(self.image_panel, 1, 0)
         self.main_layout.addWidget(self.graph_panel, 1, 4)
 
