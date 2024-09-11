@@ -1,19 +1,47 @@
+
+#import matplotlib and set backend configuration for pyqt compatability
 import matplotlib
 matplotlib.use('QtAgg')
+
+#import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+
+#import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
 
 class ColoursGraph(FigureCanvasQTAgg):
-    """A wrapper class for Matplotlib RGB or cielab plots"""
+    """
+    A class acting as a PyQt widget which will contain matplotlib plots.
+    FigureCanvasQTAGG acts a base class for ColoursGraph class (thus inheriting methods for matplotlib compatability).
+    The widget will show 3 subplots where each plot shows a component of the RGB or L*A*B* colour space. 
+    The plots are displayed vertically on the MainWindow of the application. 
 
-    def __init__(self, parent=None, width=5, height=5, dpi=100, df = None):    
+    Parameters:
+        FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
+    """
+
+    def __init__(self, parent=None, width=5, height=5, dpi=100, df = None):
+        """ 
+        Initialisation function for the ColourGraph PyQt Widget.
+
+        Parameters:
+            parent(None): Variable declaring that this widget has no parent widget (except the main window). 
+            width(int) - Inches: The width of the matplotlib figure. 
+            height(int) - Inches: The height of the matplot figure. 
+            dpi(int) - Dots Per Inch: matplotlib resolution settings. 
+            df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
+        """    
         
+        #Defining the top-end matplotlib figure 
         fig = Figure(figsize=(width, height), dpi=dpi)
 
         # Drawing three subplots, one for each colour channel
         self.axes_left = fig.add_subplot(131)
         self.axes_center = fig.add_subplot(132)
         self.axes_right = fig.add_subplot(133)
+
+        # Calling the initialsation function of ColourGraph's parent class FigureCanvasQTAGG and passing in 
+        #matplotlib's Figure class to specify the parameters of the plots
         super(ColoursGraph, self).__init__(fig)
 
         # Red channel
