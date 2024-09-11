@@ -26,23 +26,23 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         Parameters:
             parent(None): Variable declaring that this widget has no parent widget (except the main window). 
-            width(int) - Inches: The width of the matplotlib figure. 
-            height(int) - Inches: The height of the matplot figure. 
-            dpi(int) - Dots Per Inch: matplotlib resolution settings. 
+            width(int): The width of the matplotlib figure. 
+            height(int): The height of the matplot figure. 
+            dpi(int): matplotlib resolution settings - Dots Per Inch. 
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """    
         
         #Defining the top-end matplotlib figure 
-        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
 
         # Drawing three subplots, one for each colour channel
-        self.axes_left = fig.add_subplot(131)
-        self.axes_center = fig.add_subplot(132)
-        self.axes_right = fig.add_subplot(133)
+        self.axes_left = self.fig.add_subplot(131)
+        self.axes_center = self.fig.add_subplot(132)
+        self.axes_right = self.fig.add_subplot(133)
 
         # Calling the initialsation function of ColourGraph's parent class FigureCanvasQTAGG and passing in 
         #matplotlib's Figure class to specify the parameters of the plots
-        super(ColoursGraph, self).__init__(fig)
+        super(ColoursGraph, self).__init__(self.fig)
 
         # Red channel
         self.axes_left.set_title('Red')
@@ -66,4 +66,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.axes_right.grid(axis = 'y')
         self.axes_right.invert_yaxis()
         self.axes_right.set_xlim(0, 100)
+
+        self.fig.tight_layout(rect=(0.05,0,0.95,1))
+
 
