@@ -37,7 +37,8 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.label_min_font_size = 3
         self.label_max_font_size = 20
-        self.subplot_min_width = 5
+        self.subplot_min_width = 0.35
+        self.base_font_size = 10 
 
         # Drawing three subplots, one for each colour channel
         self.axes_left = self.fig.add_subplot(131)
@@ -87,6 +88,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         if self.verifyTightLayout():
             self.fig.tight_layout()
         
+        #change font size if current font size and subplot width not below minimum values
         if self.verifyLabelFontChange():
             self.setFontSize()
 
@@ -96,8 +98,16 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         font_size = self.calcNewFont()
         for ax in self.fig.get_axes():
+            #setting new font size for figure x and y labels
             ax.xaxis.label.set_fontsize(font_size)
             ax.yaxis.label.set_fontsize(font_size)
+
+            #setting new font size for tick/axis labels
+            ax.tick_params(axis='x', labelsize=font_size)
+            ax.tick_params(axis='y', labelsize=font_size)
+
+            #setting new font size for title
+            ax.set_title(ax.get_title(), fontsize=font_size)
 
     def calcNewFont(self):
         """
@@ -105,11 +115,10 @@ class ColoursGraph(FigureCanvasQTAgg):
         the ColoursGraph widget gets resized. 
         """
         width, height = self.fig.get_size_inches()
-        scale_factor = width / 3
-        base_font = 10 
+        scale_factor = width / 5
 
         #choose smallest font out of the new scaled font or the outright maximum font
-        new_font_size = min(base_font * scale_factor,self.label_max_font_size)
+        new_font_size = min(self.base_font_size * scale_factor,self.label_max_font_size)
 
         #choose largest font out of the outright minimum font size and the new scaled font size
         font_size = max(self.label_min_font_size,new_font_size)
@@ -121,9 +130,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQtAgg (Colours Graph) widget currently has the smallest font
         size setting set.
         """
-        if self.verifyLabelGreaterThanMinFontSize() is None:
+        if self.verifyLabelGreaterThanMinFontSize() is False:
             return None
-        if self.verifySubplotGreaterThanMinWidth() is None:
+        if self.verifySubplotGreaterThanMinWidth() is False:
             return None
         return True
 
@@ -133,9 +142,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         are greater than the minimum label font size
         """
         x_label_font_size = self.axes_left.xaxis.label.get_fontsize()
-        font_size_bool = bool(x_label_font_size > self.label_min_font_size)
-        if font_size_bool is False:
-            return None
+
+        if x_label_font_size <= self.label_min_font_size:
+            return False
         return True
 
     
@@ -144,10 +153,12 @@ class ColoursGraph(FigureCanvasQTAgg):
         Function checking if the width of subplots is greater than
         the minimum allowable width of a subplot
         """
-        subplot_width = self.axes_center.get_position().width
-        subplot_size_bool = bool(subplot_width > self.subplot_min_width)
-        if subplot_size_bool is False:
-            return None
+        norm_width = self.axes_center.get_position().width
+        fig_width, fig_height = self.fig.get_size_inches()
+        subplot_width_inches = fig_width *norm_width
+
+        if subplot_width_inches <= self.subplot_min_width:
+            return False
         return True
 
     def verifyTightLayout(self):
