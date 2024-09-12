@@ -76,38 +76,44 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.fig.tight_layout()
     
     def resizeEvent(self, event):
-        #set new graphical parameters for figure on resize of window
-        self.setResizeFormatParameters()
+        """
+        Event handler function that will adjust the graphical parameters of the 
+        matplotlib figure. 
+        
+        There are two main changes: 
+            1) changing font size
+            2) turning tight layout on and off.
+        """
+        #set tight_layout setting to figure if figure has dimensions
+        if self.verifyTightLayout():
+            self.fig.tight_layout()
+
+        #change font size if current font size and subplot width not below minimum values
+        if self.verifyLabelFontChange():
+            self.setFontSize()
+
         # Redraw the figure
         self.draw()
         # Initialise an instance of the new figure  
         super().resizeEvent(event)
 
-    def setResizeFormatParameters(self):
-        #set tight_layout setting to figure if figure has dimensions
-        if self.verifyTightLayout():
-            self.fig.tight_layout()
-        
-        #change font size if current font size and subplot width not below minimum values
-        if self.verifyLabelFontChange():
-            self.setFontSize()
-
     def setFontSize(self):
         """
-        Sets a new font size for the x and y labels on the matplotlib plot.
+        Sets new parameters for font size graphical elements of the matplotlib figure.
+        These include title, tick markers and axis labels font sizes.
         """
-        font_size = self.calcNewFont()
+        new_font_size = self.calcNewFont()
         for ax in self.fig.get_axes():
             #setting new font size for figure x and y labels
-            ax.xaxis.label.set_fontsize(font_size)
-            ax.yaxis.label.set_fontsize(font_size)
+            ax.xaxis.label.set_fontsize(new_font_size)
+            ax.yaxis.label.set_fontsize(new_font_size)
 
             #setting new font size for tick/axis labels
-            ax.tick_params(axis='x', labelsize=font_size)
-            ax.tick_params(axis='y', labelsize=font_size)
+            ax.tick_params(axis='x', labelsize=new_font_size)
+            ax.tick_params(axis='y', labelsize=new_font_size)
 
             #setting new font size for title
-            ax.set_title(ax.get_title(), fontsize=font_size)
+            ax.set_title(ax.get_title(), fontsize=new_font_size)
 
     def calcNewFont(self):
         """
@@ -153,6 +159,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         Function checking if the width of subplots is greater than
         the minimum allowable width of a subplot
         """
+        #calculation of subplot size in inches, requires conversion form normalised units
         norm_width = self.axes_center.get_position().width
         fig_width, fig_height = self.fig.get_size_inches()
         subplot_width_inches = fig_width *norm_width
