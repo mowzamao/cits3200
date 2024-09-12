@@ -29,7 +29,21 @@ class Toolbar(QToolBar):
 
     def get_style(self):
         """Returns the CSS style for buttons."""
-        return open('./app/style/buttons.css').read() 
+        return """
+            QToolBar {
+                background-color: white;
+                padding: 4px;
+            }
+            QToolButton {
+                background-color: blue;
+                border-radius: 2px;
+                padding: 10px;
+                font-weight: 650;
+            }
+            QToolButton:hover {
+                background-color: grey;
+            }
+        """
     
 
 
