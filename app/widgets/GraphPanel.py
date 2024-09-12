@@ -43,16 +43,9 @@ class GraphPanel(QWidget):
         df = source.get_random_dataset()
         ######################################################
 
-        #Create QHBoxLayout instance as a container for both colour and layer plots
-        #layout = QHBoxLayout()
-
         #Create instances of the colours and graphs plots. 
         colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
         layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
-
-        #Add graphs to the GHBoxLayout widget
-        # layout.addWidget(layers_graph,stretch=2)  
-        # layout.addWidget(colours_graph, stretch=8)
 
         colours_layout = QHBoxLayout()
         colours_layout.addWidget(colours_graph)
