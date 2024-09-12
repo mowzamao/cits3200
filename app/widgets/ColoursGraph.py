@@ -3,6 +3,7 @@
 import matplotlib
 matplotlib.use('QtAgg')
 import numpy as np
+import pandas as pd
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -21,7 +22,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
     """
 
-    def __init__(self, parent=None, width=5, height=5, dpi=100, df = None):
+    def __init__(self, parent:classmethod=None, width:float=5, height:float=5, dpi:int=100, df:pd.DataFrame = None):
         """ 
         Initialisation function for the ColourGraph PyQt Widget.
 
@@ -31,49 +32,78 @@ class ColoursGraph(FigureCanvasQTAgg):
             height(int): The height of the matplot figure. 
             dpi(int): matplotlib resolution settings - Dots Per Inch. 
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
-        """    
-        
-        #Defining the top-end matplotlib figure 
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        """
+
+        #define default values for subplot graphical parameters 
         self.label_min_font_size = 3
         self.label_max_font_size = 20
         self.subplot_min_width = 0.35
-        self.base_font_size = 10 
+        self.base_font_size = 10     
+        
+        #Defining the top-end matplotlib figure 
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        
 
         # Drawing three subplots, one for each colour channel
         self.axes_left = self.fig.add_subplot(131)
         self.axes_center = self.fig.add_subplot(132)
         self.axes_right = self.fig.add_subplot(133)
 
-        # Calling the initialsation function of ColourGraph's parent class FigureCanvasQTAGG and passing in 
-        #matplotlib's Figure class to specify the parameters of the plots
+        # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
 
-        # Red channel
-        self.axes_left.set_title('Red')
-        self.axes_left.plot(round(100*df['Red']/255,  4), df['Depth'],  color='red')
-        self.axes_left.grid(axis = 'y')
-        self.axes_left.invert_yaxis()
-        self.axes_left.set_ylabel('Depth (m)')
-        self.axes_left.set_xlim(0, 100)
+        #plot data for the ColourGraph Panel
+        self.plotColourData(df)
 
-        # Green channel
-        self.axes_center.set_title('Green')
-        self.axes_center.plot(round(100*df['Green']/255,  4), df['Depth'],  color='green')
-        self.axes_center.grid(axis = 'y')
-        self.axes_center.invert_yaxis()
-        self.axes_center.set_xlabel('Intensity (%)')
-        self.axes_center.set_xlim(0, 100)
+        #adding headings for the entire ColoursGraph figure
+        self.setFigureAxisLabels('Depth (m)','Intensity (%)')
+        
 
-        # Blue channel
-        self.axes_right.set_title('Blue')
-        self.axes_right.plot(round(100*df['Blue']/255,  4), df['Depth'],  color='blue')
-        self.axes_right.grid(axis = 'y')
-        self.axes_right.invert_yaxis()
-        self.axes_right.set_xlim(0, 100)
+    def plotColourData(self,df:pd.DataFrame):
+        """
+        Function which iterative plots data from an inputted pandas dataframe onto three subplots.
+        """
+        for index,subplot in enumerate([self.axes_left,self.axes_center,self.axes_right],start=1):
 
-        # Call tight_layout initially
-        self.fig.tight_layout()
+            #for each subplot in the ColoursGraph panel prepare the pandas series to be plotted
+            data_column_name,depth_column, data_column = self.graphDataPreperation(df,index)
+
+            #plot the data from the pandas dataframe
+            subplot.plot(data_column, depth_column,  color = data_column_name)
+
+            #set the graphical parameters for each subplot
+            subplot.set_title(data_column_name)
+            subplot.grid(axis = 'y')
+            subplot.invert_yaxis()
+            subplot.set_xlim(0,100)
+
+    def setFigureAxisLabels(self,x_label:str,y_label:str):
+        """
+        Function which sets the axis labels for the entire ColoursGraph plot panel. 
+        """
+        self.axes_left.set_ylabel(x_label)
+        self.axes_center.set_xlabel(y_label)
+
+
+    def graphDataPreperation(self,df:pd.DataFrame,index:int):
+        """
+        Function that takes a dataframe and an index (ranging in values from 1-3) and 
+        returns two series and a string. The two series contain data to be plotted in the 
+        graphsPanel window. The string is the title for the subplot (and also is the column name
+        from which the plotted data originates). 
+        """
+        df_columns = df.columns
+
+        #extracting name of column to be plotted
+        data_column_name = df_columns[index]
+        
+        #cleaning and scaling the data to be plotted 
+        data_column = round(100*df[data_column_name]/255,  4)
+
+        #defining the data to be plotted on the x_axis
+        depth_column = df.iloc[:,0]
+        return data_column_name,depth_column, data_column 
+
     
     def resizeEvent(self, event):
         """
