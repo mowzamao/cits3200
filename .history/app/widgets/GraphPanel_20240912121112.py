@@ -21,19 +21,21 @@ class GraphPanel(QWidget):
 
 
         layout = QVBoxLayout()
+
+        graphs = Graphs(df = df)
         
-        fullscreen_icon = QIcon("./app/style/fullscreen.svg")
+
+        temp_pixmap = QPixmap(25, 25)
+        temp_pixmap.fill(QColor("red"))
+        fullscreen_icon = QIcon(temp_pixmap)
         fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
         fullscreen_button = QPushButton(self, icon = fullscreen_icon)
         fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
         fullscreen_button.setFixedSize(fullscreen_icon_size)
-        fullscreen_button.move(fullscreen_button.geometry().bottomRight())
+        # fullscreen_button.move(self.geometry().bottomLeft() - fullscreen_button.geometry().bottomRight())
 
-        layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
-        
-        graphs = Graphs(df = df)
-        layout.addWidget(graphs)  
-
+        layout.addWidget(fullscreen_button, stretch=2)
+        layout.addWidget(graphs,stretch=8)  
         self.setLayout(layout)
 
     def switch_graph_fullscreen(self):

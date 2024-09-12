@@ -21,6 +21,9 @@ class GraphPanel(QWidget):
 
 
         layout = QVBoxLayout()
+
+        graphs = Graphs(df = df)
+        layout.addWidget(graphs)  
         
         fullscreen_icon = QIcon("./app/style/fullscreen.svg")
         fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
@@ -30,9 +33,6 @@ class GraphPanel(QWidget):
         fullscreen_button.move(fullscreen_button.geometry().bottomRight())
 
         layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
-        
-        graphs = Graphs(df = df)
-        layout.addWidget(graphs)  
 
         self.setLayout(layout)
 

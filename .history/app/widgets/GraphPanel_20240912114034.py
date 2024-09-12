@@ -1,9 +1,10 @@
-from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QPushButton
 from PyQt6.QtGui import QPixmap, QIcon, QColor
 from PyQt6.QtCore import Qt, QSize
 
 from app.utils.RandomDataGenerator import RandomDataGenerator 
-from app.widgets.Graphs import Graphs
+from app.widgets.ColoursGraph import ColoursGraph
+from app.widgets.LayersGraph import LayersGraph
 
 class GraphPanel(QWidget):
     """The pyqt class that defines the panel containing the colour graphs
@@ -20,19 +21,22 @@ class GraphPanel(QWidget):
         ######################################################
 
 
-        layout = QVBoxLayout()
-        
-        fullscreen_icon = QIcon("./app/style/fullscreen.svg")
-        fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
+        layout = QHBoxLayout()
+        colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = df)
+        layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = df)
+
+        temp_pixmap = QPixmap(25, 25)
+        temp_pixmap.fill(QColor("red"))
+        fullscreen_icon = QIcon(temp_pixmap)
+        fullscreen_icon_size = fullscreen_icon.actualSize(QSize(1,1))
         fullscreen_button = QPushButton(self, icon = fullscreen_icon)
         fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
         fullscreen_button.setFixedSize(fullscreen_icon_size)
-        fullscreen_button.move(fullscreen_button.geometry().bottomRight())
+        fullscreen_button.move(self.geometry().bottomRight() - fullscreen_button.geometry().bottomRight())
 
-        layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
-        
-        graphs = Graphs(df = df)
-        layout.addWidget(graphs)  
+        layout.addWidget(layers_graph,stretch=2)  
+        layout.addWidget(colours_graph, stretch=3)  
+        layout.addWidget(fullscreen_button, stretch=5)
 
         self.setLayout(layout)
 
