@@ -1,5 +1,3 @@
-
-#importing classes for PyQT formatting 
 from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt6.QtGui import QPixmap, QIcon, QColor
 from PyQt6.QtCore import Qt, QSize
@@ -8,40 +6,24 @@ from app.utils.RandomDataGenerator import RandomDataGenerator
 from app.widgets.Graphs import Graphs
 
 class GraphPanel(QWidget):
+    """The pyqt class that defines the panel containing the colour graphs
     """
-    The PyQt class that defines the panel showing the colour graphs
-
-    Parameters:
-        QWidget(Class): A base/parent class making GraphPanel a PyQT widget.
-    """
-
     def __init__(self, parent=None):
-        """
-        The initialisation function for the GraphPanel class/PyQt widget.
-
-        Parameters:
-            parent(Class): paramater to optionally add a base/parent class upon initialisation. 
-        """
-
-        #Initialise instance of the GraphPanel class by using the QWidget initialisation function
         super().__init__(parent)
-
-        #Create and set the graphs for this instance of the GraphPanel class
         self.init_ui()
 
     def init_ui(self):
-        """
-        Function to generate and define plots for the GraphPanel Widget.
-        """
 
-        ##################################################### 
-        # Testing with random data, remove for MVP 
+        ####### Testing with random data, remove for MVP ######
         source = RandomDataGenerator()
         df = source.get_random_dataset()
         ######################################################
 
 
         layout = QVBoxLayout()
+
+        graphs = Graphs(df = df)
+        layout.addWidget(graphs)  
         
         fullscreen_icon = QIcon("./app/style/fullscreen.svg")
         fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
@@ -51,9 +33,6 @@ class GraphPanel(QWidget):
         fullscreen_button.move(fullscreen_button.geometry().bottomRight())
 
         layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
-        
-        graphs = Graphs(df = df)
-        layout.addWidget(graphs)  
 
         self.setLayout(layout)
 
