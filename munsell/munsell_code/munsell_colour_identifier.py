@@ -3,6 +3,12 @@ import numpy as np
 import pandas as pd
 from munsell_colour_mapping import get_munsell_dictionary
 
+#example call of the munsell mapping/dictionary
+#munsell_dict = get_munsell_dictionary(['munsell/munsell_data/real_CIELAB.csv','munsell/munsell_data/real_sRGB.csv'],['l*','a*','b*','h','v','c','r','g','b'])
+
+#example call of the find_closest_munsell_colour 
+#closest_colour_code = find_closest_munsell_colour([3,5,80],'RGB',munsell_dict)
+
 def find_closest_munsell_color(input_colour:list, input_type:str, munsell_dict:dict):
     """
     Find the closest Munsell Rock Color Code to the given RGB or LAB value.
@@ -46,5 +52,3 @@ def colour_similarity_check(distance:float,munsell_code:str,closest_colour_code:
 
     return closest_colour_code,min_distance
 
-munsell_dict = get_munsell_dictionary(['munsell_data/real_CIELAB.csv','munsell_data/real_sRGB.csv'],['l*','a*','b*','h','v','c','r','g','b'])
-print(find_closest_munsell_color([1,60,90],'rgb',munsell_dict))

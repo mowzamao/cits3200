@@ -1,5 +1,8 @@
 import pandas as pd
 
+#example call of the munsell mapping/dictionary
+#munsell_dict = get_munsell_dictionary(['munsell/munsell_data/real_CIELAB.csv','munsell/munsell_data/real_sRGB.csv'],['l*','a*','b*','h','v','c','r','g','b'])
+
 def get_munsell_dictionary(file_path_list:list,required_columns:list):
     """
     Return a python dictionary mapping munsell rock colour codes to RGB and L*A*B* data.
