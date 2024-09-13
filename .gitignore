@@ -4,4 +4,3 @@ Scripts/
 pyvenv.cfg
 .venv/
 .gitignore
-munsell_data/
