@@ -15,12 +15,23 @@ class Graphs(QWidget):
         self.init_ui()
 
     def init_ui(self):
-
-        layout = QHBoxLayout()
-        
+        #generate instances of the sediment graphs
         colours_graph = ColoursGraph(self, width=5, height=5, dpi=100, df = self.df)
         layers_graph  = LayersGraph(self, width=20, height=20, dpi=100, df = self.df)
 
-        layout.addWidget(layers_graph,stretch=2)  
-        layout.addWidget(colours_graph, stretch=8)  
-        self.setLayout(layout)
+        #create layout for colour graph
+        colours_layout = QHBoxLayout()
+        colours_layout.addWidget(colours_graph)
+
+        #create layout for layers graph
+        layers_layout = QHBoxLayout()
+        layers_layout.addWidget(layers_graph)
+
+        #create main layout of Graphs panel
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(layers_layout,stretch=2)
+        main_layout.addLayout(colours_layout,stretch=8)
+
+
+        #Set the layout of this instance of the Graph Panel
+        self.setLayout(main_layout)
