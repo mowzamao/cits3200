@@ -9,13 +9,14 @@ class ImagePanel(QWidget):
     def init_ui(self):
         """Create a core image display panel"""
         """Create and return the QLabel for displaying the sediment core image."""
-        layout = QHBoxLayout()
+        # Initialize the QLabel
         image_label = QLabel("Sediment core image will be displayed here.")
         image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         image_label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
         
-        layout.addWidget(image_label)
-        
+        # Set the layout
+        layout = QHBoxLayout(self)
+        layout.addWidget(self.image_label)
         self.setLayout(layout)
     
     def set_image(self, pixmap):
