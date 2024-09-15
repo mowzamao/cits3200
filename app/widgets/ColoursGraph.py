@@ -57,6 +57,9 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         #adding headings for the entire ColoursGraph figure
         self.setFigureAxisLabels('Depth (m)','Intensity (%)')
+
+        #adding title to the entire matplotlib figure
+        self.addFigureTitle(df)
         
 
     def plotColourData(self,df:pd.DataFrame):
@@ -76,6 +79,30 @@ class ColoursGraph(FigureCanvasQTAgg):
             subplot.grid(axis = 'y')
             subplot.invert_yaxis()
             subplot.set_xlim(0,100)
+
+    def addFigureTitle(self,df:pd.DataFrame = None,fontsize:int = 16,title:str = None):
+        """
+        Function to add a title to the entire ColoursGraph Matplotlib figure. The string
+        to be rendered as a title can be generated through two methods. 1) using the first letter 
+        of the 2nd - 4th column names of a pandas dataframe passed to the function, 2)using a string
+        passed into the function. 
+
+        parameters:
+            df(pd.Dataframe - optional): A pandas dataframe containing the plotted data. The column names of the dataframe are used for the title
+            fontsize(int): Parameter setting the size of the title.
+            title(str - optional): A string which will be rendered as the matplotlib figure's title.
+        """
+        #if no title string is provided generate a title string based of df column names
+        if df is not None and title is None:
+            analysis_type = df.columns[1][0] + df.columns[2][0] + df.columns[3][0]
+            title = analysis_type + ' Colour Space Plot'
+
+        #store title string as a class variable for later access
+        self.figure_title = title
+
+        #render new title onto matplotlib figure  
+        self.fig.suptitle(title, fontweight='bold',y = 0.97,fontsize = fontsize)
+
 
     def setFigureAxisLabels(self,x_label:str,y_label:str):
         """
@@ -144,6 +171,10 @@ class ColoursGraph(FigureCanvasQTAgg):
 
             #setting new font size for title
             ax.set_title(ax.get_title(), fontsize=new_font_size)
+        
+        #adjusting font size of title
+        self.addFigureTitle(title = self.figure_title,fontsize=new_font_size + 2)
+        
 
     def calcNewFont(self):
         """
