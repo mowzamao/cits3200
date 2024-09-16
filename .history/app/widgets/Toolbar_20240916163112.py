@@ -15,7 +15,7 @@ class Toolbar(QToolBar):
         self.export_results = QAction("Export Results", self)
        
         self.addAction(self.calibrate_image)
-        self.addAction(self.run_rgb)
+        self.addAction(self.self.run_rgb)
         self.addAction(self.rub_cielab)
         self.addAction(self.export_results)
 

@@ -3,7 +3,7 @@ QMainWindow {background-color: #eaeaea;}
 QMenuBar {
   padding: 10px;
   font-weight: 650;
-  background-color: #8a4c57;
+  background-color: #FAF7F7;
 }
 
 QToolBar {
@@ -19,5 +19,5 @@ QToolButton {
 }
 QToolButton:hover {
   color: #FAF7F7;
-  background-color: #8a4c57;
+  background-color: #FAF7F7;
 }
