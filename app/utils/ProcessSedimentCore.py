@@ -125,7 +125,7 @@ class ExtractCore():
 
         num_cores = len(cores)
         if num_cores == 0: return 0
-        elif num_cores == 1: core = self.cores[0]
+        elif num_cores == 1: core = cores[0]
         else: core = self.get_largest_core(cores)
         
         x, y, width, height = core
@@ -230,10 +230,9 @@ def process_core_image(filepath: str, core_width_mm: int, df: bool=True) -> dict
     image = core_data['Image']
     length = core_data['Length']
     colours = Colours(image).get_weighted_average_layer_colours(df=df)
-
     core = {
         "Image": image,
-        "Length": length,
+        "Length (mm)": length,
         "Colours": colours
     }
     return core
@@ -241,7 +240,10 @@ def process_core_image(filepath: str, core_width_mm: int, df: bool=True) -> dict
 if __name__ == '__main__':
     """ Testing the functions """
     core_width_mm = 77 # sediment core width in millimeters
-    file_path = 'app/utils/image-data/MI-24_03/SCREEN banner 96dpi-3148-2.jpg' # for testing purposes
+    file_path = 'app/utils/image-data/MI-24_03/SCREEN banner 96dpi-3191.jpg' # for testing purposes
     core = process_core_image(file_path, core_width_mm, df=True)
     transform.show_img(core['Image'], title='Extracted Sediment Core')
-    print(core['Colours'])
+    print(core)
+    print(type(core['Image']))
+    print(type(core['Length (mm)']))
+    print(type(core['Colours']))
