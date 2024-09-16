@@ -15,8 +15,8 @@ class ImagePanel(QWidget):
         image_label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
         
         # Set the layout
-        layout = QHBoxLayout(self)
-        layout.addWidget(self.image_label)
+        layout = QHBoxLayout()
+        layout.addWidget(image_label)
         self.setLayout(layout)
     
     def set_image(self, pixmap):
