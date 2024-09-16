@@ -66,19 +66,12 @@ class LayersGraph(FigureCanvasQTAgg):
         if self.verifyDimensions():
             self.layers_fig.tight_layout()
 
-        if self.verifyTitleFont():
+        if self.verifyFigGreaterThanMinWidth() and self.verifytitleGreaterThanMinFont():
             self.setFontSize()
         
         self.draw()
         # Initialise an instance of the new figure  
         super().resizeEvent(event)
-
-    def verifyTitleFont(self):
-        if self.verifytitleGreaterThanMinFont() is False:
-            return None
-        if self.verifyFigGreaterThanMinWidth() is False:
-            return None
-        return True
     
     def verifytitleGreaterThanMinFont(self):
         """
