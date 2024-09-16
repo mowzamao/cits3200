@@ -17,7 +17,7 @@ class LayersGraph(FigureCanvasQTAgg):
         core_as_grid = np.zeros((height, width, 3), dtype=int)
 
         #populate the numpy array with RGB values which numpy.imshow will render
-        self.populateCore_as_grid(df,height, width,core_as_grid)
+        core_as_grid = self.populateCore_as_grid(df,height, width,core_as_grid)
 
         #define the figure the plot will be rendered in 
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -47,6 +47,7 @@ class LayersGraph(FigureCanvasQTAgg):
             for col in range(width):
                 for channel in range(3):
                     core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
+        return core_as_grid
 
 
 
