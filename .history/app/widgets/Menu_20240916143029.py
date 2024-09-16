@@ -19,6 +19,8 @@ class Menu(QMenuBar):
         self.addMenu(file_menu) 
         self.addMenu(settings_menu) 
         self.addMenu(help_menu) 
+        
+        self.setStyleSheet(self.get_style())
 
 
     def create_file_menu(self):
@@ -114,5 +116,9 @@ class Menu(QMenuBar):
                 self.parent.statusBar().showMessage(f"Image saved to: {file_name}")
             else:
                 self.parent.statusBar().showMessage("No image available to save.")
+
+    def get_style(self):
+        """Returns the CSS style for buttons."""
+        return open('./app/style/buttons.css').read() 
 
 
