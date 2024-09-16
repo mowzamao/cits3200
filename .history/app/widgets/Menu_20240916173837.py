@@ -79,10 +79,10 @@ class Menu(QMenuBar):
 
             if image is not None:
 
+
                 ##############################################################
-                self.parent.graph_panel = GraphPanel(self.parent, image)
-                self.parent.graph_panel.init_ui()
-                self.parent.graph_panel.update()
+                containing_layout = self.parent.graph_panel.parent().layout()
+                containing_layout.replaceWidget(self.parent, GraphPanel(image))
                 ################################################################
 
                 # Format the image

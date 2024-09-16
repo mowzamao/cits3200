@@ -13,7 +13,7 @@ class RandomDataGenerator():
         
         # The bases colours for randomly sampling
         # self.colours = [[234,208,168], [182,159,102], [107,84,40], [234,208,168], [182,159,102], [107,84,40], [234,208,168], [182,159,102], [107,84,40], [118,85,43], [255,77,179], [64,41,5]]
-        self.colours = [[0,255,0]]
+        self.colours = [[234,208,168]]
 
     def add_noise(self, value):
         noise = normal(self.noise['mean'], self.noise['sd'], 1)[0]

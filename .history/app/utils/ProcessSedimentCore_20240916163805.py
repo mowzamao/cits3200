@@ -9,7 +9,7 @@ import cv2 as cv
 import numpy as np
 import pandas as pd
 
-import app.utils.ImageTransforming as transform
+import ImageTransforming as transform
 
 class Scaling():
     """ 
@@ -198,9 +198,8 @@ class Colours():
         
         scaled_depths = [y * self.scale for y in range(0, self.height)]
         if df == True:
-            df = pd.DataFrame(weighted_avgs, columns=['Blue', 'Green', 'Red'])
+            df = pd.DataFrame(weighted_avgs, columns=['channel1', 'channel2', 'channel3'])
             df['Depth (mm)'] = scaled_depths
-            df = df[['Depth (mm)', 'Blue', 'Green', 'Red']]
             return df
         return np.array(weighted_avgs)
 

@@ -4,7 +4,7 @@ from PyQt6.QtCore import Qt
 import cv2 as cv
 import numpy as np
 from app.utils.ImageTransforming import *   
-from app.widgets.GraphPanel import GraphPanel
+from app.widgets.Graphs import Graphs
 
 class Menu(QMenuBar):
     def __init__(self, parent=None):
@@ -79,11 +79,8 @@ class Menu(QMenuBar):
 
             if image is not None:
 
-                ##############################################################
-                self.parent.graph_panel = GraphPanel(self.parent, image)
-                self.parent.graph_panel.init_ui()
-                self.parent.graph_panel.update()
-                ################################################################
+                print("Here!!!")
+                self.parent.graph_panel = 
 
                 # Format the image
                 oriented_image = orient_array(image)

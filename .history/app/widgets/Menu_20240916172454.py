@@ -4,8 +4,6 @@ from PyQt6.QtCore import Qt
 import cv2 as cv
 import numpy as np
 from app.utils.ImageTransforming import *   
-from app.widgets.GraphPanel import GraphPanel
-
 class Menu(QMenuBar):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -79,12 +77,6 @@ class Menu(QMenuBar):
 
             if image is not None:
 
-                ##############################################################
-                self.parent.graph_panel = GraphPanel(self.parent, image)
-                self.parent.graph_panel.init_ui()
-                self.parent.graph_panel.update()
-                ################################################################
-
                 # Format the image
                 oriented_image = orient_array(image)
                 red, green, blue = img_rgb_array(oriented_image, is_BGR=True)
@@ -94,6 +86,7 @@ class Menu(QMenuBar):
                 self.parent.image_panel.set_image(display_image)
 
                 self.parent.statusBar().showMessage(f"Loaded and formatted image: {file_name}")
+                self.parent.graph_panel.init_ui(image)
             else:
                 self.parent.statusBar().showMessage("Failed to load image.")
 

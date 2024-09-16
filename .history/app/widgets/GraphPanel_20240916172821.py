@@ -32,8 +32,6 @@ class GraphPanel(QWidget):
         self.init_ui()
 
     def init_ui(self):
-
-        self.update()
         """
         Function to generate and define plots for the GraphPanel Widget.
         """

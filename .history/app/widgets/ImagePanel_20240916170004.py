@@ -1,8 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QHBoxLayout, QLabel
 from PyQt6.QtCore import Qt
 
-from app.widgets.GraphPanel import GraphPanel
-
 class ImagePanel(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -25,9 +23,3 @@ class ImagePanel(QWidget):
         """Set the given QPixmap on the image label."""
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
         
-
-        # ##############################################################
-        # self.parent.graph_panel = GraphPanel(self,  self.image_label)
-        # self.parent.graph_panel.update()
-        # self.update()
-        # ################################################################

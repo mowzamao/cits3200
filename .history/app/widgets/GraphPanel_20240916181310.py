@@ -38,6 +38,11 @@ class GraphPanel(QWidget):
         Function to generate and define plots for the GraphPanel Widget.
         """
 
+
+        layout = QVBoxLayout()
+
+        fullscreen_icon = QIcon("./app/style/fullscreen.svg")
+
         df = None
         if len(self.img) == 0: 
             source = RandomDataGenerator()
@@ -45,17 +50,13 @@ class GraphPanel(QWidget):
         else:
             data_dict = process_core_image(self.img, 77, True)
             df = data_dict["Colours"]
+            fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
+                    
 
-
-        layout = QVBoxLayout()
-        
-        fullscreen_icon = QIcon("./app/style/fullscreen.svg")
-        fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
         fullscreen_button = QPushButton(self, icon = fullscreen_icon)
         fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
         fullscreen_button.setFixedSize(fullscreen_icon_size)
         fullscreen_button.move(fullscreen_button.geometry().bottomRight())
-
         layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
         
         graphs = Graphs(df = df)

@@ -28,9 +28,9 @@ class MainWindow(QMainWindow):
         self.main_layout = QHBoxLayout(self.central_widget)
 
 
-        self.image_panel = ImagePanel(self)
-        self.graph_panel = GraphPanel(self)
-        self.toolbar = Toolbar(self)
+        self.image_panel = ImagePanel()
+        self.graph_panel = GraphPanel()
+        self.toolbar = Toolbar()
         self.menu = Menu(self)
 
 

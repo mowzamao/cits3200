@@ -198,9 +198,9 @@ class Colours():
         
         scaled_depths = [y * self.scale for y in range(0, self.height)]
         if df == True:
-            df = pd.DataFrame(weighted_avgs, columns=['Blue', 'Green', 'Red'])
+            df = pd.DataFrame(weighted_avgs, columns=['channel1', 'channel2', 'channel3'])
             df['Depth (mm)'] = scaled_depths
-            df = df[['Depth (mm)', 'Blue', 'Green', 'Red']]
+            df = df[['Depth (mm)', 'channel1', 'channel2', 'channel3']]
             return df
         return np.array(weighted_avgs)
 

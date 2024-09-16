@@ -31,19 +31,17 @@ class GraphPanel(QWidget):
         self.img = img
         self.init_ui()
 
-    def init_ui(self):
-
-        self.update()
+    def init_ui(self, img ):
         """
         Function to generate and define plots for the GraphPanel Widget.
         """
 
         df = None
-        if len(self.img) == 0: 
+        if len(img) == 0: 
             source = RandomDataGenerator()
             df = source.get_random_dataset()
         else:
-            data_dict = process_core_image(self.img, 77, True)
+            data_dict = process_core_image(img, 77, True)
             df = data_dict["Colours"]
 
 

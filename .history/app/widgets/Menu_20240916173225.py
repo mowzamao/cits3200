@@ -79,11 +79,8 @@ class Menu(QMenuBar):
 
             if image is not None:
 
-                ##############################################################
-                self.parent.graph_panel = GraphPanel(self.parent, image)
-                self.parent.graph_panel.init_ui()
-                self.parent.graph_panel.update()
-                ################################################################
+                print("Here!!!")
+                self.parent.graph_panel.__init__(image)
 
                 # Format the image
                 oriented_image = orient_array(image)

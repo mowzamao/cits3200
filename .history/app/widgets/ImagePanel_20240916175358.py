@@ -26,8 +26,8 @@ class ImagePanel(QWidget):
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
         
 
-        # ##############################################################
-        # self.parent.graph_panel = GraphPanel(self,  self.image_label)
-        # self.parent.graph_panel.update()
-        # self.update()
-        # ################################################################
+        ##############################################################
+        self.parent.graph_panel = GraphPanel(self,  self.image_label)
+        self.parent.graph_panel.update()
+        self.update()
+        ################################################################

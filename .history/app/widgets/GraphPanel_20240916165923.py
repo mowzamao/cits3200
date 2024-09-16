@@ -4,7 +4,6 @@ from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
 from PyQt6.QtGui import QPixmap, QIcon, QColor
 from PyQt6.QtCore import Qt, QSize
 
-from app.utils.ProcessSedimentCore import *
 from app.utils.RandomDataGenerator import *
 from app.widgets.Graphs import Graphs
 
@@ -16,7 +15,7 @@ class GraphPanel(QWidget):
         QWidget(Class): A base/parent class making GraphPanel a PyQT widget.
     """
 
-    def __init__(self, parent=None, img = []):
+    def __init__(self, parent=None):
         """
         The initialisation function for the GraphPanel class/PyQt widget.
 
@@ -28,22 +27,19 @@ class GraphPanel(QWidget):
         super().__init__(parent)
 
         #Create and set the graphs for this instance of the GraphPanel class
-        self.img = img
         self.init_ui()
 
-    def init_ui(self):
-
-        self.update()
+    def init_ui(self, img = None):
         """
         Function to generate and define plots for the GraphPanel Widget.
         """
 
-        df = None
-        if len(self.img) == 0: 
+        if img == None: 
             source = RandomDataGenerator()
             df = source.get_random_dataset()
         else:
-            data_dict = process_core_image(self.img, 77, True)
+            data_dict = process_core_image(img, 77, True)
+            print(data_dict)
             df = data_dict["Colours"]
 
 
