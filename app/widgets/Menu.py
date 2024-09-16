@@ -3,7 +3,7 @@ from PyQt6.QtGui import QPixmap, QAction
 from PyQt6.QtCore import Qt
 import cv2 as cv
 import numpy as np
-from app.utils.image_formatting import *   
+from app.utils.ImageTransforming import *   
 class Menu(QMenuBar):
     def __init__(self, parent=None):
         super().__init__(parent)
