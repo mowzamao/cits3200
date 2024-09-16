@@ -31,7 +31,7 @@ class MainWindow(QMainWindow):
         self.image_panel = ImagePanel()
         self.graph_panel = GraphPanel()
         self.toolbar = Toolbar()
-        self.menu = Menu()
+        self.menu = Menu(self)
 
 
         self.addToolBar(self.toolbar)
