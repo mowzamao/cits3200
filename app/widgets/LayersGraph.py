@@ -12,12 +12,12 @@ class LayersGraph(FigureCanvasQTAgg):
     def __init__(self, parent=None, width=5, height=5, dpi=100, df = None):    
 
         #define metadata for layer plot
-        self.height = len(df)
-        self.width = max(1, height//10)
-        self.core_as_grid = np.zeros((height, width, 3), dtype=int)
+        height = len(df)
+        width = max(1, height//10)
+        core_as_grid = np.zeros((height, width, 3), dtype=int)
 
         #populate the numpy array with RGB values which numpy.imshow will render
-        self.populateCore_as_grid(df)
+        self.populateCore_as_grid(df,height, width,core_as_grid)
 
         #define the figure the plot will be rendered in 
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -29,21 +29,24 @@ class LayersGraph(FigureCanvasQTAgg):
 
         #initialise instance of the plot and render image 
         super(LayersGraph, self).__init__(fig)
-        self.axes.imshow(self.core_as_grid)
+        self.axes.imshow(core_as_grid)
 
-    def populateCore_as_grid(self,df:pd.DataFrame):
+        #show title
+        self.axes.set_title("Stratified Colour Layers",fontsize = 8, fontweight='bold')
+
+    def populateCore_as_grid(self,df:pd.DataFrame,height:int,width:int,core_as_grid:np.ndarray):
         """
         Function to add RGB data to the core_as_grid variable for the Layers plot. 
         The array has every row as a specific layer / colour and each column shows 
         a component of an RGB value.
 
         Parameters:
-            df(pd.Dataframe): the data to be rendered in the layers plot. gi
+            df(pd.Dataframe): the data to be rendered in the layers plot.
         """
-        for row in range(self.height):
-            for col in range(self.width):
+        for row in range(height):
+            for col in range(width):
                 for channel in range(3):
-                    self.core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
+                    core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
 
 
 
