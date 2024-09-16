@@ -34,7 +34,7 @@ class Scaling():
         Parameters:
             core_width (int): the width of the sediment core in pixels
         """
-        return self.core_width_in_mm / core_width
+        self.scale = self.core_width_in_mm / core_width
     
     def get_core_length(self, core: list) -> float:
         """ 
@@ -45,11 +45,11 @@ class Scaling():
         """
         _, _, w, h = core
         if w < h: # the sediment core is vertical
-            scale = self.get_mm_scale(w)
-            length = h * scale
+            self.get_mm_scale(w)
+            length = h * self.scale
         else: # the sediment core is horizontal
-            scale = self.get_mm_scale(h)
-            length = w * scale
+            self.get_mm_scale(h)
+            length = w * self.scale
         return length
 
 class ExtractCore():
@@ -62,7 +62,7 @@ class ExtractCore():
         img (numpy.ndarray): the image as an array
         core (dict): the extracted sediment core
     """
-    def __init__(self, filepath: str, core_width_mm: int):
+    def __init__(self, img: np.array, core_width_mm: int):
         """
         Constructor for the ExtractCore class.
         
@@ -70,9 +70,8 @@ class ExtractCore():
             filepath (str): the file path of the image
             core_width_mm (int): the width of the sediment core in millimeters
         """
-        self.filepath = filepath
         self.core_width_mm = core_width_mm
-        self.img = transform.import_img(filepath)
+        self.img = img
 
     def find_cores(self) -> list:
         """
@@ -129,8 +128,10 @@ class ExtractCore():
         else: core = self.get_largest_core(cores)
         
         x, y, width, height = core
+        scaling = Scaling(self.core_width_mm)
         self.core = {
-            "Length": Scaling(self.core_width_mm).get_core_length(core),
+            "Length": scaling.get_core_length(core),
+            "Scale" : scaling.scale,
             "Image": transform.orient_array(transform.crop_img(self.img, x, y, width, height))
         }
         return self.core
@@ -146,7 +147,7 @@ class Colours():
         colour (int): the number of colour channels in the image
         weights (numpy.ndarray): the weights for the weighted average of the colour channels
     """
-    def __init__(self, img: np.array):
+    def __init__(self, img: np.array, scale: float):
         """
         Constructor for the Colours class.
         
@@ -156,6 +157,7 @@ class Colours():
         self.img = transform.orient_array(img)
         self.height, self.width, self.colour = self.img.shape
         self.weights = None
+        self.scale = scale
     
     def get_weights(self):
         """ Returns the weights for the weighted average of the colour channels """
@@ -193,13 +195,16 @@ class Colours():
                 weighted_avg = self.get_weighted_avg_colour_channel(colour_values)
                 channel_avgs.append(weighted_avg)
             weighted_avgs.append(channel_avgs)
+        
+        scaled_depths = [y * self.scale for y in range(0, self.height)]
         if df == True:
             df = pd.DataFrame(weighted_avgs, columns=['channel1', 'channel2', 'channel3'])
+            df['Depth (mm)'] = scaled_depths
             return df
         return np.array(weighted_avgs)
 
 
-def process_core_image(filepath: str, core_width_mm: int, df: bool=True) -> dict:
+def process_core_image(img: np.array, core_width_mm: int, df: bool=True) -> dict:
     """ 
     Function for processing a sediment core image.
 
@@ -225,11 +230,12 @@ def process_core_image(filepath: str, core_width_mm: int, df: bool=True) -> dict
     Returns:
         core (dict): a dictionary containing the image, length, and colours of the sediment core
     """
-    core_data = ExtractCore(filepath, core_width_mm).extract_core()
+    core_data = ExtractCore(img, core_width_mm).extract_core()
     if core_data == 0: return 0
     image = core_data['Image']
     length = core_data['Length']
-    colours = Colours(image).get_weighted_average_layer_colours(df=df)
+    scale = core_data['Scale']
+    colours = Colours(image, scale).get_weighted_average_layer_colours(df=df)
     core = {
         "Image": image,
         "Length (mm)": length,
@@ -241,7 +247,8 @@ if __name__ == '__main__':
     """ Testing the functions """
     core_width_mm = 77 # sediment core width in millimeters
     file_path = 'app/utils/image-data/MI-24_03/SCREEN banner 96dpi-3191.jpg' # for testing purposes
-    core = process_core_image(file_path, core_width_mm, df=True)
+    img = transform.import_img(file_path)
+    core = process_core_image(img, core_width_mm, df=True)
     transform.show_img(core['Image'], title='Extracted Sediment Core')
     print(core)
     print(type(core['Image']))
