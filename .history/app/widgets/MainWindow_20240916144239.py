@@ -43,6 +43,6 @@ class MainWindow(QMainWindow):
         """Set properties for the main window."""
         self.setWindowTitle("Sediment Core Analysis Tool")
         self.showMaximized()
-        self.setStyleSheet(open('./app/style/style.css').read())
+        self.setStyleSheet(open('./app/style/buttons.css').read())
 
  
