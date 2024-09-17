@@ -16,9 +16,9 @@ class LayersGraph(FigureCanvasQTAgg):
 
         for row in range(height):
             for col in range(width):
-                core_as_grid[row][col][0] = int(df.loc[row, df.columns[3]])
-                core_as_grid[row][col][1] = int(df.loc[row, df.columns[2]])
-                core_as_grid[row][col][2] = int(df.loc[row, df.columns[1]])
+                core_as_grid[row][col][0] = int(df.loc[row, df.columns[2]])
+                core_as_grid[row][col][1] = int(df.loc[row, df.columns[1]])
+                core_as_grid[row][col][2] = int(df.loc[row, df.columns[0]])
 
         fig = Figure(figsize=(width, height), dpi=dpi)
 
