@@ -11,6 +11,8 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
 
+from PyQt6 import QtCore, QtWidgets
+
 class ColoursGraph(FigureCanvasQTAgg):
     """
     A class acting as a PyQt widget which will contain matplotlib plots.
@@ -141,18 +143,37 @@ class ColoursGraph(FigureCanvasQTAgg):
             1) changing font size
             2) turning tight layout on and off.
         """
-        #set tight_layout setting to figure if figure has dimensions
-        if self.verifyTightLayout():
-            self.fig.tight_layout()
-
         #change font size if current font size and subplot width not below minimum values
         if self.verifyLabelFontChange():
             self.setFontSize()
+
+        #set tight_layout setting to figure if figure has dimensions
+        if self.verifyTightLayout():
+            self.fig.tight_layout()
 
         # Redraw the figure
         self.draw()
         # Initialise an instance of the new figure  
         super().resizeEvent(event)
+
+    def changeEvent(self, event):
+        """
+        Override the changeEvent to handle maximization and minimization.
+        When the window is minimized or maximized, this method will be called,
+        and we can trigger the resizing logic.
+        """
+        if event.type() == QtCore.QEvent.Type.WindowStateChange:
+            window_state = self.window().windowState()
+            if window_state & QtCore.Qt.WindowState.WindowMinimized:
+                # The window has been minimized
+                self.resizeEvent(event)
+            elif window_state & QtCore.Qt.WindowState.WindowMaximized:
+                # The window has been maximized
+                self.resizeEvent(event)
+            elif window_state == QtCore.Qt.WindowState.WindowNoState:
+                # The window has been restored from minimized or maximized
+                self.resizeEvent(event)
+        super().changeEvent(event)
 
     def setFontSize(self):
         """
