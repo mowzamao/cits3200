@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from matplotlib.gridspec import GridSpec
 
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
@@ -15,30 +16,31 @@ class LayersGraph(FigureCanvasQTAgg):
         self.layers_title_min_fontsize = 3
         self.layers_title_max_fontsize = 10 
         self.layers_title_base_fontsize = 7 
-        self.layers_min_width = 0.15    
+        self.layers_min_width = 5
         height = len(df)
         width = max(1, height//10)
-
-        core_as_grid = self.createCore_as_grid(df,height, width)
+        self.core_as_grid = self.createCore_as_grid(df,height, width) 
+    
         self.setupLayersFigure(width,height,dpi)
+
         super(LayersGraph, self).__init__(self.layers_fig)
-        self.renderLayersFigure(core_as_grid)
 
-
-    def renderLayersFigure(self,core_as_grid):
-        #render image
-        self.layers_axes.imshow(core_as_grid, aspect='auto')
-        #show title
-        self.layers_axes.set_title("Colour Layers",fontsize = 8, fontweight='bold')
-
-    def setupLayersFigure(self,width,height,dpi):
+    def setupLayersFigure(self,width,height, dpi):
         #define the figure the plot will be rendered in 
         self.layers_fig = Figure(figsize=(width, height), dpi=dpi)
-        self.layers_axes = self.layers_fig.add_subplot(111)
+        #self.layers_axes = self.layers_fig.add_subplot(111)
+        gs = GridSpec(1, 1, figure=self.layers_fig)
+        self.layers_axes = self.layers_fig.add_subplot(gs[0, 0])
 
-        #remove axis / make them invisible 
+        # #remove axis / make them invisible 
         self.layers_axes.get_xaxis().set_ticks([])
         self.layers_axes.get_yaxis().set_ticks([])
+        self.layers_axes.set_position([0.1,0.3,0.7,0.5])
+
+        #render image 
+        self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold')
+        self.layers_axes.imshow(self.core_as_grid,aspect='auto')
+        
 
 
     def createCore_as_grid(self,df:pd.DataFrame,height:int,width:int):
@@ -88,11 +90,9 @@ class LayersGraph(FigureCanvasQTAgg):
         Function which checks LayersGraph Figure is less than minimum width. 
         """
         #calculation of subplot size in inches, requires conversion form normalised units
-        norm_width = self.layers_axes.get_position().width
-        fig_width, fig_height = self.layers_fig.get_size_inches()
-        fig_width_inches = fig_width *norm_width
+        fig_width = self.layers_fig.get_figwidth()
         
-        if fig_width_inches <= self.layers_min_width:
+        if fig_width <= self.layers_min_width:
             return False
         return True
 
@@ -101,7 +101,7 @@ class LayersGraph(FigureCanvasQTAgg):
         Function which resets fontsize of LayersGraph Title
         """
         new_fontsize = self.calcNewFont()
-        self.layers_axes.set_title("Colour Layers",fontsize = new_fontsize, fontweight='bold')
+        self.layers_fig.suptitle("Colour Layers",fontsize = new_fontsize, fontweight='bold')
 
     def calcNewFont(self):
         """
