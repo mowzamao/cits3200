@@ -1,67 +1,51 @@
-
-#importing classes for PyQT formatting 
-from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
-from PyQt6.QtGui import QPixmap, QIcon, QColor
-from PyQt6.QtCore import Qt, QSize
-
-from app.utils.ProcessSedimentCore import *
-from app.utils.RandomDataGenerator import *
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton
+from PyQt6.QtGui import QIcon
+from PyQt6.QtCore import QSize
 from app.widgets.Graphs import Graphs
 
 class GraphPanel(QWidget):
     """
     The PyQt class that defines the panel showing the colour graphs
-
-    Parameters:
-        QWidget(Class): A base/parent class making GraphPanel a PyQT widget.
     """
-
-    def __init__(self, parent=None, img = []):
+    
+    def __init__(self, parent=None, df=None):
         """
-        The initialisation function for the GraphPanel class/PyQt widget.
-
-        Parameters:
-            parent(Class): paramater to optionally add a base/parent class upon initialisation. 
+        The initialization function for the GraphPanel class/PyQt widget.
         """
-
-        #Initialise instance of the GraphPanel class by using the QWidget initialisation function
         super().__init__(parent)
-
-        #Create and set the graphs for this instance of the GraphPanel class
-        self.img = img
+        self.df = df  # Store the dataframe directly
+        self.layout = QVBoxLayout(self)  # Create a layout for the GraphPanel
         self.init_ui()
 
     def init_ui(self):
-
-        self.update()
         """
         Function to generate and define plots for the GraphPanel Widget.
         """
+        # Clear existing layout and refresh the graph
+        for i in reversed(range(self.layout.count())):
+            widget = self.layout.itemAt(i).widget()
+            if widget:
+                widget.setParent(None)  # Remove old widget
 
-        df = None
-        if len(self.img) == 0: 
-            source = RandomDataGenerator()
-            df = source.get_random_dataset()
-        else:
-            data_dict = process_core_image(self.img, 77, True)
-            df = data_dict["Colours"]
-
-
-        layout = QVBoxLayout()
-        
+        # Fullscreen button for toggling view
         fullscreen_icon = QIcon("./app/style/fullscreen.svg")
-        fullscreen_icon_size = fullscreen_icon.actualSize(QSize(20,20))
-        fullscreen_button = QPushButton(self, icon = fullscreen_icon)
+        fullscreen_button = QPushButton(self, icon=fullscreen_icon)
+        fullscreen_button.setFixedSize(QSize(20, 20))
         fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
-        fullscreen_button.setFixedSize(fullscreen_icon_size)
-        fullscreen_button.move(fullscreen_button.geometry().bottomRight())
-
-        layout.addWidget(fullscreen_button,Qt.AlignmentFlag(1))
         
-        graphs = Graphs(df = df)
-        layout.addWidget(graphs)  
+        self.layout.addWidget(fullscreen_button)
 
-        self.setLayout(layout)
+        # Ensure the dataframe (df) is used to generate the graphs
+        if self.df is not None:
+            graphs = Graphs(df=self.df)  # Pass the dataframe to the graph widget
+            self.layout.addWidget(graphs)
+        else:
+            print("No dataframe provided. Please upload and process an image.")
 
     def switch_graph_fullscreen(self):
-        self.parent().parent().image_panel.setVisible(not self.parent().parent().image_panel.isVisible)
+        """
+        Toggles between fullscreen and normal mode by hiding or showing the image panel.
+        """
+        parent_window = self.parent().parent()
+        image_panel = parent_window.image_panel
+        image_panel.setVisible(not image_panel.isVisible())
