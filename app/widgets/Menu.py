@@ -3,7 +3,8 @@ from PyQt6.QtGui import QPixmap, QAction
 from PyQt6.QtCore import Qt
 import cv2 as cv
 import numpy as np
-from app.utils.ImageTransforming import *   
+from app.utils.ImageTransforming import * 
+from app.utils.ProcessSedimentCore import *   
 from app.widgets.GraphPanel import GraphPanel
 
 class Menu(QMenuBar):
@@ -63,37 +64,33 @@ class Menu(QMenuBar):
 
         return help_menu
 
-    """Opens, formats, and displays an image. It handles the user input for selecting an image file, processes the image with the formatting functions, and then displays it in the application."""
     def open_image(self):
-        """Open an image file amd display it in the ImagePanel."""
+        """Open an image file and display it in the ImagePanel."""
         file_name, _ = QFileDialog.getOpenFileName(
             self, 
             "Open Image", 
             "", 
             "Images (*.png *.jpg *.bmp)"
         )
-        
+    
         if file_name:
             # Load the image using OpenCV
             image = cv.imread(file_name)
 
             if image is not None:
-
-                ##############################################################
-                self.parent.graph_panel = GraphPanel(self.parent, image)
-                self.parent.graph_panel.init_ui()
-                self.parent.graph_panel.update()
-                ################################################################
-
-                # Format the image
+                # Format the image and display it in ImagePanel
                 oriented_image = orient_array(image)
-                red, green, blue = img_rgb_array(oriented_image, is_BGR=True)
-                
-                # Convert back to displayable format using QPixmap
                 display_image = QPixmap(file_name)
                 self.parent.image_panel.set_image(display_image)
 
-                self.parent.statusBar().showMessage(f"Loaded and formatted image: {file_name}")
+                # Process the core image to get the data (df)
+                data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
+
+                if data_dict != 0:  # If processing is successful
+                    self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
+                    self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
+                
+                    self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
             else:
                 self.parent.statusBar().showMessage("Failed to load image.")
 
