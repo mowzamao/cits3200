@@ -1,4 +1,4 @@
-User Stories for Sprint 3
+ Sprint 3 User Stories
 
 1. As a researcher, I want top and bottom labels added to the representation of the core in the GUI, so that I can easily identify the length and orientation of the core.  
 
