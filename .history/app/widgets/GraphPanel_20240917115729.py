@@ -1,6 +1,6 @@
-from PyQt6.QtWidgets import QWidget, QVBoxLayout,QHBoxLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
 from PyQt6.QtGui import QIcon
-from PyQt6.QtCore import Qt, QSize
+from PyQt6.QtCore import QSize
 from app.widgets.Graphs import Graphs
 
 class GraphPanel(QWidget):
@@ -15,17 +15,18 @@ class GraphPanel(QWidget):
         super().__init__(parent)
         self.df = df  # Store the dataframe directly
         self.layout = QVBoxLayout(self)  # Create a layout for the GraphPanel
-        self.init_empty()
+        self.init_ui()
 
 
     def init_empty(self):
-        self.label = QLabel("Data analysis results will be displayed here.")
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
+        self.image_label = QLabel("Sediment core image will be displayed here.")
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
         
         # Set the layout
-        self.layout.addWidget(self.label)
-        self.setLayout(self.layout)
+        layout = QHBoxLayout()
+        layout.addWidget(self.image_label)
+        self.setLayout(layout)
 
 
     def init_ui(self):

@@ -24,8 +24,9 @@ class GraphPanel(QWidget):
         self.label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
         
         # Set the layout
-        self.layout.addWidget(self.label)
-        self.setLayout(self.layout)
+        layout = QHBoxLayout()
+        layout.addWidget(self.label)
+        self.setLayout(layout)
 
 
     def init_ui(self):

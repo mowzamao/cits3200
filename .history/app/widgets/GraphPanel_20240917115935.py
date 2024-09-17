@@ -19,13 +19,14 @@ class GraphPanel(QWidget):
 
 
     def init_empty(self):
-        self.label = QLabel("Data analysis results will be displayed here.")
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
+        self.image_label = QLabel("Data analysis results will be displayed here.")
+        self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image_label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
         
         # Set the layout
-        self.layout.addWidget(self.label)
-        self.setLayout(self.layout)
+        layout = QHBoxLayout()
+        layout.addWidget(self.image_label)
+        self.setLayout(layout)
 
 
     def init_ui(self):

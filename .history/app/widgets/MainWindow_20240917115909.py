@@ -40,6 +40,8 @@ class MainWindow(QMainWindow):
         self.main_layout.addWidget(self.graph_panel, stretch =5)
 
 
+        self.graph_panel.init_empty()
+
     def set_window_properties(self):
         """Set properties for the main window."""
         self.setWindowTitle("Sediment Core Analysis Tool")
