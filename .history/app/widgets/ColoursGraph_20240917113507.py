@@ -37,7 +37,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         #define default values for subplot graphical parameters 
         self.label_min_font_size = 3
         self.label_max_font_size = 20
-        self.subplot_min_width = 0
+        self.subplot_min_width = 0.1
         self.base_font_size = 8   
         
         #Defining the top-end matplotlib figure 
