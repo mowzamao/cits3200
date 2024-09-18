@@ -42,5 +42,3 @@ Absent:
     - We need to provide detailed documentation regarding the sediment core extraction and colour analysis processes
 
 Meeting closed at: 1:59pm
-
-Meeting closed at: 1:59pm
