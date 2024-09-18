@@ -1,21 +1,51 @@
-# CITS3200 Sprint 2 Retrospective #
-Meeting date: 17/09/2024  
-Attendees: Sophie, Rishwanth, Josh, Matt, Blair  
-Meeting started at: 2:09pm  
-Apologies:  
+# CITS3200 Sprint 2 Internal Project Retrospective
+
+Meeting date: 17/09/2024    
+Attendees: Sophie, Rishwanth, Josh, Matt, Blair    
+Meeting started at: 2:09 pm    
+Apologies:    
 Absent: 
 
-## Project Retrospective:
-### Goal completion:
-- Feeling good about tasks completed, most of the client feedback was to do with additional functionality to be worked on in Sprint 3
-- Have completed 4 out of the 10 user stories, with progress already made to complete 4 of the remaining 6
-- - Looking to drop user stories number 5 and number 9, due to change for multiple input images for multiple output graphs and difficulty in scope respectively
+## Process Reflection
+
+### What Went Well
+
+* We efficiently identified, discussed, and allocated tasks week-to-week.  
+* We subdivided our tasks into the relatively independent streams of GUI design and sediment analysis, resulting in smooth, concurrent progress.  
+* All team members consistently attended group meetings and completed their assigned tasks within the proposed deadlines, with only occasional delays due to the unavailability of client data. 
+* We completed our tasks to a high standard, and the client was pleased with our progress.  
+* We completed our MVP in-line with the client's desired priorities 
+
+### What Did Not Go So Well
+
+* Team members developing interconnected components did not discuss their assumptions regarding inputs and outputs. This made it difficult to combine the features into a single product.  
+* Our initial plans were overoptimistic, and we overestimated the number of user stories we could complete within the sprint timeframe.  
+* While we didn't finish all the user stories planned for sprint 2, the client identified many as unnecessary or low-priority, allowing us to refocus our efforts on completing high-priority tasks.  
+* Our lack of planning regarding GitHub merging practices led to confusing regarding how and when to merge branches.  
+* We must establish clear guidelines regarding who needs to review code prior to merging and the type of merging to use.
+
+### What Can Be Improved
+
+* We should implement rigorous standardised testing for each new feature.   
+  * Often, when implementing a new feature for the GUI, old features would break or not work on other team member's devices. Stricter testing will ensure that these problems are found early.  
+* We must ensure to communicate more promptly with our client, project mentor, and auditor.  
+  * Occasionally, we were sending emails about meetings only a few days in advance, making it difficult to avoid scheduling conflicts.  
+* We must check the marking criteria for each sprint and deliverable thoroughly.  
+  * Sometimes, we would make assumptions about what a deliverable should look like only to find that the marking criteria suggested something different.  
+  * To prevent this from happening, all team members should look at the deliverable descriptions and marking criteria when making decisions.  
+* We should increase our utilisation of project management tools like Trello to improve our productivity and maintain communication between team members.  
+  * We started sending short text files to each other about what tasks we thought needed to be completed rather than having official documentation available to the whole team.  
+  * Updating our Trello dashboard regularly will mean less time is spent confirming with each other what tasks have been completed and what tasks are left to complete.
+
+## Goal completion
+
+* The most important functionality has been completed, and the client expressed she was happy with how the project was progressing.  
+* Most of the client’s feedback regarded additional functionality in Sprint 3\.
+
 ### Timeline completion:
-- Making excellent progress to complete all base product functionality during Sprint 3
-- Looking mainly to adding optional functionality in scope for Sprint 3
-- Mostly cutting down on estimates for timesheet, despite completing expected amount of work for sprint 2
 
-## General Business:
-- Core is an 78mm or 80mm standardised core width
+* The team is making excellent progress in completing all base product functionality during Sprint 3  
+* Looking mainly to adding optional functionality in scope for Sprint 3  
+* Mostly cutting down on estimates for timesheet, despite completing expected amount of work for sprint 2
 
-Meeting closed at: 2:32pm
+Meeting closed at: 2:32pm  
