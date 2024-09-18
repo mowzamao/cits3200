@@ -8,7 +8,7 @@ Absent:
 ## Project Retrospective:
 ### Goal completion:
 - Feeling good about tasks completed, most of the client feedback was to do with additional functionality to be worked on in Sprint 3
-- Have completed 3 out of the 10 user stories, with progress already made to complete 5 of the remaining 7
+- Have completed 4 out of the 10 user stories, with progress already made to complete 4 of the remaining 6
 - - Looking to drop user stories number 5 and number 9, due to change for multiple input images for multiple output graphs and difficulty in scope respectively
 ### Timeline completion:
 - Making excellent progress to complete all base product functionality during Sprint 3
