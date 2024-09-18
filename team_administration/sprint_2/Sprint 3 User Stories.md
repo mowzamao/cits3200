@@ -7,7 +7,7 @@
 | 3 | As a researcher, I want top and bottom labels added to the representation of the core in the GUI, so that I can easily identify the length and orientation of the core. | High | Plotting / Display |
 | 4 | As a researcher, I want the option to rotate the input image by 90 degrees in the GUI and data output, so that I can correctly align the core without needing to manually adjust it beforehand. | High | Plotting / Display 
 | 5 | As a researcher, I want to be able to toggle y-axis (core depth) ticks on the GUI graph display, so that I can customize the graph for presentations or detailed analysis. | Medium | Plotting / Display |
-| 6 | As a researcher, I want graph labels to appear bold to improve the readability of the graphs. | High | Plotting / Display |
+| 6 | As an end-user, I want graph labels to appear bold to improve the readability of the graphs. | High | Plotting / Display |
 | 7 | As a researcher, I want the GUI to highlight the graph values relative to the moused-over position on the core representation, so that I can easily link the visual core features with corresponding graph data. | Medium | Plotting / Display |
 | 8 | As a researcher, I want the ability to zoom in on the core representation and graph displays, so that I can take a closer look at specific details. | High | Plotting / Display |
 | 9 | As a researcher, I want to be able to open multiple panels so I can analyse different core images side-by-side. | High | Plotting / Display |
