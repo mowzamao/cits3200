@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QToolBar, QPushButton
-from PyQt6.QtGui import QPixmap, QAction  
+from PyQt5.QtWidgets import QToolBar, QPushButton, QAction 
+from PyQt5.QtGui import QPixmap 
 
 class Toolbar(QToolBar):
     def __init__(self, parent=None):

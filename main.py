@@ -1,5 +1,8 @@
+# nuitka-project: --onefile
+# nuitka-project: --plugin-enable=pyqt6
+
 import sys
-from PyQt6.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
 from app.widgets.MainWindow import MainWindow
 
 def main():
