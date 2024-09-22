@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('QtAgg')
 import numpy as np
 import pandas as pd
+from matplotlib.ticker import MaxNLocator
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -76,6 +77,8 @@ class ColoursGraph(FigureCanvasQTAgg):
             subplot.grid(axis = 'y')
             subplot.invert_yaxis()
             subplot.set_xlim(0,100)
+            subplot.set_yticks(depth_column)
+            subplot.yaxis.set_major_locator(MaxNLocator(nbins=20))
 
     def setFigureAxisLabels(self,x_label:str,y_label:str):
         """
@@ -101,7 +104,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         data_column = round(100*df[data_column_name]/255,  4)
 
         #defining the data to be plotted on the x_axis
-        depth_column = df.iloc[:,0]
+        depth_column = df['Depth (mm)']
+        print(depth_column)
+        
         return data_column_name,depth_column, data_column 
 
     
