@@ -5,11 +5,14 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QPixmap, QAction  
 from PyQt6.QtCore import Qt, QSize
+from matplotlib.backends.backend_pdf import PdfPages
 
 from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
+from app.widgets.ColoursGraph import ColoursGraph
+from app.widgets.LayersGraph import LayersGraph
 
 class MainWindow(QMainWindow):
     """ A class defining the structure and actions of the outermost window in the application
@@ -45,5 +48,38 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Sediment Core Analysis Tool")
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
+        
+    def export_graphs_as_pdf(self): 
+        """Export the graphs displayed in the graph panel as a PDF file."""
+        # Open file dialog to specify where to save the PDF
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Graphs as PDF",
+            "",
+            "PDF Files (*.pdf)"
+        )
+
+        if file_name:
+            if not file_name.endswith('.pdf'):
+                file_name += '.pdf'
+
+            # Get the graphs (ColoursGraph and LayersGraph) from the GraphPanel
+            graphs_widget = self.graph_panel.layout.itemAt(1).widget()  # This should be the Graphs widget
+            
+            # Assuming ColoursGraph is the first child in Graphs widget
+            colours_graph = graphs_widget.findChild(ColoursGraph)
+            layers_graph = graphs_widget.findChild(LayersGraph)
+
+            # Export both figures to a PDF using PdfPages
+            with PdfPages(file_name) as pdf:
+                if colours_graph:
+                    pdf.savefig(colours_graph.fig)  # Save ColoursGraph as a page in the PDF
+                if layers_graph:
+                    pdf.savefig(layers_graph.fig)  # Save LayersGraph as a page in the PDF
+
+            # Optional: Show message in status bar
+            self.statusBar().showMessage(f"Graphs saved to: {file_name}")
+
+    
 
  
