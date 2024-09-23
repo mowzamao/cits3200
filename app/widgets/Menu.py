@@ -28,15 +28,12 @@ class Menu(QMenuBar):
         """Create the File menu and add actions."""
         file_menu = QMenu("File", self)
         open_action = QAction("Open", self)
-        save_action = QAction("Save", self)
         exit_action = QAction("Exit", self)
 
         open_action.triggered.connect(self.open_image)
-        save_action.triggered.connect(self.save_image)
         exit_action.triggered.connect(self.close)
 
         file_menu.addAction(open_action)
-        file_menu.addAction(save_action)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
         
@@ -94,32 +91,4 @@ class Menu(QMenuBar):
             else:
                 self.parent.statusBar().showMessage("Failed to load image.")
 
-    """Saves the currently displayed image to a user-specified location. It handles user input for selecting a save location, converts the image to a format that can be saved, and then saves it using OpenCV."""
-    def save_image(self):
-        """Prompt for an output location to save the formatted image."""
-        file_name, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Image",
-            "",
-            "Images (*.png *.jpg *.bmp)"
-        )
-
-        if file_name:
-            # Assuming the image is already processed and saved in self.image
-            oriented_image = self.parent.image_panel.image_label.pixmap().toImage()
-            if not oriented_image.isNull():
-                # Convert QImage to OpenCV image for saving
-                buffer = oriented_image.constBits().asstring(
-                    oriented_image.width() * oriented_image.height() * oriented_image.depth() // 8
-                )
-                image = np.frombuffer(buffer, np.uint8).reshape(
-                    (oriented_image.height(), oriented_image.width(), oriented_image.depth() // 8)
-                )
-
-                # Save the image
-                cv.imwrite(file_name, image)
-                self.parent.statusBar().showMessage(f"Image saved to: {file_name}")
-            else:
-                self.parent.statusBar().showMessage("No image available to save.")
-
-
+   
