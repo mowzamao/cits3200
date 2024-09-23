@@ -18,6 +18,8 @@ class Toolbar(QToolBar):
         self.addAction(self.run_rgb)
         self.addAction(self.rub_cielab)
         self.addAction(self.export_results)
+        self.export_results.triggered.connect(self.parent().export_graphs_as_pdf)# Connect Export Results button to the export method in MainWindow
+
 
 
     
