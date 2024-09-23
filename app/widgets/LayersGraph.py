@@ -20,12 +20,12 @@ class LayersGraph(FigureCanvasQTAgg):
                 core_as_grid[row][col][1] = int(df.loc[row, df.columns[2]])
                 core_as_grid[row][col][2] = int(df.loc[row, df.columns[1]])
 
-        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(figsize=(width, height), dpi=dpi)
 
         self.axes = fig.add_subplot(111)
         self.axes.get_xaxis().set_ticks([])
         self.axes.get_yaxis().set_ticks([])
-        super(LayersGraph, self).__init__(fig)
+        super(LayersGraph, self).__init__(self.fig)
 
         self.axes.imshow(core_as_grid)
 
