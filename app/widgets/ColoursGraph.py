@@ -2,13 +2,14 @@
 #import matplotlib and set backend configuration for pyqt compatability
 import matplotlib
 matplotlib.use('QtAgg')
+import matplotlib.axes
 import matplotlib.figure
 import numpy as np
 import pandas as pd
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator,MultipleLocator
 
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
@@ -67,29 +68,21 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_center = self.fig.add_subplot(132)
         axes_right = self.fig.add_subplot(133)
 
-        print(df.head(-10))
-
         for index,ax in enumerate(self.fig.axes,start=1):
-
             color_data = round(100*df.iloc[:,index]/255,  4)
             depth = df.iloc[:,0]
             color_component = df.columns[index]
 
             ax.plot(color_data, depth, color = color_component)
 
-            #set the graphical parameters for each subplot
-            ax.set_title(color_component)
-    
-            ax.invert_yaxis()
-            ax.grid(axis = 'y')
+            ax.set_title(color_component, fontweight='bold')
+
+            ax = self.setCustomTicks(ax)
+
+            ax.grid(axis = 'both',visible=True)
             ax.set_xlim(0,100)
-
-            ax.set_xticks(color_data)
-            ax.set_yticks(depth)
-
-            ax.yaxis.set_major_locator(MaxNLocator(nbins=10))
-            ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
-            
+            ax.set_ylim(bottom=0)
+            ax.invert_yaxis()
         
         #add title to figure 
         self.addFigureTitle(df = df)
@@ -97,6 +90,21 @@ class ColoursGraph(FigureCanvasQTAgg):
         #adding headings for the entire ColoursGraph figure
         axes_left.set_ylabel('Depth (m)')
         axes_center.set_xlabel('Intensity (%)')
+
+    def setCustomTicks(self,ax:matplotlib.axes.Axes):
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=20))
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+
+        ax.yaxis.minorticks_on()
+        ax.yaxis.set_minor_locator(MultipleLocator(0.05))
+        ax.xaxis.set_minor_locator(MultipleLocator(5))
+
+        ax.tick_params(axis='x', which='both', top=True, labeltop=False)
+        ax.tick_params(axis='y', which='both', right=True, labelright=False)
+
+        ax.tick_params(which='minor', length=4, color='grey')
+        return ax
+        
 
     def addFigureTitle(self,figure_title:str=None,df:pd.DataFrame = None,fontsize:int = 16):
         """
@@ -116,7 +124,7 @@ class ColoursGraph(FigureCanvasQTAgg):
             figure_title = analysis_type + ' Colour Space Plot'
 
         #render new title onto matplotlib figure  
-        self.fig.suptitle(figure_title, fontweight='bold',y = 0.97,fontsize = fontsize)
+        self.fig.suptitle(figure_title, fontweight='bold',fontsize = fontsize)
     
     def resizeEvent(self,event):
         """
@@ -156,7 +164,7 @@ class ColoursGraph(FigureCanvasQTAgg):
             ax.tick_params(axis='y', labelsize=new_font_size)
 
             #setting new font size for title
-            ax.set_title(ax.get_title(), fontsize=new_font_size)
+            ax.set_title(label = ax.get_title(), fontsize=new_font_size,fontweight = 'bold')
         
         #adjusting font size of title
         self.addFigureTitle(figure_title = self.fig.get_suptitle(),fontsize=new_font_size + 2)
