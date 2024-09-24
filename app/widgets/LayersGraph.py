@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtWidgets
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
 
-    def __init__(self, parent=None, width=5, height=5, dpi=100, df = None):
+    def __init__(self, parent=None, dpi=100, df = None):
 
         #defining metadate for layers plot
         self.layers_title_min_fontsize = 5
@@ -23,7 +23,7 @@ class LayersGraph(FigureCanvasQTAgg):
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
         top,bottom = self.getColoursGraphCoordinates(parent) 
-        self.setupLayersFigure(width,height,dpi,top,bottom)
+        self.setupLayersFigure(dpi,top,bottom)
         
         super(LayersGraph, self).__init__(self.layers_fig)
         
@@ -75,9 +75,9 @@ class LayersGraph(FigureCanvasQTAgg):
                     core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
         return core_as_grid
     
-    def setupLayersFigure(self,width,height, dpi,top,bottom):
+    def setupLayersFigure(self,dpi,top,bottom):
         #define the figure the plot will be rendered in 
-        self.layers_fig = Figure(figsize=(width, height), dpi=dpi)
+        self.layers_fig = Figure(dpi=dpi)
 
         top_space = 1- top
         bottom_space = bottom
@@ -107,7 +107,6 @@ class LayersGraph(FigureCanvasQTAgg):
         self.draw_idle()
         # Initialise an instance of the new figure
         super().resizeEvent(event)  
-        
 
     def setFontSize(self):
         """

@@ -13,8 +13,8 @@ class Graphs(QWidget):
         super().__init__(parent)
         self.df = df
         #generate instances of the sediment graphs
-        self.colours_graph = ColoursGraph(self,width=5, height=5, dpi=100, df = self.df)
-        self.layers_graph  = LayersGraph(self,width=20, height=20, dpi=100, df = self.df)
+        self.colours_graph = ColoursGraph(self,dpi=100, df = self.df)
+        self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
         self.init_ui(self.colours_graph,self.layers_graph)
 
     def init_ui(self,colours_graph,layers_graph):

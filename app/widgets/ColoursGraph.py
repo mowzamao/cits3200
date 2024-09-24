@@ -27,7 +27,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
     """
 
-    def __init__(self, parent:classmethod=None, width:float=5, height:float=5, dpi:int=100, df:pd.DataFrame = None):
+    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None):
         """ 
         Initialisation function for the ColourGraph PyQt Widget.
 
@@ -46,7 +46,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.base_font_size = 10 
         
         #Defining the top-end matplotlib figure 
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
+        self.fig = Figure(dpi=dpi)
 
         self.plotColourData(df)
 
@@ -55,9 +55,6 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
-
-        
-        
 
     def plotColourData(self,df:pd.DataFrame):
         """
