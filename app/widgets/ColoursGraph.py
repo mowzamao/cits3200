@@ -62,6 +62,9 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         #adding title to the entire matplotlib figure
         self.addFigureTitle(df)
+
+        #connecting resize event to graph
+        self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
         
 
     def plotColourData(self,df:pd.DataFrame):

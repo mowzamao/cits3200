@@ -23,6 +23,8 @@ class LayersGraph(FigureCanvasQTAgg):
         self.setupLayersFigure(width,height,dpi)
         super(LayersGraph, self).__init__(self.layers_fig)
 
+        self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
+
     def setupLayersFigure(self,width,height, dpi):
         #define the figure the plot will be rendered in 
         self.layers_fig = Figure(figsize=(width, height), dpi=dpi)
