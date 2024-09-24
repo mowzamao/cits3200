@@ -75,7 +75,7 @@ class ColoursGraph(FigureCanvasQTAgg):
 
             ax.plot(color_data, depth, color = color_component)
 
-            ax.set_title(color_component, fontweight='bold')
+            ax.set_title(color_component, fontweight='bold',pad = 10)
 
             ax = self.setCustomTicks(ax)
 
@@ -164,7 +164,7 @@ class ColoursGraph(FigureCanvasQTAgg):
             ax.tick_params(axis='y', labelsize=new_font_size)
 
             #setting new font size for title
-            ax.set_title(label = ax.get_title(), fontsize=new_font_size,fontweight = 'bold')
+            ax.set_title(label = ax.get_title(), fontsize=new_font_size,fontweight = 'bold',pad = 10)
         
         #adjusting font size of title
         self.addFigureTitle(figure_title = self.fig.get_suptitle(),fontsize=new_font_size + 2)
