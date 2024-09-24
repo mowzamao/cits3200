@@ -2,6 +2,7 @@
 #import matplotlib and set backend configuration for pyqt compatability
 import matplotlib
 matplotlib.use('QtAgg')
+import matplotlib.figure
 import numpy as np
 import pandas as pd
 
@@ -36,32 +37,21 @@ class ColoursGraph(FigureCanvasQTAgg):
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """
 
-        #define default values for subplot graphical parameters 
-        self.label_min_font_size = 3
-        self.label_max_font_size = 20
-        self.subplot_min_width = 0.35
-        self.base_font_size = 10     
+        #define default values for subplot graphical parameters
+        self.graphical_settings = { 
+            'label_min_font_size': 3,
+            'label_max_font_size': 20,
+            'axes_min_width': 0.35,
+            'base_font_size': 10
+        }     
         
         #Defining the top-end matplotlib figure 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
-        
-
-        # Drawing three subplots, one for each colour channel
-        self.axes_left = self.fig.add_subplot(131)
-        self.axes_center = self.fig.add_subplot(132)
-        self.axes_right = self.fig.add_subplot(133)
 
         # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
 
-        #plot data for the ColourGraph Panel
         self.plotColourData(df)
-
-        #adding headings for the entire ColoursGraph figure
-        self.setFigureAxisLabels('Depth (m)','Intensity (%)')
-
-        #adding title to the entire matplotlib figure
-        self.addFigureTitle(df)
 
         #connecting resize event to graph
         self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
@@ -71,21 +61,33 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
         """
-        for index,subplot in enumerate([self.axes_left,self.axes_center,self.axes_right],start=1):
+        # Drawing three subplots, one for each colour channel
+        axes_left = self.fig.add_subplot(131)
+        axes_center = self.fig.add_subplot(132)
+        axes_right = self.fig.add_subplot(133)
 
-            #for each subplot in the ColoursGraph panel prepare the pandas series to be plotted
-            data_column_name,depth_column, data_column = self.graphDataPreperation(df,index)
+        for index,ax in enumerate(self.fig.axes,start=1):
 
-            #plot the data from the pandas dataframe
-            subplot.plot(data_column, depth_column,  color = data_column_name)
+            color_data = round(100*df.iloc[:,index]/255,  4)
+            depth = df.iloc[:,0]
+            color_component = df.columns[index]
+
+            ax.plot(color_data, depth,  color = color_component)
 
             #set the graphical parameters for each subplot
-            subplot.set_title(data_column_name)
-            subplot.grid(axis = 'y')
-            subplot.invert_yaxis()
-            subplot.set_xlim(0,100)
+            ax.set_title(color_component)
+            ax.grid(axis = 'y')
+            ax.invert_yaxis()
+            ax.set_xlim(0,100)
+        
+        #add title to figure 
+        self.addFigureTitle(df = df)
 
-    def addFigureTitle(self,df:pd.DataFrame = None,fontsize:int = 16,title:str = None):
+        #adding headings for the entire ColoursGraph figure
+        axes_left.set_ylabel('Depth (m)')
+        axes_center.set_xlabel('Intensity (%)')
+
+    def addFigureTitle(self,figure_title:str=None,df:pd.DataFrame = None,fontsize:int = 16):
         """
         Function to add a title to the entire ColoursGraph Matplotlib figure. The string
         to be rendered as a title can be generated through two methods. 1) using the first letter 
@@ -98,46 +100,14 @@ class ColoursGraph(FigureCanvasQTAgg):
             title(str - optional): A string which will be rendered as the matplotlib figure's title.
         """
         #if no title string is provided generate a title string based of df column names
-        if df is not None and title is None:
+        if df is not None and figure_title is None:
             analysis_type = df.columns[1][0] + df.columns[2][0] + df.columns[3][0]
-            title = analysis_type + ' Colour Space Plot'
-
-        #store title string as a class variable for later access
-        self.figure_title = title
+            figure_title = analysis_type + ' Colour Space Plot'
 
         #render new title onto matplotlib figure  
-        self.fig.suptitle(title, fontweight='bold',y = 0.97,fontsize = fontsize)
-
-
-    def setFigureAxisLabels(self,x_label:str,y_label:str):
-        """
-        Function which sets the axis labels for the entire ColoursGraph plot panel. 
-        """
-        self.axes_left.set_ylabel(x_label)
-        self.axes_center.set_xlabel(y_label)
-
-
-    def graphDataPreperation(self,df:pd.DataFrame,index:int):
-        """
-        Function that takes a dataframe and an index (ranging in values from 1-3) and 
-        returns two series and a string. The two series contain data to be plotted in the 
-        graphsPanel window. The string is the title for the subplot (and also is the column name
-        from which the plotted data originates). 
-        """
-        df_columns = df.columns
-
-        #extracting name of column to be plotted
-        data_column_name = df_columns[index]
-        
-        #cleaning and scaling the data to be plotted 
-        data_column = round(100*df[data_column_name]/255,  4)
-
-        #defining the data to be plotted on the x_axis
-        depth_column = df.iloc[:,0]
-        return data_column_name,depth_column, data_column 
-
+        self.fig.suptitle(figure_title, fontweight='bold',y = 0.97,fontsize = fontsize)
     
-    def resizeEvent(self, event):
+    def resizeEvent(self,event):
         """
         Event handler function that will adjust the graphical parameters of the 
         matplotlib figure. 
@@ -147,7 +117,7 @@ class ColoursGraph(FigureCanvasQTAgg):
             2) turning tight layout on and off.
         """
         #change font size if current font size and subplot width not below minimum values
-        if self.verifyLabelFontChange():
+        if self.verifyLabelGreaterThanMinFontSize() and self.verifySubplotGreaterThanMinWidth():
             self.setFontSize()
 
         #set tight_layout setting to figure if figure has dimensions
@@ -159,31 +129,13 @@ class ColoursGraph(FigureCanvasQTAgg):
         # Initialise an instance of the new figure  
         super().resizeEvent(event)
 
-    def changeEvent(self, event):
-        """
-        Override the changeEvent to handle maximization and minimization.
-        When the window is minimized or maximized, this method will be called,
-        and we can trigger the resizing logic.
-        """
-        if event.type() == QtCore.QEvent.Type.WindowStateChange:
-            window_state = self.window().windowState()
-            if window_state & QtCore.Qt.WindowState.WindowMinimized:
-                # The window has been minimized
-                self.resizeEvent(event)
-            elif window_state & QtCore.Qt.WindowState.WindowMaximized:
-                # The window has been maximized
-                self.resizeEvent(event)
-            elif window_state == QtCore.Qt.WindowState.WindowNoState:
-                # The window has been restored from minimized or maximized
-                self.resizeEvent(event)
-        super().changeEvent(event)
 
-    def setFontSize(self):
+    def setFontSize(self,):
         """
         Sets new parameters for font size graphical elements of the matplotlib figure.
         These include title, tick markers and axis labels font sizes.
         """
-        new_font_size = self.calcNewFont()
+        new_font_size = self.calcNewFont(self.fig,self.graphical_settings)
         for ax in self.fig.get_axes():
             #setting new font size for figure x and y labels
             ax.xaxis.label.set_fontsize(new_font_size)
@@ -197,7 +149,7 @@ class ColoursGraph(FigureCanvasQTAgg):
             ax.set_title(ax.get_title(), fontsize=new_font_size)
         
         #adjusting font size of title
-        self.addFigureTitle(title = self.figure_title,fontsize=new_font_size + 2)
+        self.addFigureTitle(figure_title = self.fig.get_suptitle(),fontsize=new_font_size + 2)
         
 
     def calcNewFont(self):
@@ -205,38 +157,23 @@ class ColoursGraph(FigureCanvasQTAgg):
         Calculates the new font size for x and y axis labels when
         the ColoursGraph widget gets resized. 
         """
-        width, height = self.fig.get_size_inches()
+        width, _ = self.fig.get_size_inches()
         scale_factor = width / 5
 
         #choose smallest font out of the new scaled font or the outright maximum font
-        new_font_size = min(self.base_font_size * scale_factor,self.label_max_font_size)
+        new_font_size = min(self.graphical_settings['base_font_size'] * scale_factor,self.graphical_settings['label_max_font_size'])
 
         #choose largest font out of the outright minimum font size and the new scaled font size
-        font_size = max(self.label_min_font_size,new_font_size)
+        font_size = max(self.graphical_settings['label_min_font_size'],new_font_size)
         return font_size
 
-    def verifyLabelFontChange(self):
-        """
-        Function to check is the matplotlib Figure being rendered in the 
-        FigureCanvasQtAgg (Colours Graph) widget currently has the smallest font
-        size setting set.
-        """
-        if self.verifyLabelGreaterThanMinFontSize() is False:
-            return None
-        if self.verifySubplotGreaterThanMinWidth() is False:
-            return None
-        return True
 
     def verifyLabelGreaterThanMinFontSize(self):
         """
         Function checking if the current font size of a subplots labels
         are greater than the minimum label font size
         """
-        x_label_font_size = self.axes_left.xaxis.label.get_fontsize()
-
-        if x_label_font_size <= self.label_min_font_size:
-            return False
-        return True
+        return self.fig.axes[0].xaxis.label.get_fontsize() <= self.graphical_settings['label_min_font_size']
 
     
     def verifySubplotGreaterThanMinWidth(self):
@@ -245,13 +182,11 @@ class ColoursGraph(FigureCanvasQTAgg):
         the minimum allowable width of a subplot
         """
         #calculation of subplot size in inches, requires conversion form normalised units
-        norm_width = self.axes_center.get_position().width
-        fig_width, fig_height = self.fig.get_size_inches()
+        norm_width = self.fig.axes[1].get_position().width
+        fig_width,_ = self.fig.get_size_inches()
         subplot_width_inches = fig_width *norm_width
 
-        if subplot_width_inches <= self.subplot_min_width:
-            return False
-        return True
+        return subplot_width_inches <= self.graphical_settings['subplot_min_width']
 
     def verifyTightLayout(self):
         """
@@ -259,12 +194,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQTAGG (Colours Graph) widget has a width and height 
         greater than 0 inches.
         """
-        # Get the current width and height of the figure
         width, height = self.fig.get_size_inches()
-
-        if width > 0 and height > 0:
-            return True
-        else:
-            return None
+        return width > 0 and height > 0 
 
 
