@@ -8,6 +8,7 @@ import pandas as pd
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.ticker import MaxNLocator
 
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
@@ -66,19 +67,29 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_center = self.fig.add_subplot(132)
         axes_right = self.fig.add_subplot(133)
 
+        print(df.head(-10))
+
         for index,ax in enumerate(self.fig.axes,start=1):
 
             color_data = round(100*df.iloc[:,index]/255,  4)
             depth = df.iloc[:,0]
             color_component = df.columns[index]
 
-            ax.plot(color_data, depth,  color = color_component)
+            ax.plot(color_data, depth, color = color_component)
 
             #set the graphical parameters for each subplot
             ax.set_title(color_component)
-            ax.grid(axis = 'y')
+    
             ax.invert_yaxis()
+            ax.grid(axis = 'y')
             ax.set_xlim(0,100)
+
+            ax.set_xticks(color_data)
+            ax.set_yticks(depth)
+
+            ax.yaxis.set_major_locator(MaxNLocator(nbins=10))
+            ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+            
         
         #add title to figure 
         self.addFigureTitle(df = df)
