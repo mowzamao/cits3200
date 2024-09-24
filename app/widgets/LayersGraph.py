@@ -79,7 +79,6 @@ class LayersGraph(FigureCanvasQTAgg):
         Function which resets fontsize of LayersGraph Title
         """
         new_fontsize = self.calcNewFont()
-        print(new_fontsize)
         self.layers_fig.suptitle("Colour Layers",fontsize = new_fontsize, fontweight='bold',y = 0.97)
 
     def calcNewFont(self):
