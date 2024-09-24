@@ -116,8 +116,6 @@ class ColoursGraph(FigureCanvasQTAgg):
             1) changing font size
             2) turning tight layout on and off.
         """
-        
-
         #change font size if current font size and subplot width not below minimum values
         if self.verifyLabelGreaterThanMinFontSize():
             self.setFontSize()
@@ -167,7 +165,6 @@ class ColoursGraph(FigureCanvasQTAgg):
         #choose largest font out of the outright minimum font size and the new scaled font size
         font_size = max(self.label_min_font_size , new_font_size)
         return font_size
-
 
     def verifyLabelGreaterThanMinFontSize(self):
         """

@@ -7,6 +7,8 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
 from matplotlib.gridspec import GridSpec
 
+from PyQt6 import QtCore, QtWidgets
+
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
 
@@ -16,31 +18,45 @@ class LayersGraph(FigureCanvasQTAgg):
         self.layers_title_min_fontsize = 5
         self.layers_title_max_fontsize = 12 
         self.layers_title_base_fontsize = 7 
-        self.layers_min_width = 1.5
         height = len(df)
         width = max(1, height//10)
-        self.core_as_grid = self.createCore_as_grid(df,height, width) 
-        self.setupLayersFigure(width,height,dpi)
-        super(LayersGraph, self).__init__(self.layers_fig)
 
+        self.core_as_grid = self.createCore_as_grid(df,height, width)
+        top,bottom = self.getColoursGraphCoordinates(parent) 
+        self.setupLayersFigure(width,height,dpi,top,bottom)
+        
+        super(LayersGraph, self).__init__(self.layers_fig)
+        
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
 
-    def setupLayersFigure(self,width,height, dpi):
-        #define the figure the plot will be rendered in 
-        self.layers_fig = Figure(figsize=(width, height), dpi=dpi)
-        
-        # Create a GridSpec with 2 rows and 1 column
-        gs = GridSpec(nrows=3, ncols=3, height_ratios=[0.1, 0.8,0.1],width_ratios=[0.05,0.9,0.05], figure=self.layers_fig)
-        self.layers_axes = self.layers_fig.add_subplot(gs[1, 1])
 
-        # #remove axis / make them invisible 
-        self.layers_axes.get_xaxis().set_ticks([])
-        self.layers_axes.get_yaxis().set_ticks([])
+    def getColoursGraphCoordinates(self,parent):
+        figure = self.accessColourGraph(parent)
+        first_data_point,last_data_point = self.getFirstAndLastDataPoints(figure)
+        first_data_point,last_data_point = self.relativeCoordinatesTransformation(figure,first_data_point,last_data_point)
+        return first_data_point[1], last_data_point[1]
+    
+    def accessColourGraph(self,parent) -> Figure:
+        return parent.colours_graph.figure
+    
+    def getFirstAndLastDataPoints(self,figure:Figure):
+        #retrieve intensity and depth data 
+        intensity = figure.axes[0].lines[0].get_xdata()
+        depth = figure.axes[0].lines[0].get_ydata()
+        #retrieve first and last data points of the data
+        first_data_point = (intensity[0],depth[0])
+        last_data_point = (intensity[-1],depth[-1])
+        return first_data_point,last_data_point
+    
+    def relativeCoordinatesTransformation(self,figure:Figure,first_data_point:tuple,last_data_point:tuple):
+        #define transformation
+        data_to_figure = figure.axes[0].transData + figure.transFigure.inverted()
 
-        #render image 
-        self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
-        self.layers_axes.imshow(self.core_as_grid,aspect='auto')
-
+        #transform first and last data points
+        first_data_point = tuple(data_to_figure.transform((first_data_point)))
+        last_data_point = tuple(data_to_figure.transform((last_data_point)))
+        return first_data_point,last_data_point
+    
 
     def createCore_as_grid(self,df:pd.DataFrame,height:int,width:int):
         """
@@ -59,17 +75,36 @@ class LayersGraph(FigureCanvasQTAgg):
                     core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
         return core_as_grid
     
+    def setupLayersFigure(self,width,height, dpi,top,bottom):
+        #define the figure the plot will be rendered in 
+        self.layers_fig = Figure(figsize=(width, height), dpi=dpi)
+
+        top_space = 1- top
+        bottom_space = bottom
+        middle_space = 1 - (top_space + bottom_space)
+
+        # Create a GridSpec with 2 rows and 1 column
+        gs = GridSpec(nrows=3, ncols=3, height_ratios=[top_space,middle_space,bottom_space],width_ratios=[0.05,0.9,0.05], figure=self.layers_fig)
+        self.layers_axes = self.layers_fig.add_subplot(gs[1, 1])
+
+        # remove axis / make them invisible 
+        self.layers_axes.get_xaxis().set_ticks([])
+        self.layers_axes.get_yaxis().set_ticks([])
+
+        #render image 
+        self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
+        self.layers_axes.imshow(self.core_as_grid,aspect='auto')
+    
     def resizeEvent(self, event):
         """
         Function which resizes graphical parameters of the LayersGraph 
         as PyQt window is changed.  
         """
         if self.verifyDimensions():
-            if self.verifyFigGreaterThanMinWidth(): 
-                self.setFontSize()
+            self.setFontSize()
             self.layers_fig.tight_layout()
         
-        self.draw()
+        self.draw_idle()
         # Initialise an instance of the new figure
         super().resizeEvent(event)  
         
@@ -102,13 +137,6 @@ class LayersGraph(FigureCanvasQTAgg):
         width, height = self.layers_fig.get_size_inches()
         return width > 0 and height > 0 
     
-    def verifyFigGreaterThanMinWidth(self):
-        """
-        Function which checks LayersGraph Figure is less than minimum width. 
-        """
-        #calculation of subplot size in inches, requires conversion form normalised units
-        fig_width = self.layers_fig.get_figwidth()
-        return fig_width <= self.layers_min_width
 
 
 
