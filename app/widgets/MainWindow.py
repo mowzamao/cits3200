@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtGui import QPixmap, QAction  
 from PyQt6.QtCore import Qt, QSize
 from matplotlib.backends.backend_pdf import PdfPages
+import pandas as pd
 
 from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
@@ -79,6 +80,30 @@ class MainWindow(QMainWindow):
 
             # Optional: Show message in status bar
             self.statusBar().showMessage(f"Graphs saved to: {file_name}")
+    
+    # Function to export raw data to CSV
+    def export_data_to_csv(self):
+        # Open a file dialog for the user to select a location to save the CSV
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Raw Data as CSV",
+            "",
+            "CSV Files (*.csv)"  # Filter for CSV files
+        )
+
+        if file_name:
+            if not file_name.endswith('.csv'):
+                file_name += '.csv'
+
+            # Get the DataFrame from the graph panel
+            df = self.graph_panel.df  # Assuming df contains your raw data
+            
+            if df is not None:
+                # Export the DataFrame to CSV
+                df.to_csv(file_name, index=False)
+                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
+            else:
+                self.statusBar().showMessage("No data available to export.")
 
     
 
