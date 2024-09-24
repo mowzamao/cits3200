@@ -28,12 +28,15 @@ class Menu(QMenuBar):
         """Create the File menu and add actions."""
         file_menu = QMenu("File", self)
         open_action = QAction("Open", self)
+        export_csv_action = QAction("Export as CSV", self)  # New action for CSV export
         exit_action = QAction("Exit", self)
 
         open_action.triggered.connect(self.open_image)
+        export_csv_action.triggered.connect(self.parent.export_data_to_csv)  # Link to export function
         exit_action.triggered.connect(self.close)
 
         file_menu.addAction(open_action)
+        file_menu.addAction(export_csv_action)  # Add CSV export option to the menu
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
         
