@@ -31,31 +31,9 @@ class LayersGraph(FigureCanvasQTAgg):
 
 
     def getColoursGraphCoordinates(self,parent):
-        figure = self.accessColourGraph(parent)
-        first_data_point,last_data_point = self.getFirstAndLastDataPoints(figure)
-        first_data_point,last_data_point = self.relativeCoordinatesTransformation(figure,first_data_point,last_data_point)
-        return first_data_point[1], last_data_point[1]
-    
-    def accessColourGraph(self,parent) -> Figure:
-        return parent.colours_graph.figure
-    
-    def getFirstAndLastDataPoints(self,figure:Figure):
-        #retrieve intensity and depth data 
-        intensity = figure.axes[0].lines[0].get_xdata()
-        depth = figure.axes[0].lines[0].get_ydata()
-        #retrieve first and last data points of the data
-        first_data_point = (intensity[0],depth[0])
-        last_data_point = (intensity[-1],depth[-1])
-        return first_data_point,last_data_point
-    
-    def relativeCoordinatesTransformation(self,figure:Figure,first_data_point:tuple,last_data_point:tuple):
-        #define transformation
-        data_to_figure = figure.axes[0].transData + figure.transFigure.inverted()
-
-        #transform first and last data points
-        first_data_point = tuple(data_to_figure.transform((first_data_point)))
-        last_data_point = tuple(data_to_figure.transform((last_data_point)))
-        return first_data_point,last_data_point
+        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
+        print(top[1],bottom[1])
+        return top[1],bottom[1]
     
 
     def createCore_as_grid(self,df:pd.DataFrame,height:int,width:int):
@@ -76,16 +54,15 @@ class LayersGraph(FigureCanvasQTAgg):
         return core_as_grid
     
     def setupLayersFigure(self,dpi,top,bottom):
-        #define the figure the plot will be rendered in 
+        #define the figure the plot will be rendered in
         self.layers_fig = Figure(dpi=dpi)
+        self.layers_axes = self.layers_fig.add_subplot(111)
 
-        top_space = 1- top
-        bottom_space = bottom
-        middle_space = 1 - (top_space + bottom_space)
-
-        # Create a GridSpec with 2 rows and 1 column
-        gs = GridSpec(nrows=3, ncols=3, height_ratios=[top_space,middle_space,bottom_space],width_ratios=[0.05,0.9,0.05], figure=self.layers_fig)
-        self.layers_axes = self.layers_fig.add_subplot(gs[1, 1])
+        self.layers_axes.clear()
+        self.layers_axes.set_position([0.1,bottom,0.8,top])
+        self.layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,top,bottom])
+        self.layers_axes.set_xlim(0,1)
+        self.layers_axes.set_ylim(top,bottom)
 
         # remove axis / make them invisible 
         self.layers_axes.get_xaxis().set_ticks([])
@@ -93,7 +70,6 @@ class LayersGraph(FigureCanvasQTAgg):
 
         #render image 
         self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
-        self.layers_axes.imshow(self.core_as_grid,aspect='auto')
     
     def resizeEvent(self, event):
         """

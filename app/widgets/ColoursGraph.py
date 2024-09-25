@@ -43,7 +43,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.label_min_font_size = 3
         self.label_max_font_size = 20
         self.axes_min_width = 0.35
-        self.base_font_size = 10 
+        self.base_font_size = 10
+        self.df = df 
+        self.dpi = dpi
         
         #Defining the top-end matplotlib figure 
         self.fig = Figure(dpi=dpi)
@@ -53,9 +55,23 @@ class ColoursGraph(FigureCanvasQTAgg):
         #connecting resize event to graph
         self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
 
+
         # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
 
+    def getLineHeightRelativeCoordinates(self):
+        first_data_point = (self.df.iloc[1,1],self.df.iloc[0,1])
+        last_data_point = (self.df.iloc[1,-1],self.df.iloc[0,-1])
+        
+        first_data_point = self.getNormalisedCoords(first_data_point)
+        last_data_point = self.getNormalisedCoords(last_data_point)
+        return first_data_point, last_data_point
+    
+    def getNormalisedCoords(self,data_point):
+        width,height = tuple(self.fig.get_size_inches())
+        data_point = self.fig.axes[0].transData.transform(data_point) 
+        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
+    
     def plotColourData(self,df:pd.DataFrame):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
