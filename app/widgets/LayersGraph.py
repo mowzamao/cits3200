@@ -22,7 +22,7 @@ class LayersGraph(FigureCanvasQTAgg):
 
         self.fig = Figure(figsize=(width, height), dpi=dpi)
 
-        self.axes = fig.add_subplot(111)
+        self.axes = self.fig.add_subplot(111)
         self.axes.get_xaxis().set_ticks([])
         self.axes.get_yaxis().set_ticks([])
         super(LayersGraph, self).__init__(self.fig)

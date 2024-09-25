@@ -105,6 +105,28 @@ class MainWindow(QMainWindow):
             else:
                 self.statusBar().showMessage("No data available to export.")
 
-    
+    # Function to export raw data to Excel
+    def export_data_to_excel(self):
+        # Open a file dialog to specify where to save the Excel file
+        file_name, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Raw Data as Excel",
+            "",
+            "Excel Files (*.xlsx)"
+        )
+
+        if file_name:
+            if not file_name.endswith('.xlsx'):
+                file_name += '.xlsx'
+
+            # Get the DataFrame from the graph panel (assuming df is stored there)
+            df = self.graph_panel.df  # Make sure this is where your data is stored
+            
+            if df is not None:
+                # Export the DataFrame to Excel
+                df.to_excel(file_name, index=False)
+                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
+            else:
+                self.statusBar().showMessage("No data available to export.")
 
  
