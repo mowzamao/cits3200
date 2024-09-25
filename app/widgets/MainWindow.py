@@ -69,14 +69,13 @@ class MainWindow(QMainWindow):
             
             # Assuming ColoursGraph is the first child in Graphs widget
             colours_graph = graphs_widget.findChild(ColoursGraph)
-            layers_graph = graphs_widget.findChild(LayersGraph)
+           
 
             # Export both figures to a PDF using PdfPages
             with PdfPages(file_name) as pdf:
                 if colours_graph:
                     pdf.savefig(colours_graph.fig)  # Save ColoursGraph as a page in the PDF
-                if layers_graph:
-                    pdf.savefig(layers_graph.fig)  # Save LayersGraph as a page in the PDF
+             
 
             # Optional: Show message in status bar
             self.statusBar().showMessage(f"Graphs saved to: {file_name}")
