@@ -9,7 +9,7 @@ import pandas as pd
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
-from matplotlib.ticker import MaxNLocator,MultipleLocator
+from matplotlib.ticker import MaxNLocator,AutoMinorLocator
 
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
@@ -105,17 +105,21 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_center.set_xlabel('Intensity (%)')
 
     def setCustomTicks(self,ax:matplotlib.axes.Axes):
-        ax.yaxis.set_major_locator(MaxNLocator(nbins=20))
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=4))
+        y_axis_nbins = 20 
+        x_axis_nbins = 4 
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=y_axis_nbins))
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=x_axis_nbins))
 
-        ax.yaxis.minorticks_on()
-        ax.yaxis.set_minor_locator(MultipleLocator(0.05))
-        ax.xaxis.set_minor_locator(MultipleLocator(5))
+        ax.yaxis.set_minor_locator(AutoMinorLocator(4))
+        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
 
         ax.tick_params(axis='x', which='both', top=True, labeltop=False)
         ax.tick_params(axis='y', which='both', right=True, labelright=False)
 
-        ax.tick_params(which='minor', length=4, color='grey')
+        ax.tick_params(which='minor', length=2, color='grey')
+        ax.tick_params(which='major', length=4, color='grey')
+
+        ax.yaxis.minorticks_on()
         return ax
         
 
