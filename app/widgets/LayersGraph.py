@@ -17,7 +17,9 @@ class LayersGraph(FigureCanvasQTAgg):
         #defining metadate for layers plot
         self.layers_title_min_fontsize = 5
         self.layers_title_max_fontsize = 12 
-        self.layers_title_base_fontsize = 7 
+        self.layers_title_base_fontsize = 7
+        self.dpi = dpi
+        self.parent = parent 
         height = len(df)
         width = max(1, height//10)
 
@@ -32,7 +34,6 @@ class LayersGraph(FigureCanvasQTAgg):
 
     def getColoursGraphCoordinates(self,parent):
         top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
-        print(top[1],bottom[1])
         return top[1],bottom[1]
     
 
@@ -59,10 +60,11 @@ class LayersGraph(FigureCanvasQTAgg):
         self.layers_axes = self.layers_fig.add_subplot(111)
 
         self.layers_axes.clear()
-        self.layers_axes.set_position([0.1,bottom,0.8,top])
-        self.layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,top,bottom])
+        self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
         self.layers_axes.set_xlim(0,1)
-        self.layers_axes.set_ylim(top,bottom)
+        self.layers_axes.set_ylim(0,1)
+        self.layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,0,1],origin = 'upper')
+        
 
         # remove axis / make them invisible 
         self.layers_axes.get_xaxis().set_ticks([])
@@ -77,8 +79,9 @@ class LayersGraph(FigureCanvasQTAgg):
         as PyQt window is changed.  
         """
         if self.verifyDimensions():
+            top,bottom = self.getColoursGraphCoordinates(self.parent)
+            self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
             self.setFontSize()
-            self.layers_fig.tight_layout()
         
         self.draw_idle()
         # Initialise an instance of the new figure
