@@ -5,9 +5,6 @@ import matplotlib.pyplot as plt
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
-from matplotlib.gridspec import GridSpec
-
-from PyQt6 import QtCore, QtWidgets
 
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
@@ -25,17 +22,10 @@ class LayersGraph(FigureCanvasQTAgg):
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
         top,bottom = self.getColoursGraphCoordinates(parent) 
-        self.setupLayersFigure(dpi,top,bottom)
+        self.layers_fig,self.layers_axes = self.setLayersFigure(dpi,top,bottom)
+        self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
         
         super(LayersGraph, self).__init__(self.layers_fig)
-        
-        self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
-
-
-    def getColoursGraphCoordinates(self,parent):
-        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
-        return top[1],bottom[1]
-    
 
     def createCore_as_grid(self,df:pd.DataFrame,height:int,width:int):
         """
@@ -54,24 +44,31 @@ class LayersGraph(FigureCanvasQTAgg):
                     core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
         return core_as_grid
     
-    def setupLayersFigure(self,dpi,top,bottom):
+    def setLayersFigure(self,dpi,top,bottom):
         #define the figure the plot will be rendered in
-        self.layers_fig = Figure(dpi=dpi)
-        self.layers_axes = self.layers_fig.add_subplot(111)
+        layers_fig = Figure(dpi=dpi)
 
-        self.layers_axes.clear()
-        self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-        self.layers_axes.set_xlim(0,1)
-        self.layers_axes.set_ylim(0,1)
-        self.layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,0,1],origin = 'upper')
-        
-
-        # remove axis / make them invisible 
-        self.layers_axes.get_xaxis().set_ticks([])
-        self.layers_axes.get_yaxis().set_ticks([])
-
+        #set axis
+        layers_axes = layers_fig.add_subplot(111) 
+        layers_axes.clear()
+        layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
+        layers_axes.set_xlim(0,1)
+        layers_axes.set_ylim(0,1)
         #render image 
-        self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
+        layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,0,1],origin = 'upper')
+
+        #add title
+        layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
+
+        #hiding ticks and their labels
+        layers_axes.get_xaxis().set_ticks([])
+        layers_axes.get_yaxis().set_ticks([])
+        return layers_fig,layers_axes
+
+    def getColoursGraphCoordinates(self,parent):
+        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
+        return top[1],bottom[1]
+    
     
     def resizeEvent(self, event):
         """

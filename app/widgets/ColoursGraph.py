@@ -101,8 +101,8 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.addFigureTitle(df = df)
 
         #adding headings for the entire ColoursGraph figure
-        axes_left.set_ylabel('Depth (m)')
-        axes_center.set_xlabel('Intensity (%)')
+        axes_left.set_ylabel('Depth (m)',fontweight = 'bold')
+        axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
 
     def setCustomTicks(self,ax:matplotlib.axes.Axes):
         y_axis_nbins = 20 
