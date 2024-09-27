@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
+from PyQt6.QtCore import QTimer
 
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
@@ -70,19 +71,40 @@ class LayersGraph(FigureCanvasQTAgg):
         return top[1],bottom[1]
     
     
+    # def resizeEvent(self, event):
+    #     """
+    #     Function which resizes graphical parameters of the LayersGraph 
+    #     as PyQt window is changed.  
+    #     """
+    #     QTimer.singleShot(2000)
+    #     if self.verifyDimensions():
+    #         top,bottom = self.getColoursGraphCoordinates(self.parent)
+    #         self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
+    #         self.setFontSize()
+        
+    #     self.draw_idle()
+    #     # Initialise an instance of the new figure
+    #     super().resizeEvent(event)
+
     def resizeEvent(self, event):
         """
         Function which resizes graphical parameters of the LayersGraph 
-        as PyQt window is changed.  
+        as PyQt window is changed.
         """
-        if self.verifyDimensions():
-            top,bottom = self.getColoursGraphCoordinates(self.parent)
-            self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-            self.setFontSize()
-        
-        self.draw_idle()
+        # Call delayed function after 2 seconds
+        QTimer.singleShot(10, self.delayed_resize_logic)
+
         # Initialise an instance of the new figure
-        super().resizeEvent(event)  
+        super().resizeEvent(event)
+
+    def delayed_resize_logic(self):
+        """ This method handles the delayed resizing logic. """
+        if self.verifyDimensions():
+            top, bottom = self.getColoursGraphCoordinates(self.parent)
+            self.layers_axes.set_position([0.1, bottom, 0.8, (top - bottom)])
+            self.setFontSize()
+        self.draw_idle()
+
 
     def setFontSize(self):
         """

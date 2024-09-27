@@ -14,8 +14,6 @@ from matplotlib.ticker import MaxNLocator,AutoMinorLocator
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
 
-from PyQt6 import QtCore, QtWidgets
-
 class ColoursGraph(FigureCanvasQTAgg):
     """
     A class acting as a PyQt widget which will contain matplotlib plots.
@@ -26,6 +24,11 @@ class ColoursGraph(FigureCanvasQTAgg):
     Parameters:
         FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
     """
+    label_min_font_size = 3
+    label_max_font_size = 20
+    axes_min_width = 0.35
+    base_font_size = 10
+
 
     def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None):
         """ 
@@ -38,15 +41,10 @@ class ColoursGraph(FigureCanvasQTAgg):
             dpi(int): matplotlib resolution settings - Dots Per Inch. 
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """
-
-        #define default values for subplot graphical parameters
-        self.label_min_font_size = 3
-        self.label_max_font_size = 20
-        self.axes_min_width = 0.35
-        self.base_font_size = 10
         self.df = df 
         self.dpi = dpi
-        
+        #self.parent = parent
+
         #Defining the top-end matplotlib figure 
         self.fig = Figure(dpi=dpi)
 
@@ -54,7 +52,6 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         #connecting resize event to graph
         self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
-
 
         # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
@@ -165,7 +162,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         super().resizeEvent(event)
 
 
-    def setFontSize(self,):
+    def setFontSize(self):
         """
         Sets new parameters for font size graphical elements of the matplotlib figure.
         These include title, tick markers and axis labels font sizes.
