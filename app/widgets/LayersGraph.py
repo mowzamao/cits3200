@@ -9,17 +9,16 @@ from PyQt6.QtCore import QTimer
 
 class LayersGraph(FigureCanvasQTAgg):
     """A wrapper class for a Matplotlib plot of the sediment layers"""
+    layers_title_min_fontsize = 5
+    layers_title_max_fontsize = 12 
+    layers_title_base_fontsize = 7
 
     def __init__(self, parent=None, dpi=100, df = None):
-
-        #defining metadate for layers plot
-        self.layers_title_min_fontsize = 5
-        self.layers_title_max_fontsize = 12 
-        self.layers_title_base_fontsize = 7
         self.dpi = dpi
         self.parent = parent 
         height = len(df)
         width = max(1, height//10)
+        df = df[self.getAnalysisType(df)]
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
         top,bottom = self.getColoursGraphCoordinates(parent) 
@@ -45,6 +44,21 @@ class LayersGraph(FigureCanvasQTAgg):
                     core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
         return core_as_grid
     
+    def getAnalysisType(self,df:pd.DataFrame):
+        """
+        Function which returns a list of column names in the order of depth, R,G,B so that 
+        imshow is given the correct colour values as inputs. For later development, this function can 
+        be used to handle and setup CEILAB analysis.
+
+        parameters:
+            df(pd.Dataframe): pandas dataframe containing the data to be plotted.
+        """
+        df_columns = df.columns
+        if 'Blue' in df_columns and 'Red' in df_columns and 'Green' in df_columns:
+            return ['Depth (mm)','Red',"Green",'Blue']
+        else:
+            return None
+    
     def setLayersFigure(self,dpi,top,bottom):
         #define the figure the plot will be rendered in
         layers_fig = Figure(dpi=dpi)
@@ -64,7 +78,6 @@ class LayersGraph(FigureCanvasQTAgg):
         #add title
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
 
-
         #hiding ticks and their labels
         layers_axes.get_xaxis().set_ticks([])
         layers_axes.get_yaxis().set_ticks([])
@@ -78,7 +91,9 @@ class LayersGraph(FigureCanvasQTAgg):
     def resizeEvent(self, event):
         """
         Function which resizes graphical parameters of the LayersGraph 
-        as PyQt window is changed.
+        as PyQt window is changed. There is a delayed run time for this function 
+        to allow for the ColoursGraph to fully render. Without doing this the layers graph
+        receives the wrong coordinates for the locaiton of the start and end points of the data.
         """
         # Call delayed function after 2 seconds
         QTimer.singleShot(10, self.delayed_resize_logic)

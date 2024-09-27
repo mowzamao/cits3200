@@ -64,14 +64,16 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_left = self.fig.add_subplot(131)
         axes_center = self.fig.add_subplot(132)
         axes_right = self.fig.add_subplot(133)
+        
+        column_names = self.getAnalysisType(df)
 
-        for index,ax in enumerate(self.fig.axes,start=1):
+        for ax,column_name in zip(self.fig.axes,column_names):
             #get colour arrays to be plotted 
-            color_data = round(100*df.iloc[:,index]/255,  4)
-            depth = df.iloc[:,0]
-            color_component = df.columns[index]
+            color_data = round(100*df[column_name]/255,  4)
+            depth = df['Depth (mm)']
+            color_component = column_name
 
-            ax.plot(color_data, depth, color = color_component)
+            ax.plot(color_data, depth, color = color_component.lower())
 
             #set graphical parameters for each subplot
             ax.set_title(color_component, fontweight='bold',pad = 10)
@@ -85,8 +87,24 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.addFigureTitle(df = df)
 
         #adding headings for the entire ColoursGraph figure
-        axes_left.set_ylabel('Depth (m)',fontweight = 'bold')
+        axes_left.set_ylabel('Depth (mm)',fontweight = 'bold')
         axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
+
+    def getAnalysisType(self,df:pd.DataFrame):
+        """
+        Function which returns the column names of the colour data to be plotted. 
+        The list is order according to what is rendered on the GUI. This function can 
+        later be used to handle and setup CEILAB analysis. 
+
+        parameters:
+            df(pd.Dataframe): pandas dataframe containing the data to be plotted.
+        """
+        df_columns = df.columns
+        if 'Blue' in df_columns and 'Red' in df_columns and 'Green' in df_columns:
+            return ['Red',"Green",'Blue']
+        else:
+            return None
+
 
     def setCustomTicks(self,ax:matplotlib.axes.Axes,y_axis_nbins:int,x_axis_nbins:int,y_axis_nminor:int,x_axis_nminor:int):
         """
@@ -129,8 +147,11 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         #if no title string is provided generate a title string based of df column names
         if df is not None and figure_title is None:
-            analysis_type = df.columns[1][0] + df.columns[2][0] + df.columns[3][0]
-            figure_title = analysis_type + ' Colour Space Plot'
+            columns = self.getAnalysisType(df)
+            if columns == ['Red',"Green","Blue"]:
+                figure_title = 'RGB Colour Space Plot'
+            else:
+                figure_title = 'Colour Space Plot'
 
         #render new title onto matplotlib figure  
         self.fig.suptitle(figure_title, fontweight='bold',fontsize = fontsize)
@@ -163,7 +184,6 @@ class ColoursGraph(FigureCanvasQTAgg):
         These include title, tick markers and axis labels font sizes.
         """
         new_font_size = self.calcNewFont()
-        print(new_font_size)
         for ax in self.fig.get_axes():
             #setting new font size for figure x and y labels
             ax.xaxis.label.set_fontsize(new_font_size)
