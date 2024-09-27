@@ -25,7 +25,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
     """
     label_min_font_size = 3
-    label_max_font_size = 20
+    label_max_font_size = 14.5
     axes_min_width = 0.35
     base_font_size = 10
 
@@ -168,6 +168,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         These include title, tick markers and axis labels font sizes.
         """
         new_font_size = self.calcNewFont()
+        print(new_font_size)
         for ax in self.fig.get_axes():
             #setting new font size for figure x and y labels
             ax.xaxis.label.set_fontsize(new_font_size)

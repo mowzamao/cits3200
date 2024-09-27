@@ -23,7 +23,7 @@ class LayersGraph(FigureCanvasQTAgg):
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
         top,bottom = self.getColoursGraphCoordinates(parent) 
-        self.layers_fig,self.layers_axes = self.setLayersFigure(dpi,top,bottom)
+        self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
         
         super(LayersGraph, self).__init__(self.layers_fig)
@@ -55,36 +55,25 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
         layers_axes.set_xlim(0,1)
         layers_axes.set_ylim(0,1)
+        layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
+        layers_axes_top = layers_axes.twiny()
+        layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
         #render image 
         layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,0,1],origin = 'upper')
 
         #add title
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
 
+
         #hiding ticks and their labels
         layers_axes.get_xaxis().set_ticks([])
         layers_axes.get_yaxis().set_ticks([])
-        return layers_fig,layers_axes
+        layers_axes_top.get_xaxis().set_ticks([])
+        return layers_fig,layers_axes,layers_axes_top
 
     def getColoursGraphCoordinates(self,parent):
         top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
         return top[1],bottom[1]
-    
-    
-    # def resizeEvent(self, event):
-    #     """
-    #     Function which resizes graphical parameters of the LayersGraph 
-    #     as PyQt window is changed.  
-    #     """
-    #     QTimer.singleShot(2000)
-    #     if self.verifyDimensions():
-    #         top,bottom = self.getColoursGraphCoordinates(self.parent)
-    #         self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-    #         self.setFontSize()
-        
-    #     self.draw_idle()
-    #     # Initialise an instance of the new figure
-    #     super().resizeEvent(event)
 
     def resizeEvent(self, event):
         """
@@ -111,7 +100,13 @@ class LayersGraph(FigureCanvasQTAgg):
         Function which resets fontsize of LayersGraph Title
         """
         new_fontsize = self.calcNewFont()
-        self.layers_fig.suptitle("Colour Layers",fontsize = new_fontsize, fontweight='bold',y = 0.97)
+        self.layers_fig.suptitle(self.layers_fig.get_suptitle(),fontsize = new_fontsize, fontweight='bold',y = 0.97)
+
+        if new_fontsize > 14.5:
+            new_fontsize = 14.5
+
+        self.layers_axes.set_xlabel(self.layers_axes.get_xlabel(),fontsize = new_fontsize, fontweight='bold',labelpad = 10 )
+        self.layers_axes_top.set_xlabel(self.layers_axes_top.get_xlabel(),fontsize = new_fontsize, fontweight='bold',labelpad = 10)
 
     def calcNewFont(self):
         """
