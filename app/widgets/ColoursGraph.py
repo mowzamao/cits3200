@@ -53,7 +53,6 @@ class ColoursGraph(FigureCanvasQTAgg):
         super(ColoursGraph, self).__init__(self.fig)
 
     
-    
     def plotColourData(self,df:pd.DataFrame):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
@@ -67,16 +66,16 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_right = self.fig.add_subplot(133)
 
         for index,ax in enumerate(self.fig.axes,start=1):
+            #get colour arrays to be plotted 
             color_data = round(100*df.iloc[:,index]/255,  4)
             depth = df.iloc[:,0]
             color_component = df.columns[index]
 
             ax.plot(color_data, depth, color = color_component)
 
+            #set graphical parameters for each subplot
             ax.set_title(color_component, fontweight='bold',pad = 10)
-
             ax = self.setCustomTicks(ax,20,4,4,2)
-
             ax.grid(axis = 'both',visible=True)
             ax.set_xlim(0,100)
             ax.set_ylim(bottom=0)
