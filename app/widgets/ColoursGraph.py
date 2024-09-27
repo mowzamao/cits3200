@@ -43,18 +43,13 @@ class ColoursGraph(FigureCanvasQTAgg):
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """
         self.df = df 
-        self.dpi = dpi
-        #self.parent = parent
-
-        #Defining the top-end matplotlib figure 
+        self.dpi = dpi 
         self.fig = Figure(dpi=dpi)
-
         self.plotColourData(df)
 
         #connecting resize event to graph
         self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
 
-        # initialise an instance of the ColoursGraph class
         super(ColoursGraph, self).__init__(self.fig)
 
     def getLineHeightRelativeCoordinates(self):
@@ -88,7 +83,7 @@ class ColoursGraph(FigureCanvasQTAgg):
 
             ax.set_title(color_component, fontweight='bold',pad = 10)
 
-            ax = self.setCustomTicks(ax)
+            ax = self.setCustomTicks(ax,20,4,4,2)
 
             ax.grid(axis = 'both',visible=True)
             ax.set_xlim(0,100)
@@ -102,14 +97,12 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_left.set_ylabel('Depth (m)',fontweight = 'bold')
         axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
 
-    def setCustomTicks(self,ax:matplotlib.axes.Axes):
-        y_axis_nbins = 20 
-        x_axis_nbins = 4 
+    def setCustomTicks(self,ax:matplotlib.axes.Axes,y_axis_nbins:int,x_axis_nbins:int,y_axis_n_minor:int,x_axis_n_minor:int):
         ax.yaxis.set_major_locator(MaxNLocator(nbins=y_axis_nbins))
         ax.xaxis.set_major_locator(MaxNLocator(nbins=x_axis_nbins))
 
-        ax.yaxis.set_minor_locator(AutoMinorLocator(4))
-        ax.xaxis.set_minor_locator(AutoMinorLocator(2))
+        ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_n_minor))
+        ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_n_minor))
 
         ax.tick_params(axis='x', which='both', top=True, labeltop=False)
         ax.tick_params(axis='y', which='both', right=True, labelright=False)
