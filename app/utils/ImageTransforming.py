@@ -57,30 +57,6 @@ def crop_img(img: np.array, x: int, y: int, w: int, h: int) -> np.array:
     """ Crops an image to a bounding box"""
     return img[y:y+h, x:x+w]
 
-def to_rgb(img: np.array) -> np.array:
-    """ Converts an image to the RGB color space from CIE Lab"""
-    rgb = cv.cvtColor(img, cv.COLOR_Lab2RGB)
-    return rgb
-
-def to_lab(img: np.array) -> np.array:
-    """ Converts an image to the Lab color space from RGB"""
-    lab = cv.cvtColor(img, cv.COLOR_RGB2Lab)
-    return lab
-
-def img_rgb_array(img: np.array, is_BGR: bool=False) -> tuple[np.array]:
-    """Turns an OpenCV RGB or BGR image into 3 seperate Red, Green, and Blue arrays of all the same shape"""
-    red = img[:,:,2] if is_BGR else img[:,:,0]
-    green = img[:,:,1]
-    blue = img[:,:,0] if is_BGR else img[:,:,2]
-    return red, green, blue
-
-def img_lab_array(img: np.array) -> tuple[np.array]:
-    """Turns an OpenCV CIELAB image into 3 seperate L*, a*, and b* arrays of all the same shape"""
-    light = img[:,:,0]
-    a_coord = img[:,:,1]
-    b_coord = img[:,:,2]
-    return light, a_coord, b_coord
-
 """ Other Fucntions """
 def orient_array(array: np.array) -> np.array:
     """Orients input 2D or larger array to have it's height (1st axis) be longer than it's width (2nd axis)
