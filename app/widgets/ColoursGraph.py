@@ -6,6 +6,7 @@ import matplotlib.axes
 import matplotlib.figure
 import numpy as np
 import pandas as pd
+from matplotlib.ticker import MaxNLocator
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg

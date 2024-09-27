@@ -9,22 +9,17 @@ class Toolbar(QToolBar):
     def init_ui(self):
         """Create the controls panel with buttons for various functions."""
 
-        self.greyscale = QAction("Convert to Greyscale", self)
-        self.analyze_rgb = QAction("RGB Analysis", self)
-        self.detect_perimeter = QAction("Perimeter Detection", self)
-        self.set_calibration = QAction("Set Calibration Points", self)
-        self.export_data = QAction("Export Results", self)
-        self.plot_rgb_graph = QAction("Plot RGB Graph", self)
-        self.plot_greyscale = QAction("Plot Greyscale Intensity", self)
+        self.calibrate_image = QAction("Calibrate Image", self)
+        self.run_rgb = QAction("Run RGB Analysis", self)
+        self.rub_cielab = QAction("Run CIELAB Analysis", self)
+        self.export_results = QAction("Export Results", self)
        
-        self.addAction(self.greyscale)
-        self.addAction(self.analyze_rgb)
-        self.addAction(self.detect_perimeter)
-        self.addAction(self.set_calibration)
-        self.addAction(self.export_data)
-        self.addAction(self.plot_rgb_graph)
-        self.addAction(self.greyscale)
-    
+        self.addAction(self.calibrate_image)
+        self.addAction(self.run_rgb)
+        self.addAction(self.rub_cielab)
+        self.addAction(self.export_results)
+        self.export_results.triggered.connect(self.parent().export_graphs_as_pdf)# Connect Export Results button to the export method in MainWindow
+
 
 
     

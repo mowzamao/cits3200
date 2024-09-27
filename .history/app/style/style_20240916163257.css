@@ -1,0 +1,21 @@
+QMainWindow {background-color: #eaeaea;}
+
+QMenuBar {
+  padding: 10px;
+  font-weight: 650;
+  background-color: rgb(18, 61, 117);
+}
+
+QToolBar {
+  background-color: #f3f2f0;
+  padding: 4px;
+}
+QToolButton {
+  background-color: #f3f2f0;
+  border-radius: 2px;
+  padding: 10px;
+  font-weight: 650;
+}
+QToolButton:hover {
+  background-color: rgb(45, 101, 173);
+}
