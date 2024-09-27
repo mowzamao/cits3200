@@ -44,7 +44,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         self.df = df 
         self.dpi = dpi 
-        self.fig = Figure(dpi=dpi)
+        self.fig = Figure(dpi=self.dpi)
         self.plotColourData(df)
 
         #connecting resize event to graph
@@ -52,22 +52,14 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         super(ColoursGraph, self).__init__(self.fig)
 
-    def getLineHeightRelativeCoordinates(self):
-        first_data_point = (self.df.iloc[0,1],self.df.iloc[0,0])
-        last_data_point = (self.df.iloc[-1,1],self.df.iloc[-1,0])
-        
-        first_data_point = self.getNormalisedCoords(first_data_point)
-        last_data_point = self.getNormalisedCoords(last_data_point)
-        return first_data_point, last_data_point
     
-    def getNormalisedCoords(self,data_point):
-        width,height = self.fig.get_size_inches()
-        data_point = self.fig.axes[0].transData.transform(data_point) 
-        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
     
     def plotColourData(self,df:pd.DataFrame):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
+
+        parameters:
+            df(pd.Dataframe): the pandas dataframe with the colour data to be plotted
         """
         # Drawing three subplots, one for each colour channel
         axes_left = self.fig.add_subplot(131)
@@ -97,12 +89,22 @@ class ColoursGraph(FigureCanvasQTAgg):
         axes_left.set_ylabel('Depth (m)',fontweight = 'bold')
         axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
 
-    def setCustomTicks(self,ax:matplotlib.axes.Axes,y_axis_nbins:int,x_axis_nbins:int,y_axis_n_minor:int,x_axis_n_minor:int):
+    def setCustomTicks(self,ax:matplotlib.axes.Axes,y_axis_nbins:int,x_axis_nbins:int,y_axis_nminor:int,x_axis_nminor:int):
+        """
+        Function to setup the ticks on the axis of the ColoursGraph Plot.
+
+        parameters:
+            ax(matplotlib.axes.Axes): the axes object of a matplotlib subfigure which newly set ticks will be placed on.
+            y_axis_nbins(int): the number of bins / major ticks on the y axis of the ColoursGraph
+            x_axis_nbins(int): the number of bins / major ticks on the x axis of the ColoursGraph
+            y_axis_nminor(int) the number of minor ticks to sit between the major ticks on the y axis of the ColoursGraph
+            x_axis_nminor(int): the number of minor ticks to sit between the major ticks on the x axis of the ColoursGraph
+        """
         ax.yaxis.set_major_locator(MaxNLocator(nbins=y_axis_nbins))
         ax.xaxis.set_major_locator(MaxNLocator(nbins=x_axis_nbins))
 
-        ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_n_minor))
-        ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_n_minor))
+        ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_nminor))
+        ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_nminor))
 
         ax.tick_params(axis='x', which='both', top=True, labeltop=False)
         ax.tick_params(axis='y', which='both', right=True, labelright=False)
@@ -209,5 +211,29 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         width, height = self.fig.get_size_inches()
         return width > 0 and height > 0 
+    
+    def getLineHeightRelativeCoordinates(self):
+        """
+        Function that gets the height display coordinates for the first and last data points 
+        on the first subplot of the ColoursGraph. This is called by Layers Graph to align the layers 
+        with the ColoursGraph.
+        """
+        first_data_point = (self.df.iloc[0,1],self.df.iloc[0,0])
+        last_data_point = (self.df.iloc[-1,1],self.df.iloc[-1,0])
+        
+        first_data_point = self.getNormalisedCoords(first_data_point)
+        last_data_point = self.getNormalisedCoords(last_data_point)
+        return first_data_point, last_data_point
+    
+    def getNormalisedCoords(self,data_point):
+        """
+        Function that converts a matplotlib data coordinates into display coordinates.
+
+        parameters:
+            data_point(tuple): the x and y data coordinates of a point on a matplotlib graph/axes
+        """
+        width,height = self.fig.get_size_inches()
+        data_point = self.fig.axes[0].transData.transform(data_point) 
+        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
 
 
