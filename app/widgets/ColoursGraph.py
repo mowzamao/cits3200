@@ -2,12 +2,15 @@
 #import matplotlib and set backend configuration for pyqt compatability
 import matplotlib
 matplotlib.use('QtAgg')
+import matplotlib.axes
+import matplotlib.figure
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import MaxNLocator
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
+from matplotlib.ticker import MaxNLocator,AutoMinorLocator
 
 #import Figure - a class which is matplotlib's top-end container for plots
 from matplotlib.figure import Figure
@@ -22,8 +25,13 @@ class ColoursGraph(FigureCanvasQTAgg):
     Parameters:
         FigureCanvasQTAgg(Class): Child class allowing ColoursGraph class to inheret methods for matplotlib and PyQt compatability
     """
+    label_min_font_size = 3
+    label_max_font_size = 14.5
+    axes_min_width = 0.35
+    base_font_size = 10
 
-    def __init__(self, parent:classmethod=None, width:float=5, height:float=5, dpi:int=100, df:pd.DataFrame = None):
+
+    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None):
         """ 
         Initialisation function for the ColourGraph PyQt Widget.
 
@@ -34,83 +42,121 @@ class ColoursGraph(FigureCanvasQTAgg):
             dpi(int): matplotlib resolution settings - Dots Per Inch. 
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """
-
-        #define default values for subplot graphical parameters 
-        self.label_min_font_size = 3
-        self.label_max_font_size = 20
-        self.subplot_min_width = 0
-        self.base_font_size = 8   
-        
-        #Defining the top-end matplotlib figure 
-        self.fig = Figure(figsize=(width, height), dpi=dpi)
-        
-
-        # Drawing three subplots, one for each colour channel
-        self.axes_left = self.fig.add_subplot(131)
-        self.axes_center = self.fig.add_subplot(132)
-        self.axes_right = self.fig.add_subplot(133)
-
-        # initialise an instance of the ColoursGraph class
-        super(ColoursGraph, self).__init__(self.fig)
-
-        #plot data for the ColourGraph Panel
+        self.df = df 
+        self.dpi = dpi 
+        self.fig = Figure(dpi=self.dpi)
         self.plotColourData(df)
 
-        #adding headings for the entire ColoursGraph figure
-        self.setFigureAxisLabels('Depth (m)','Intensity (%)')
-        
+        #connecting resize event to graph
+        self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
 
+        super(ColoursGraph, self).__init__(self.fig)
+
+    
     def plotColourData(self,df:pd.DataFrame):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
+
+        parameters:
+            df(pd.Dataframe): the pandas dataframe with the colour data to be plotted
         """
-        for index,subplot in enumerate([self.axes_left,self.axes_center,self.axes_right],start=1):
+        # Drawing three subplots, one for each colour channel
+        axes_left = self.fig.add_subplot(131)
+        axes_center = self.fig.add_subplot(132)
+        axes_right = self.fig.add_subplot(133)
+        
+        column_names = self.getAnalysisType(df)
 
-            #for each subplot in the ColoursGraph panel prepare the pandas series to be plotted
-            data_column_name,depth_column, data_column = self.graphDataPreperation(df,index)
+        for ax,column_name in zip(self.fig.axes,column_names):
+            #get colour arrays to be plotted 
+            color_data = round(100*df[column_name]/255,  4)
+            depth = df['Depth (mm)']
+            color_component = column_name
 
-            #plot the data from the pandas dataframe
-            subplot.plot(data_column, depth_column,  color = data_column_name)
+            ax.plot(color_data, depth, color = color_component.lower())
 
-            #set the graphical parameters for each subplot
-            subplot.set_title(data_column_name)
-            subplot.grid(axis = 'y')
-            subplot.invert_yaxis()
-            subplot.set_xlim(0,100)
-            subplot.set_yticks(depth_column)
-            subplot.yaxis.set_major_locator(MaxNLocator(nbins=20))
+            #set graphical parameters for each subplot
+            ax.set_title(color_component, fontweight='bold',pad = 10)
+            ax = self.setCustomTicks(ax,20,4,4,2)
+            ax.grid(axis = 'both',visible=True)
+            ax.set_xlim(0,100)
+            ax.set_ylim(bottom=0)
+            ax.invert_yaxis()
+        
+        #add title to figure 
+        self.addFigureTitle(df = df)
 
-    def setFigureAxisLabels(self,x_label:str,y_label:str):
+        #adding headings for the entire ColoursGraph figure
+        axes_left.set_ylabel('Depth (mm)',fontweight = 'bold')
+        axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
+
+    def getAnalysisType(self,df:pd.DataFrame):
         """
-        Function which sets the axis labels for the entire ColoursGraph plot panel. 
-        """
-        self.axes_left.set_ylabel(x_label)
-        self.axes_center.set_xlabel(y_label)
+        Function which returns the column names of the colour data to be plotted. 
+        The list is order according to what is rendered on the GUI. This function can 
+        later be used to handle and setup CEILAB analysis. 
 
-
-    def graphDataPreperation(self,df:pd.DataFrame,index:int):
-        """
-        Function that takes a dataframe and an index (ranging in values from 1-3) and 
-        returns two series and a string. The two series contain data to be plotted in the 
-        graphsPanel window. The string is the title for the subplot (and also is the column name
-        from which the plotted data originates). 
+        parameters:
+            df(pd.Dataframe): pandas dataframe containing the data to be plotted.
         """
         df_columns = df.columns
+        if 'Blue' in df_columns and 'Red' in df_columns and 'Green' in df_columns:
+            return ['Red',"Green",'Blue']
+        else:
+            return None
 
-        #extracting name of column to be plotted
-        data_column_name = df_columns[index]
+
+    def setCustomTicks(self,ax:matplotlib.axes.Axes,y_axis_nbins:int,x_axis_nbins:int,y_axis_nminor:int,x_axis_nminor:int):
+        """
+        Function to setup the ticks on the axis of the ColoursGraph Plot.
+
+        parameters:
+            ax(matplotlib.axes.Axes): the axes object of a matplotlib subfigure which newly set ticks will be placed on.
+            y_axis_nbins(int): the number of bins / major ticks on the y axis of the ColoursGraph
+            x_axis_nbins(int): the number of bins / major ticks on the x axis of the ColoursGraph
+            y_axis_nminor(int) the number of minor ticks to sit between the major ticks on the y axis of the ColoursGraph
+            x_axis_nminor(int): the number of minor ticks to sit between the major ticks on the x axis of the ColoursGraph
+        """
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=y_axis_nbins))
+        ax.xaxis.set_major_locator(MaxNLocator(nbins=x_axis_nbins))
+
+        ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_nminor))
+        ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_nminor))
+
+        ax.tick_params(axis='x', which='both', top=True, labeltop=False)
+        ax.tick_params(axis='y', which='both', right=True, labelright=False)
+
+        ax.tick_params(which='minor', length=2, color='grey')
+        ax.tick_params(which='major', length=4, color='grey')
+
+        ax.yaxis.minorticks_on()
+        return ax
         
-        #cleaning and scaling the data to be plotted 
-        data_column = round(100*df[data_column_name]/255,  4)
 
-        #defining the data to be plotted on the x_axis
-        depth_column = df['Depth (mm)']
-        print(depth_column)
-        
-        return data_column_name,depth_column, data_column 
+    def addFigureTitle(self,figure_title:str=None,df:pd.DataFrame = None,fontsize:int = 16):
+        """
+        Function to add a title to the entire ColoursGraph Matplotlib figure. The string
+        to be rendered as a title can be generated through two methods. 1) using the first letter 
+        of the 2nd - 4th column names of a pandas dataframe passed to the function, 2)using a string
+        passed into the function. 
 
+        parameters:
+            df(pd.Dataframe - optional): A pandas dataframe containing the plotted data. The column names of the dataframe are used for the title
+            fontsize(int): Parameter setting the size of the title.
+            title(str - optional): A string which will be rendered as the matplotlib figure's title.
+        """
+        #if no title string is provided generate a title string based of df column names
+        if df is not None and figure_title is None:
+            columns = self.getAnalysisType(df)
+            if columns == ['Red',"Green","Blue"]:
+                figure_title = 'RGB Colour Space Plot'
+            else:
+                figure_title = 'Colour Space Plot'
+
+        #render new title onto matplotlib figure  
+        self.fig.suptitle(figure_title, fontweight='bold',fontsize = fontsize)
     
-    def resizeEvent(self, event):
+    def resizeEvent(self,event):
         """
         Event handler function that will adjust the graphical parameters of the 
         matplotlib figure. 
@@ -119,18 +165,18 @@ class ColoursGraph(FigureCanvasQTAgg):
             1) changing font size
             2) turning tight layout on and off.
         """
+        #change font size if current font size and subplot width not below minimum values
+        if self.verifyLabelGreaterThanMinFontSize():
+            self.setFontSize()
+
         #set tight_layout setting to figure if figure has dimensions
         if self.verifyTightLayout():
             self.fig.tight_layout()
 
-        #change font size if current font size and subplot width not below minimum values
-        if self.verifyLabelFontChange():
-            self.setFontSize()
-
         # Redraw the figure
-        self.draw()
-        # Initialise an instance of the new figure  
+        self.draw_idle()
         super().resizeEvent(event)
+
 
     def setFontSize(self):
         """
@@ -148,60 +194,33 @@ class ColoursGraph(FigureCanvasQTAgg):
             ax.tick_params(axis='y', labelsize=new_font_size)
 
             #setting new font size for title
-            ax.set_title(ax.get_title(), fontsize=new_font_size)
+            ax.set_title(label = ax.get_title(), fontsize=new_font_size,fontweight = 'bold',pad = 10)
+        
+        #adjusting font size of title
+        self.addFigureTitle(figure_title = self.fig.get_suptitle(),fontsize=new_font_size + 2)
+        
 
     def calcNewFont(self):
         """
         Calculates the new font size for x and y axis labels when
         the ColoursGraph widget gets resized. 
         """
-        width, height = self.fig.get_size_inches()
+        width, _ = self.fig.get_size_inches()
         scale_factor = width / 5
 
         #choose smallest font out of the new scaled font or the outright maximum font
         new_font_size = min(self.base_font_size * scale_factor,self.label_max_font_size)
 
         #choose largest font out of the outright minimum font size and the new scaled font size
-        font_size = max(self.label_min_font_size,new_font_size)
+        font_size = max(self.label_min_font_size , new_font_size)
         return font_size
-
-    def verifyLabelFontChange(self):
-        """
-        Function to check is the matplotlib Figure being rendered in the 
-        FigureCanvasQtAgg (Colours Graph) widget currently has the smallest font
-        size setting set.
-        """
-        if self.verifyLabelGreaterThanMinFontSize() is False:
-            return None
-        if self.verifySubplotGreaterThanMinWidth() is False:
-            return None
-        return True
 
     def verifyLabelGreaterThanMinFontSize(self):
         """
         Function checking if the current font size of a subplots labels
         are greater than the minimum label font size
         """
-        x_label_font_size = self.axes_left.xaxis.label.get_fontsize()
-
-        if x_label_font_size <= self.label_min_font_size:
-            return False
-        return True
-
-    
-    def verifySubplotGreaterThanMinWidth(self):
-        """
-        Function checking if the width of subplots is greater than
-        the minimum allowable width of a subplot
-        """
-        #calculation of subplot size in inches, requires conversion form normalised units
-        norm_width = self.axes_center.get_position().width
-        fig_width, fig_height = self.fig.get_size_inches()
-        subplot_width_inches = fig_width *norm_width
-
-        if subplot_width_inches <= self.subplot_min_width:
-            return False
-        return True
+        return self.fig.axes[0].xaxis.label.get_fontsize() >= self.label_min_font_size
 
     def verifyTightLayout(self):
         """
@@ -209,12 +228,31 @@ class ColoursGraph(FigureCanvasQTAgg):
         FigureCanvasQTAGG (Colours Graph) widget has a width and height 
         greater than 0 inches.
         """
-        # Get the current width and height of the figure
         width, height = self.fig.get_size_inches()
+        return width > 0 and height > 0 
+    
+    def getLineHeightRelativeCoordinates(self):
+        """
+        Function that gets the height display coordinates for the first and last data points 
+        on the first subplot of the ColoursGraph. This is called by Layers Graph to align the layers 
+        with the ColoursGraph.
+        """
+        first_data_point = (self.df.iloc[0,1],self.df.iloc[0,0])
+        last_data_point = (self.df.iloc[-1,1],self.df.iloc[-1,0])
+        
+        first_data_point = self.getNormalisedCoords(first_data_point)
+        last_data_point = self.getNormalisedCoords(last_data_point)
+        return first_data_point, last_data_point
+    
+    def getNormalisedCoords(self,data_point):
+        """
+        Function that converts a matplotlib data coordinates into display coordinates.
 
-        if width > 0 and height > 0:
-            return True
-        else:
-            return None
+        parameters:
+            data_point(tuple): the x and y data coordinates of a point on a matplotlib graph/axes
+        """
+        width,height = self.fig.get_size_inches()
+        data_point = self.fig.axes[0].transData.transform(data_point) 
+        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
 
 
