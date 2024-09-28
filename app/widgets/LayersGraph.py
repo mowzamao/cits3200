@@ -13,7 +13,7 @@ class LayersGraph(FigureCanvasQTAgg):
     layers_title_max_fontsize = 12 
     layers_title_base_fontsize = 7
 
-    def __init__(self, parent=None, dpi=100, df = None):
+    def __init__(self, parent=None, dpi=10, df = None):
         self.dpi = dpi
         self.parent = parent 
         height = len(df)
@@ -67,13 +67,14 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes = layers_fig.add_subplot(111) 
         layers_axes.clear()
         layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-        layers_axes.set_xlim(0,1)
-        layers_axes.set_ylim(0,1)
+        layers_axes.set_xlim(0,100)
+        layers_axes.set_ylim(0,100)
         layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
         layers_axes_top = layers_axes.twiny()
         layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
+
         #render image 
-        layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,1,0,1],origin = 'upper')
+        layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,100,0,100],origin = 'upper')
 
         #add title
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)

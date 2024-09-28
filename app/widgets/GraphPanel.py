@@ -2,6 +2,11 @@ from PyQt6.QtWidgets import QWidget, QVBoxLayout,QHBoxLayout, QPushButton, QLabe
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt, QSize
 from app.widgets.Graphs import Graphs
+from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as NavigationToolbar
+
+from app.widgets.ColoursGraph import ColoursGraph
+from app.widgets.LayersGraph import LayersGraph
 
 class GraphPanel(QWidget):
     """
@@ -39,19 +44,21 @@ class GraphPanel(QWidget):
                 widget.setParent(None)  # Remove old widget
 
         # Fullscreen button for toggling view
-        fullscreen_icon = QIcon.fromTheme("view-fullscreen")
-        fullscreen_button = QPushButton(self, icon=fullscreen_icon)
-        fullscreen_button.setFixedSize(QSize(20, 20))
-        fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
-        
-        self.layout.addWidget(fullscreen_button)
+        # fullscreen_icon = QIcon.fromTheme("view-fullscreen")
+        # fullscreen_button = QPushButton(self, icon=fullscreen_icon)
+        # fullscreen_button.setFixedSize(QSize(20, 20))
+        # fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
+
 
         # Ensure the dataframe (df) is used to generate the graphs
         if self.df is not None:
-            graphs = Graphs(df=self.df)  # Pass the dataframe to the graph widget
-            self.layout.addWidget(graphs)
+            self.graphs = Graphs(df=self.df)  # Pass the dataframe to the graph widget
         else:
             print("No dataframe provided. Please upload and process an image.")
+        
+        self.toolbar = NavigationToolbar(self.graphs.colours_graph, self)
+        self.layout.addWidget(self.toolbar)
+        self.layout.addWidget(self.graphs)
 
     def switch_graph_fullscreen(self):
         """

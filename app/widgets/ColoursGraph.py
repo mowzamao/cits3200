@@ -7,6 +7,8 @@ import matplotlib.figure
 import numpy as np
 import pandas as pd
 from matplotlib.ticker import MaxNLocator
+from matplotlib.widgets import SpanSelector
+
 
 #import FigureCanvasQTAGG - a class used as a widget which displays matplotlib plots in pyqt
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
@@ -61,9 +63,9 @@ class ColoursGraph(FigureCanvasQTAgg):
             df(pd.Dataframe): the pandas dataframe with the colour data to be plotted
         """
         # Drawing three subplots, one for each colour channel
-        axes_left = self.fig.add_subplot(131)
-        axes_center = self.fig.add_subplot(132)
-        axes_right = self.fig.add_subplot(133)
+        self.axes_left = self.fig.add_subplot(131)
+        self.axes_center = self.fig.add_subplot(132, sharex=self.axes_left, sharey=self.axes_left)
+        self.axes_right = self.fig.add_subplot(133, sharex=self.axes_left, sharey=self.axes_left)
         
         column_names = self.getAnalysisType(df)
 
@@ -80,15 +82,16 @@ class ColoursGraph(FigureCanvasQTAgg):
             ax = self.setCustomTicks(ax,20,4,4,2)
             ax.grid(axis = 'both',visible=True)
             ax.set_xlim(0,100)
-            ax.set_ylim(bottom=0)
             ax.invert_yaxis()
         
         #add title to figure 
         self.addFigureTitle(df = df)
 
         #adding headings for the entire ColoursGraph figure
-        axes_left.set_ylabel('Depth (mm)',fontweight = 'bold')
-        axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
+        self.axes_left.set_ylabel('Depth (mm)',fontweight = 'bold')
+        self.axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
+
+
 
     def getAnalysisType(self,df:pd.DataFrame):
         """
@@ -122,6 +125,7 @@ class ColoursGraph(FigureCanvasQTAgg):
 
         ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_nminor))
         ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_nminor))
+
 
         ax.tick_params(axis='x', which='both', top=True, labeltop=False)
         ax.tick_params(axis='y', which='both', right=True, labelright=False)
