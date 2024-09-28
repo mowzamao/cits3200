@@ -126,6 +126,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         ax.yaxis.set_minor_locator(AutoMinorLocator(y_axis_nminor))
         ax.xaxis.set_minor_locator(AutoMinorLocator(x_axis_nminor))
 
+
         ax.tick_params(axis='x', which='both', top=True, labeltop=False)
         ax.tick_params(axis='y', which='both', right=True, labelright=False)
 
