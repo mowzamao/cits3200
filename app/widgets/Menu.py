@@ -1,11 +1,15 @@
 from PyQt6.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu
 from PyQt6.QtGui import QPixmap, QAction  
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt,QThread, pyqtSignal
 import cv2 as cv
 import numpy as np
 from app.utils.ImageTransforming import * 
 from app.utils.ProcessSedimentCore import *   
 from app.widgets.GraphPanel import GraphPanel
+from app.widgets.DataExtractor import DataExtractor
+from app.widgets.LoadingBar import LoadingBar
+
+from time import time
 
 class Menu(QMenuBar):
     def __init__(self, parent=None):
@@ -79,22 +83,32 @@ class Menu(QMenuBar):
         if file_name:
             # Load the image using OpenCV
             image = cv.imread(file_name)
-
             if image is not None:
-                # Format the image and display it in ImagePanel
-                oriented_image = orient_array(image)
-                display_image = QPixmap(file_name)
-                self.parent.image_panel.set_image(display_image)
-
-                # Process the core image to get the data (df)
-                data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
-
-                if data_dict != 0:  # If processing is successful
-                    self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
-                    self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
+                loading_bar = LoadingBar()
+                # Running the loading bar and data extraction function concurrently 
+                extractor = DataExtractor()
+                self.thread = QThread()
+                extractor.moveToThread(self.thread)
+                extractor.progress.connect(lambda val: loading_bar.step(val))
+                extractor.data.connect(lambda data_dict: self.set_graphs(file_name, data_dict))
+                extractor.finished.connect(self.thread.quit)
                 
-                    self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
+                extractor.run(image)
+
             else:
                 self.parent.statusBar().showMessage("Failed to load image.")
 
+
+    # Using functions defined in app.utils to extract colour data 
+    # from the image and then passes this data to the Graphs section of the GUI
+    def set_graphs(self, file_name, data_dict):
+        # Format the image and display it in ImagePanel
+
+        display_image = QPixmap(file_name)
+        self.parent.image_panel.set_image(display_image)
+
+        if data_dict != 0:  # If processing is successful
+            self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
+            self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
+            self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
    

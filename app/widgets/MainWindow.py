@@ -46,8 +46,8 @@ class MainWindow(QMainWindow):
 
     def set_window_properties(self):
         """Set properties for the main window."""
-        self.setWindowTitle("Sediment Core Analysis Tool")
         self.showMaximized()
+        self.setWindowTitle("Sediment Core Analysis Tool")
         self.setStyleSheet(open('./app/style/style.css').read())
         
     def export_graphs_as_pdf(self): 
