@@ -58,6 +58,7 @@ class GraphPanel(QWidget):
         
         self.toolbar = NavigationToolbar(self.graphs.colours_graph, self)
         self.layout.addWidget(self.toolbar)
+
         self.layout.addWidget(self.graphs)
 
     def switch_graph_fullscreen(self):

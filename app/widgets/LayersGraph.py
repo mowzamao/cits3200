@@ -17,7 +17,7 @@ class LayersGraph(FigureCanvasQTAgg):
         self.dpi = dpi
         self.parent = parent 
         height = len(df)
-        width = max(1, height//10)
+        width = 5
         df = df[self.getAnalysisType(df)]
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
