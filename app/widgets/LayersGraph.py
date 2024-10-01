@@ -85,10 +85,6 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes_top.get_xaxis().set_ticks([])
         return layers_fig,layers_axes,layers_axes_top
 
-    def getColoursGraphCoordinates(self,parent):
-        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
-        return top[1],bottom[1]
-
     def resizeEvent(self, event):
         """
         Function which resizes graphical parameters of the LayersGraph 
@@ -109,6 +105,10 @@ class LayersGraph(FigureCanvasQTAgg):
             self.layers_axes.set_position([0.1, bottom, 0.8, (top - bottom)])
             self.setFontSize()
         self.draw_idle()
+
+    def getColoursGraphCoordinates(self,parent):
+        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
+        return top[1],bottom[1]
 
 
     def setFontSize(self):

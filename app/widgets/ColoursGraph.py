@@ -247,16 +247,19 @@ class ColoursGraph(FigureCanvasQTAgg):
         first_data_point = self.getNormalisedCoords(first_data_point)
         last_data_point = self.getNormalisedCoords(last_data_point)
         return first_data_point, last_data_point
-    
-    def getNormalisedCoords(self,data_point):
-        """
-        Function that converts a matplotlib data coordinates into display coordinates.
 
-        parameters:
-            data_point(tuple): the x and y data coordinates of a point on a matplotlib graph/axes
+    def getNormalisedCoords(self, data_point):
         """
-        width,height = self.fig.get_size_inches()
-        data_point = self.fig.axes[0].transData.transform(data_point) 
-        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
+        Function that converts a matplotlib data coordinates into normalized figure coordinates.
+        """
+        # Get the figure's bounding box in display (pixel) coordinates
+        bbox = self.fig.bbox
+        width, height = bbox.width, bbox.height
+        
+        # Transform the data point to display coordinates
+        data_point = self.fig.axes[0].transData.transform(data_point)
+        
+        # Normalize based on the figure's bounding box size
+        return (data_point[0] / width, data_point[1] / height)
 
 
