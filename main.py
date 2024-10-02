@@ -1,8 +1,12 @@
 # nuitka-project: --onefile
-# nuitka-project: --plugin-enable=pyqt6
+# nuitka-project: --output-filename=sediment_analysis
+# nuitka-project: --remove-output
+# nuitka-project: --mingw64
+# nuitka-project: --enable-plugins=pyqt6
+# nuitka-project: --include-data-dir=app/style=app/style
 
 import sys
-from PyQt5.QtWidgets import QApplication
+from PyQt6.QtWidgets import QApplication
 from app.widgets.MainWindow import MainWindow
 
 def main():

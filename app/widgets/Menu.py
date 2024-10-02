@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu, QAction
-from PyQt5.QtGui import QPixmap
-from PyQt5.QtCore import Qt
+from PyQt6.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu
+from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtCore import Qt
 import cv2 as cv
 import numpy as np
 from app.utils.ImageTransforming import *   

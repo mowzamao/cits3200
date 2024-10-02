@@ -1,6 +1,6 @@
-from PyQt5.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
-from PyQt5.QtGui import QPixmap, QIcon, QColor
-from PyQt5.QtCore import Qt, QSize
+from PyQt6.QtWidgets import QWidget,  QHBoxLayout, QVBoxLayout, QPushButton
+from PyQt6.QtGui import QPixmap, QIcon, QColor
+from PyQt6.QtCore import Qt, QSize
 
 from app.utils.RandomDataGenerator import RandomDataGenerator 
 from app.widgets.ColoursGraph import ColoursGraph

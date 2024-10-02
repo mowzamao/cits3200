@@ -1,10 +1,10 @@
 import sys
-from PyQt5.QtWidgets import (
+from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QGridLayout, QLabel, QVBoxLayout, QHBoxLayout, QPushButton,
-    QWidget, QFileDialog, QStatusBar, QMenuBar, QMenu, QAction
+    QWidget, QFileDialog, QStatusBar, QMenuBar, QMenu
 )
-from PyQt5.QtGui import QPixmap 
-from PyQt5.QtCore import Qt, QSize
+from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtCore import Qt, QSize
 
 from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
