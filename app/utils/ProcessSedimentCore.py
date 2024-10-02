@@ -93,10 +93,6 @@ class ExtractCore():
                 x, y, w, h = cv.boundingRect(contour)
                 if w > h*2 or h > w*2: # the sediment cores are long and thin
                     cores.append([x, y, w, h])
-                    if self.show == True:
-                        cv.rectangle(self.img, (x, y), (x+w, y+h), (0, 255, 0), 2)
-        if self.show == True:
-            transform.show_img(self.img, title='Sediment Cores')
         return cores    
     
     def get_largest_core(self, cores: list) -> list:
@@ -137,7 +133,8 @@ class ExtractCore():
         self.core = {
             "Length": scaling.get_core_length(core),
             "Scale" : scaling.scale,
-            "Image": transform.orient_array(transform.crop_img(self.img, x, y, width, height))
+            "Image": transform.orient_array(transform.crop_img(self.img, x, y, width, height)),
+            "Bounding Box": core
         }
         return self.core
 
@@ -236,104 +233,23 @@ def process_core_image(img: np.array, core_width_mm: int, df: bool=True, show: b
     Returns:
         core (dict): a dictionary containing the image, length, and colours of the sediment core
     """
-    core_data = ExtractCore(img, core_width_mm, show).extract_core()
+    core_data = ExtractCore(img, core_width_mm, show=True).extract_core()
     if core_data == 0: return 0
     image = core_data['Image']
-    length = core_data['Length']
     scale = core_data['Scale']
     colours = Colours(image, scale).get_weighted_average_layer_colours(df=df)
     core = {
         "Image": image,
-        "Length (mm)": length,
-        "Colours": colours
+        "Length (mm)": core_data['Length'],
+        "Colours": colours,
+        "Scale": scale,
+        "Bounding Box": core_data['Bounding Box']
     }
     return core
 
-def reshape_df_to_img(df: pd.DataFrame, colourspace:str) -> np.array:
-    """ Converts a Dataframe into a 1D colour image """
-    df = df[['Blue', 'Green', 'Red'] if colourspace == 'BGR' else ['L', 'a', 'b']]
-    return df.to_numpy().reshape((len(df), 1, 3)).astype(np.float32)
-
-def scale_rgb_values(img: np.array) -> pd.DataFrame:
-    """ Scales the RGB values of an image to between 0 and 1"""
-    img *=1./255
-    return img
-
-def unscale_rgb_values(img: np.array) -> pd.DataFrame:
-    """ Unscales the RGB values of an image to between 0 and 255"""
-    img *= 255
-    return np.round(img, 0)
-
-def reshape_img_to_df(img: np.array, colourspace: str) -> pd.DataFrame:
-    """
-    Reshapes a 1D colour image into a Dataframe, with a column for each colour channel
-    
-    Parameters:
-        img (np.array): an image
-        colourspace (str): the colourspace of the image
-    
-    Returns:
-        df (pd.DataFrame): a DataFrame of the image
-    """
-    img_array = img.reshape((len(img), 3))
-    columns = ['Blue', 'Green', 'Red'] if colourspace == 'BGR' else ['L', 'a', 'b']
-    return pd.DataFrame(img_array, columns=columns)
-
-def core_to_rgb(df: pd.DataFrame) -> pd.DataFrame:
-    """ 
-    Converts a DataFrame of a sediment core to RGB
-    
-    Parameters:
-        df (pd.DataFrame): a DataFrame of a sediment core
-        
-    Returns:
-        img (pd.DataFrame): a DataFrame of the sediment core in RGB
-    """
-    img = reshape_df_to_img(df, colourspace='Lab')
-    img = cv.cvtColor(img, cv.COLOR_Lab2BGR)
-    img = unscale_rgb_values(img)
-    img = reshape_img_to_df(img, colourspace='BGR')
-    img['Depth (mm)'] = df['Depth (mm)']
-    return img[['Depth (mm)', 'Blue', 'Green', 'Red']]
-
-def core_to_lab(df: pd.DataFrame) -> pd.DataFrame:
-    """ 
-    Converts a DataFrame of a sediment core to CIE Lab 
-    
-    Parameters:
-        df (pd.DataFrame): a DataFrame of a sediment core
-        
-    Returns:
-        img (pd.DataFrame): a DataFrame of the sediment core in CIE Lab
-    """
-    img = reshape_df_to_img(df, colourspace='BGR')
-    img = scale_rgb_values(img)
-    img = cv.cvtColor(img, cv.COLOR_BGR2Lab)
-    img = reshape_img_to_df(img, colourspace='Lab')
-    img['Depth (mm)'] = df['Depth (mm)']
-    return img[['Depth (mm)', 'L', 'a', 'b']]
-
-""" tests """
-def test_core_colour_conversion():
-    """ Test function for the core_to_rgb and core_to_lab functions """
-    df = pd.DataFrame({
-        'Depth (mm)': [0, 1, 2, 3],
-        'Blue': [0, 0, 255, 255],
-        'Green': [0, 255, 0, 255],
-        'Red': [255, 0, 0, 255]
-    })
-    lab = core_to_lab(df)
-    rgb = core_to_rgb(lab)
-    assert np.allclose(df, rgb), 'Core Colour Conversion Test failed!'
-    print('Core Colour Conversion Test passed!')
-
-if __name__ == '__main__':
-    # Testing
-    core_width_mm = 76 # sediment core width in millimeters
-    file_path = 'app/utils/image-data/MI-24_03/SCREEN banner 96dpi-3192-2.jpg' # for testing purposes
-    img = transform.import_img(file_path)
-    core = process_core_image(img, core_width_mm, df=True)
-    transform.show_img(core['Image'], title='Extracted Sediment Core')
-
-    # Testing core colour conversion functions
-    test_core_colour_conversion()
+def show_bounding_box(img, bounding_box):
+    """ Displays the bounding box of a sediment core """
+    x, y, w, h = bounding_box
+    img_with_bb = img.copy()
+    cv.rectangle(img_with_bb, (x, y), (x+w, y+h), (0, 255, 0), 10)
+    return img_with_bb
