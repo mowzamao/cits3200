@@ -31,6 +31,8 @@ class MainWindow(QMainWindow):
 
         self.main_layout = QHBoxLayout(self.central_widget)
 
+        self.image_panels = []  # List to store image panels
+        self.graph_panels = []  # List to store graph panels
 
         self.image_panel = ImagePanel(self)
         self.graph_panel = GraphPanel(self)
@@ -42,6 +44,31 @@ class MainWindow(QMainWindow):
         self.setMenuBar(self.menu)
         self.main_layout.addWidget(self.image_panel, stretch =5)
         self.main_layout.addWidget(self.graph_panel, stretch =5)
+
+    def add_image_and_graph_panel(self, image_path, df):
+        """Add a new ImagePanel and GraphPanel to the layout."""
+        # Create a new image panel and graph panel
+        image_panel = ImagePanel(self)
+        graph_panel = GraphPanel(self, df)
+
+        # Load the image into the new image panel
+        pixmap = QPixmap(image_path)
+        image_panel.set_image(pixmap)
+
+        # Add the new panels to the layout
+        self.main_layout.addWidget(image_panel, stretch=5)
+        self.main_layout.addWidget(graph_panel, stretch=5)
+
+        # Keep track of the panels
+        self.image_panels.append(image_panel)
+        self.graph_panels.append(graph_panel)
+
+        # Ensure that all graph panels are updated with their data
+        for graph_panel in self.graph_panels:
+            graph_panel.init_ui()  # Re-initialize the UI for all graphs with their respective data
+
+        # Ensure the layout updates without resetting previous content
+        self.central_widget.setLayout(self.main_layout)
 
 
     def set_window_properties(self):
