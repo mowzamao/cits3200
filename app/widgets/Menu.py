@@ -67,8 +67,8 @@ class Menu(QMenuBar):
 
         return help_menu
 
-    def open_image(self):
-        """Open an image file and display it in the ImagePanel."""
+     def open_image(self):
+        """Open an image file and add a new ImagePanel and GraphPanel to the main layout."""
         file_name, _ = QFileDialog.getOpenFileName(
             self, 
             "Open Image", 
@@ -76,25 +76,28 @@ class Menu(QMenuBar):
             "Images (*.png *.jpg *.bmp)"
         )
     
+
         if file_name:
             # Load the image using OpenCV
             image = cv.imread(file_name)
 
             if image is not None:
                 # Format the image and display it in ImagePanel
+                # Process the image to get the data (df)
                 oriented_image = orient_array(image)
-                display_image = QPixmap(file_name)
-                self.parent.image_panel.set_image(display_image)
-
-                # Process the core image to get the data (df)
+                
                 data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
 
                 if data_dict != 0:  # If processing is successful
-                    self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
-                    self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
-                
+                    df = data_dict["Colours"]
+
+                    # Add a new image and graph panel
+                    self.parent.add_image_and_graph_panel(file_name, df)
+
+                    # Display success message in the status bar
                     self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
             else:
+                # If image loading fails
                 self.parent.statusBar().showMessage("Failed to load image.")
 
    
