@@ -8,6 +8,7 @@ Date: September 2024
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 """ img importing and displaying functions """
 def import_img(img_path: str) -> np.array:
@@ -21,6 +22,7 @@ def show_img(img: np.array, title: str='Image') -> None:
     plt.imshow(cv.cvtColor(img, cv.COLOR_BGR2RGB))
     plt.title(title)
     plt.show()
+
 
 """ img Processing Functions """
 def remove_greys(img: np.array, show: bool=False) -> np.array:
@@ -52,10 +54,73 @@ def get_contours(img: np.array, show: bool=False) -> list:
         show_img(img, title='Contours')
     return contours
 
-""" Color Space Conversion Functions """
 def crop_img(img: np.array, x: int, y: int, w: int, h: int) -> np.array:
     """ Crops an image to a bounding box"""
     return img[y:y+h, x:x+w]
+
+
+""" Functions for converting between DataFrames and images """
+def reshape_df_to_img(df: pd.DataFrame, colourspace:str) -> np.array:
+    """ Converts a Dataframe into a 1D colour image """
+    df = df[['Blue', 'Green', 'Red'] if colourspace == 'BGR' else ['L', 'a', 'b']]
+    return df.to_numpy().reshape((len(df), 1, 3)).astype(np.float32)
+
+def scale_rgb_values(img: np.array) -> pd.DataFrame:
+    """ Scales the RGB values of an image to between 0 and 1"""
+    img *=1./255
+    return img
+
+def unscale_rgb_values(img: np.array) -> pd.DataFrame:
+    """ Unscales the RGB values of an image to between 0 and 255"""
+    img *= 255
+    return np.round(img, 0)
+
+def reshape_img_to_df(img: np.array, colourspace: str) -> pd.DataFrame:
+    """
+    Reshapes a 1D colour image into a Dataframe, with a column for each colour channel
+    
+    Parameters:
+        img (np.array): an image
+        colourspace (str): the colourspace of the image
+    """
+    img_array = img.reshape((len(img), 3))
+    columns = ['Blue', 'Green', 'Red'] if colourspace == 'BGR' else ['L', 'a', 'b']
+    return pd.DataFrame(img_array, columns=columns)
+
+def core_to_rgb(df: pd.DataFrame) -> pd.DataFrame:
+    """ Converts a DataFrame of a sediment core to RGB """
+    img = reshape_df_to_img(df, colourspace='Lab')
+    img = cv.cvtColor(img, cv.COLOR_Lab2BGR)
+    img = unscale_rgb_values(img)
+    img = reshape_img_to_df(img, colourspace='BGR')
+    img['Depth (mm)'] = df['Depth (mm)']
+    return img[['Depth (mm)', 'Blue', 'Green', 'Red']]
+
+def core_to_lab(df: pd.DataFrame) -> pd.DataFrame:
+    """ Converts a DataFrame of a sediment core to CIE Lab """
+    img = reshape_df_to_img(df, colourspace='BGR')
+    img = scale_rgb_values(img)
+    img = cv.cvtColor(img, cv.COLOR_BGR2Lab)
+    img = reshape_img_to_df(img, colourspace='Lab')
+    img['Depth (mm)'] = df['Depth (mm)']
+    return img[['Depth (mm)', 'L', 'a', 'b']]
+
+
+""" Functions for flipping images """
+def swap_df_cols(data, new_col, old_col):
+    """ Swaps two columns in a dataframe"""
+    data[new_col], data[old_col] = data[old_col], data[new_col]
+    data = data.sort_values(by=old_col)
+    data.reset_index(drop=True, inplace=True)
+    return data
+
+def flip (data: pd.DataFrame) -> pd.DataFrame:
+    """ Flips a core dataframe"""
+    if 'Flipped Depth (mm)' not in data.columns:
+        data['Flipped Depth (mm)'] = data['Depth (mm)'].max() - data['Depth (mm)']
+    data = swap_df_cols(data, 'Flipped Depth (mm)', 'Depth (mm)')
+    return data
+
 
 """ Other Fucntions """
 def orient_array(array: np.array) -> np.array:
@@ -66,4 +131,3 @@ def orient_array(array: np.array) -> np.array:
     if height < width:
         return np.swapaxes(array, 0, 1)
     return array
-
