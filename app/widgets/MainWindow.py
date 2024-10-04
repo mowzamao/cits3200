@@ -48,7 +48,32 @@ class MainWindow(QMainWindow):
         """Set properties for the main window."""
         self.setWindowTitle("Sediment Core Analysis Tool")
         self.showMaximized()
-        self.setStyleSheet(open('./app/style/style.css').read())
+        self.setStyleSheet("""
+QMainWindow {background-color: #eaeaea;}
+
+QMenuBar {
+  color: #f3f2f0;
+  padding: 3px;
+  font-weight: 650;
+  background-color: #8a4c57;
+}
+
+QToolBar {
+  background-color: #f3f2f0;
+  padding: 7px;
+}
+QToolButton {
+  color: #080808;
+  background-color: #f3f2f0;
+  border-radius: 5px;
+  padding: 10px;
+  font-weight: 400;
+}
+QToolButton:hover {
+  color: #FAF7F7;
+  background-color: #8a4c57;
+}
+""")
         
     def export_graphs_as_pdf(self): 
         """Export the graphs displayed in the graph panel as a PDF file."""
