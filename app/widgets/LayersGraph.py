@@ -21,7 +21,7 @@ class LayersGraph(FigureCanvasQTAgg):
         df = df[self.getAnalysisType(df)]
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
-        top,bottom = self.getColoursGraphCoordinates(parent) 
+        top,bottom = self.parent.colours_graph.setTopBottomCoordinates()
         self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
         
@@ -101,14 +101,10 @@ class LayersGraph(FigureCanvasQTAgg):
     def delayed_resize_logic(self):
         """ This method handles the delayed resizing logic. """
         if self.verifyDimensions():
-            top, bottom = self.getColoursGraphCoordinates(self.parent)
+            top, bottom = self.parent.colours_graph.setTopBottomCoordinates()
             self.layers_axes.set_position([0.1, bottom, 0.8, (top - bottom)])
             self.setFontSize()
         self.draw_idle()
-
-    def getColoursGraphCoordinates(self,parent):
-        return parent.colours_graph.setTopBottomCoordinates()
-
 
     def setFontSize(self):
         """
