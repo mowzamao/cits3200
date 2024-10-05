@@ -235,7 +235,32 @@ class ColoursGraph(FigureCanvasQTAgg):
         width, height = self.fig.get_size_inches()
         return width > 0 and height > 0 
     
-    def getLineHeightRelativeCoordinates(self):
+    def setTopBottomCoordinates(self)->tuple:
+        """
+        Function called upon the resizing of the LayersGraph. 
+        This function returns the coordinates for the limits of the y axis of the layers graph.
+        THis function returns in normalised / relative figure coordinates (i.e. a point between 0 and 1).
+        A top value of 0.5 means the top of the layers graph will be halfway up the layersgraph's matplotlib figure. 
+        """
+        norm_top_axis_point,norm_bottom_axis_point = self.getAxisRelativeCoordinates()
+        norm_top_point, norm_bottom_point = self.getLineHeightRelativeCoordinates()
+        top = min(norm_top_axis_point,norm_top_point)
+        bottom = max(norm_bottom_axis_point,norm_bottom_point)
+        return top,bottom 
+    
+    def getAxisRelativeCoordinates(self)->tuple:
+        """
+        Function returning the normalised/relative figure coordiantes for the top and bottom of the y axis on 
+        the ColoursGraph subplots. 
+        """
+        y_axis_bounds = self.fig.axes[0].get_ybound()
+        top_axis_point = (0,y_axis_bounds[0])
+        bottom_axis_point = (0,y_axis_bounds[1])
+        norm_top_axis_point = self.getNormalisedCoords(top_axis_point)[1]
+        norm_bottom_axis_point = self.getNormalisedCoords(bottom_axis_point)[1]
+        return norm_top_axis_point,norm_bottom_axis_point
+    
+    def getLineHeightRelativeCoordinates(self)->tuple:
         """
         Function that gets the height display coordinates for the first and last data points 
         on the first subplot of the ColoursGraph. This is called by Layers Graph to align the layers 
@@ -247,8 +272,8 @@ class ColoursGraph(FigureCanvasQTAgg):
         norm_top_point = self.getNormalisedCoords(first_data_point)[1]
         norm_bottom_point = self.getNormalisedCoords(last_data_point)[1]
         return norm_top_point, norm_bottom_point
-
-    def getNormalisedCoords(self, data_point):
+    
+    def getNormalisedCoords(self, data_point)->tuple:
         """
         Function that converts a matplotlib data coordinates into normalized figure coordinates.
         """
@@ -261,19 +286,4 @@ class ColoursGraph(FigureCanvasQTAgg):
         
         # Normalize based on the figure's bounding box size
         return (data_point[0] / width, data_point[1] / height)
-    
-    def getAxisRelativeCoordinates(self):
-        y_axis_bounds = self.fig.axes[0].get_ybound()
-        top_axis_point = (0,y_axis_bounds[0])
-        bottom_axis_point = (0,y_axis_bounds[1])
-        norm_top_axis_point = self.getNormalisedCoords(top_axis_point)[1]
-        norm_bottom_axis_point = self.getNormalisedCoords(bottom_axis_point)[1]
-        return norm_top_axis_point,norm_bottom_axis_point
-    
-    def setTopBottomCoordinates(self):
-        norm_top_axis_point,norm_bottom_axis_point = self.getAxisRelativeCoordinates()
-        norm_top_point, norm_bottom_point = self.getLineHeightRelativeCoordinates()
-        top = min(norm_top_axis_point,norm_top_point)
-        bottom = max(norm_bottom_axis_point,norm_bottom_point)
-        return top,bottom 
 
