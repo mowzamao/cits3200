@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 matplotlib.use('QtAgg')
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.figure import Figure
@@ -13,11 +14,12 @@ class LayersGraph(FigureCanvasQTAgg):
     layers_title_max_fontsize = 12 
     layers_title_base_fontsize = 7
 
-    def __init__(self, parent=None, dpi=10, df = None):
+    def __init__(self, parent=None, dpi=100, df = None):
         self.dpi = dpi
         self.parent = parent 
         height = len(df)
         width = 1
+        self.df = df
         df = df[self.getAnalysisType(df)]
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
@@ -36,12 +38,12 @@ class LayersGraph(FigureCanvasQTAgg):
         Parameters:
             df(pd.Dataframe): the data to be rendered in the layers plot.
         """
-        core_as_grid = np.zeros((height, width, 3), dtype=int)
+        core_as_grid = np.zeros((height, width, 3), dtype=float)
 
         for row in range(height):
             for col in range(width):
                 for channel in range(3):
-                    core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])
+                    core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])/255
         return core_as_grid
     
     def getAnalysisType(self,df:pd.DataFrame):
@@ -67,14 +69,26 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes = layers_fig.add_subplot(111) 
         layers_axes.clear()
         layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-        layers_axes.set_xlim(0,100)
+        layers_axes.set_xlim([0, 1])
         layers_axes.set_ylim(0,100)
         layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
         layers_axes_top = layers_axes.twiny()
         layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
 
         #render image 
-        layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,100,0,100],origin = 'upper')
+        #Loop through RGB colors and plot each layer
+        depths = list(self.df['Depth (mm)'])
+        thickness = depths[1] - depths[0]
+
+        for i, color in enumerate(self.core_as_grid):
+            depth = depths[i]
+            rect = patches.Rectangle((0, depth), 1,  thickness, 
+                             facecolor=color)
+            layers_axes.add_patch(rect)
+
+
+        # layers_axes.scatter([50]*len(self.df), self.df['Depth (mm)'], c=self.core_as_grid)
+        #layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,100,0,100],origin = 'upper')
 
         #add title
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
@@ -82,6 +96,7 @@ class LayersGraph(FigureCanvasQTAgg):
         #hiding ticks and their labels
         layers_axes.get_xaxis().set_ticks([])
         layers_axes.get_yaxis().set_ticks([])
+        layers_axes.yaxis.set_tick_params(labelleft=False)
         layers_axes_top.get_xaxis().set_ticks([])
         return layers_fig,layers_axes,layers_axes_top
 
