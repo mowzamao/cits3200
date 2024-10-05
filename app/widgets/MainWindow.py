@@ -1,85 +1,128 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QGridLayout, QLabel, QVBoxLayout, QHBoxLayout, QPushButton,
-    QWidget, QFileDialog, QStatusBar, QMenuBar, QMenu
+    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea
 )
-from PyQt6.QtGui import QPixmap, QAction  
-from PyQt6.QtCore import Qt, QSize
-from matplotlib.backends.backend_pdf import PdfPages
+from PyQt6.QtGui import QPixmap
 import pandas as pd
 
 from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
-from app.widgets.ColoursGraph import ColoursGraph
-from app.widgets.LayersGraph import LayersGraph
+
 
 class MainWindow(QMainWindow):
-    """ A class defining the structure and actions of the outermost window in the application
-        Args:
-            QMainWindow (): A child class of QtWidgets that inherits from QWidget.
-    """
+    """Main window handling the display of images and graphs, with comparison options."""
     def __init__(self):
         """Initialize the main window and setup UI components."""
         super().__init__()
 
+        # State to track images and graphs (store only 2 sets at a time)
+        self.image_history = []  # Track pairs of images and graph panels
+        self.max_images = 2  # Limit to two images at a time
+
+        # Set window properties
         self.set_window_properties()
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
+        # Create scroll area for horizontal scrolling
+        self.scroll_area = QScrollArea(self)
+        self.scroll_area.setWidgetResizable(True)  # Allow widget resizing within the scroll area
 
-        self.main_layout = QHBoxLayout(self.central_widget)
+        # Create a widget to hold the actual layout and panels
+        self.scroll_widget = QWidget()
+        self.scroll_area.setWidget(self.scroll_widget)
 
-        self.image_panels = []  # List to store image panels
-        self.graph_panels = []  # List to store graph panels
+        # Main layout for side-by-side images and graphs
+        self.main_layout = QHBoxLayout(self.scroll_widget)
 
-        self.image_panel = ImagePanel(self)
-        self.graph_panel = GraphPanel(self)
+        # Set the scroll area as the central widget of the main window
+        self.setCentralWidget(self.scroll_area)
+
+        # Initialize toolbar and menu
         self.toolbar = Toolbar(self)
         self.menu = Menu(self)
 
-
+        # Add toolbar and menu
         self.addToolBar(self.toolbar)
         self.setMenuBar(self.menu)
-        self.main_layout.addWidget(self.image_panel, stretch =5)
-        self.main_layout.addWidget(self.graph_panel, stretch =5)
+
+        # Add placeholder panels for image and graph at initialization
+        self.image_panel_1 = ImagePanel(self)
+        self.graph_panel_1 = GraphPanel(self)
+
+        # Add the placeholder panels to the layout
+        self.main_layout.addWidget(self.image_panel_1, stretch=5)
+        self.main_layout.addWidget(self.graph_panel_1, stretch=5)
 
     def add_image_and_graph_panel(self, image_path, df):
-        """Add a new ImagePanel and GraphPanel to the layout."""
-        # Create a new image panel and graph panel
-        image_panel = ImagePanel(self)
-        graph_panel = GraphPanel(self, df)
+        """Handle image and graph upload, replacing placeholders and adding them side by side."""
+        if len(self.image_history) < self.max_images:
+            # First or second image being uploaded, add it to the layout
+            self.replace_placeholder(image_path, df)
+        else:
+            # More than two images, replace the oldest one
+            self.replace_oldest_image_and_graph(image_path, df)
 
-        # Load the image into the new image panel
+    def replace_placeholder(self, image_path, df):
+        """Replace the placeholders with actual image and graph."""
+        # Create and display the image panel
+        image_panel = ImagePanel(self)
         pixmap = QPixmap(image_path)
         image_panel.set_image(pixmap)
 
-        # Add the new panels to the layout
+        # Create and display the graph panel for the image
+        graph_panel = GraphPanel(self, df)
+        graph_panel.init_ui()
+
+        # Replace the placeholders if it's the first image being uploaded
+        if len(self.image_history) == 0:
+            # Replace the first placeholder panels with actual panels
+            self.main_layout.replaceWidget(self.image_panel_1, image_panel)
+            self.main_layout.replaceWidget(self.graph_panel_1, graph_panel)
+
+            # Delete the placeholders
+            self.image_panel_1.deleteLater()
+            self.graph_panel_1.deleteLater()
+        else:
+            # Add the second set of image/graph side by side
+            self.main_layout.addWidget(image_panel, stretch=5)
+            self.main_layout.addWidget(graph_panel, stretch=5)
+
+        # Store the image and graph panels in history
+        self.image_history.append((image_panel, graph_panel))
+
+    def replace_oldest_image_and_graph(self, image_path, df):
+        """Replace the oldest image and graph when a third or more images are uploaded."""
+        # Remove the oldest image and graph
+        old_image, old_graph = self.image_history.pop(0)
+        self.main_layout.removeWidget(old_image)
+        self.main_layout.removeWidget(old_graph)
+        old_image.deleteLater()
+        old_graph.deleteLater()
+
+        # Create and display the new image and graph
+        image_panel = ImagePanel(self)
+        pixmap = QPixmap(image_path)
+        image_panel.set_image(pixmap)
+
+        graph_panel = GraphPanel(self, df)
+        graph_panel.init_ui()
+
+        # Add the new image and graph back into the layout
         self.main_layout.addWidget(image_panel, stretch=5)
         self.main_layout.addWidget(graph_panel, stretch=5)
 
-        # Keep track of the panels
-        self.image_panels.append(image_panel)
-        self.graph_panels.append(graph_panel)
-
-        # Ensure that all graph panels are updated with their data
-        for graph_panel in self.graph_panels:
-            graph_panel.init_ui()  # Re-initialize the UI for all graphs with their respective data
-
-        # Ensure the layout updates without resetting previous content
-        self.central_widget.setLayout(self.main_layout)
-
+        # Store the new image and graph
+        self.image_history.append((image_panel, graph_panel))
 
     def set_window_properties(self):
         """Set properties for the main window."""
-        self.setWindowTitle("Sediment Core Analysis Tool")
+        self.setWindowTitle("Image Analysis Tool")
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
-        
-    def export_graphs_as_pdf(self): 
+
+    def export_graphs_as_pdf(self):
         """Export the graphs displayed in the graph panel as a PDF file."""
-        # Open file dialog to specify where to save the PDF
         file_name, _ = QFileDialog.getSaveFileName(
             self,
             "Save Graphs as PDF",
@@ -91,49 +134,38 @@ class MainWindow(QMainWindow):
             if not file_name.endswith('.pdf'):
                 file_name += '.pdf'
 
-            # Get the graphs (ColoursGraph and LayersGraph) from the GraphPanel
-            graphs_widget = self.graph_panel.layout.itemAt(1).widget()  # This should be the Graphs widget
-            
-            # Assuming ColoursGraph is the first child in Graphs widget
+            # Assuming ColoursGraph is within the graph panel
+            graphs_widget = self.graph_panel.layout.itemAt(1).widget()
             colours_graph = graphs_widget.findChild(ColoursGraph)
-           
 
-            # Export both figures to a PDF using PdfPages
             with PdfPages(file_name) as pdf:
                 if colours_graph:
-                    pdf.savefig(colours_graph.fig)  # Save ColoursGraph as a page in the PDF
-             
+                    pdf.savefig(colours_graph.fig)
 
-            # Optional: Show message in status bar
             self.statusBar().showMessage(f"Graphs saved to: {file_name}")
-    
-    # Function to export raw data to CSV
+
     def export_data_to_csv(self):
-        # Open a file dialog for the user to select a location to save the CSV
+        """Export the raw data to a CSV file."""
         file_name, _ = QFileDialog.getSaveFileName(
             self,
             "Save Raw Data as CSV",
             "",
-            "CSV Files (*.csv)"  # Filter for CSV files
+            "CSV Files (*.csv)"
         )
 
         if file_name:
             if not file_name.endswith('.csv'):
                 file_name += '.csv'
 
-            # Get the DataFrame from the graph panel
-            df = self.graph_panel.df  # Assuming df contains your raw data
-            
+            df = self.graph_panel.df
             if df is not None:
-                # Export the DataFrame to CSV
                 df.to_csv(file_name, index=False)
                 self.statusBar().showMessage(f"Raw data saved to: {file_name}")
             else:
                 self.statusBar().showMessage("No data available to export.")
 
-    # Function to export raw data to Excel
     def export_data_to_excel(self):
-        # Open a file dialog to specify where to save the Excel file
+        """Export the raw data to an Excel file."""
         file_name, _ = QFileDialog.getSaveFileName(
             self,
             "Save Raw Data as Excel",
@@ -145,14 +177,9 @@ class MainWindow(QMainWindow):
             if not file_name.endswith('.xlsx'):
                 file_name += '.xlsx'
 
-            # Get the DataFrame from the graph panel (assuming df is stored there)
-            df = self.graph_panel.df  # Make sure this is where your data is stored
-            
+            df = self.graph_panel.df
             if df is not None:
-                # Export the DataFrame to Excel
                 df.to_excel(file_name, index=False)
                 self.statusBar().showMessage(f"Raw data saved to: {file_name}")
             else:
                 self.statusBar().showMessage("No data available to export.")
-
- 

@@ -67,37 +67,38 @@ class Menu(QMenuBar):
 
         return help_menu
 
-     def open_image(self):
-        """Open an image file and add a new ImagePanel and GraphPanel to the main layout."""
+    def open_image(self):
+        """Open an image file and process it to display the image and its corresponding graph."""
+        # Open a file dialog to select an image file
         file_name, _ = QFileDialog.getOpenFileName(
             self, 
             "Open Image", 
             "", 
             "Images (*.png *.jpg *.bmp)"
         )
-    
 
         if file_name:
-            # Load the image using OpenCV
+            # Read the image using OpenCV
             image = cv.imread(file_name)
 
             if image is not None:
-                # Format the image and display it in ImagePanel
-                # Process the image to get the data (df)
+                # Process the image (assuming orient_array and process_core_image are your utility functions)
                 oriented_image = orient_array(image)
                 
-                data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
+                # Assuming process_core_image returns a data dictionary with color data
+                data_dict = process_core_image(oriented_image, 77, True)  # Example core width 77mm
 
-                if data_dict != 0:  # If processing is successful
-                    df = data_dict["Colours"]
+                if data_dict != 0:
+                    df = data_dict["Colours"]  # Assuming the processed data is in 'Colours'
 
-                    # Add a new image and graph panel
+                    # Call the MainWindow method to add the image and its graph
                     self.parent.add_image_and_graph_panel(file_name, df)
 
-                    # Display success message in the status bar
+                    # Optionally, show a success message in the status bar
                     self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
+                else:
+                    # Handle processing failure
+                    self.parent.statusBar().showMessage("Failed to process the image.")
             else:
-                # If image loading fails
-                self.parent.statusBar().showMessage("Failed to load image.")
-
-   
+                # Handle case where the image could not be read
+                self.parent.statusBar().showMessage("Failed to load the image.")
