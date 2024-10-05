@@ -244,9 +244,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         first_data_point = (self.df.iloc[0,1],self.df.iloc[0,0])
         last_data_point = (self.df.iloc[-1,1],self.df.iloc[-1,0])
         
-        first_data_point = self.getNormalisedCoords(first_data_point)
-        last_data_point = self.getNormalisedCoords(last_data_point)
-        return first_data_point, last_data_point
+        norm_top_point = self.getNormalisedCoords(first_data_point)[1]
+        norm_bottom_point = self.getNormalisedCoords(last_data_point)[1]
+        return norm_top_point, norm_bottom_point
 
     def getNormalisedCoords(self, data_point):
         """
@@ -261,5 +261,19 @@ class ColoursGraph(FigureCanvasQTAgg):
         
         # Normalize based on the figure's bounding box size
         return (data_point[0] / width, data_point[1] / height)
-
+    
+    def getAxisRelativeCoordinates(self):
+        y_axis_bounds = self.fig.axes[0].get_ybound()
+        top_axis_point = (0,y_axis_bounds[0])
+        bottom_axis_point = (0,y_axis_bounds[1])
+        norm_top_axis_point = self.getNormalisedCoords(top_axis_point)[1]
+        norm_bottom_axis_point = self.getNormalisedCoords(bottom_axis_point)[1]
+        return norm_top_axis_point,norm_bottom_axis_point
+    
+    def setTopBottomCoordinates(self):
+        norm_top_axis_point,norm_bottom_axis_point = self.getAxisRelativeCoordinates()
+        norm_top_point, norm_bottom_point = self.getLineHeightRelativeCoordinates()
+        top = min(norm_top_axis_point,norm_top_point)
+        bottom = max(norm_bottom_axis_point,norm_bottom_point)
+        return top,bottom 
 

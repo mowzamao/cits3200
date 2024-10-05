@@ -107,8 +107,7 @@ class LayersGraph(FigureCanvasQTAgg):
         self.draw_idle()
 
     def getColoursGraphCoordinates(self,parent):
-        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
-        return top[1],bottom[1]
+        return parent.colours_graph.setTopBottomCoordinates()
 
 
     def setFontSize(self):
