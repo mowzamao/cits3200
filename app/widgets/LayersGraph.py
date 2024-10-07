@@ -25,7 +25,10 @@ class LayersGraph(FigureCanvasQTAgg):
         self.core_as_grid = self.createCore_as_grid(df,height, width)
         top,bottom = self.parent.colours_graph.setTopBottomCoordinates()
         self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
+
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
+
+        
         
         super(LayersGraph, self).__init__(self.layers_fig)
 
@@ -70,7 +73,6 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes.clear()
         layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
         layers_axes.set_xlim([0, 1])
-        #layers_axes.set_ylim(0,100)
         layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
         layers_axes_top = layers_axes.twiny()
         layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
@@ -92,9 +94,8 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
 
         #hiding ticks and their labels
-        layers_axes.get_xaxis().set_ticks([])
-        layers_axes.get_yaxis().set_ticks([])
         layers_axes.yaxis.set_tick_params(which='both',labelleft=False,left = False)
+        layers_axes.xaxis.set_tick_params(which='both',labelleft=False,left = False)
         layers_axes_top.get_xaxis().set_ticks([])
         return layers_fig,layers_axes,layers_axes_top
 
