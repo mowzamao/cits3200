@@ -24,9 +24,6 @@ class MainWindow(QMainWindow):
         self.image_history = []  # Track triples of images panels, graph panels and thumbnails
         self.max_images = 2  # Limit to two images at a time
         self.num_images = 0  # The number of active images i.e. 0, 1,..., or max_images
-                        
-        unit = 7  # main panel height - used as a refernce unit
-        self.unit = unit
 
         # Set window properties
         self.set_window_properties()
@@ -100,18 +97,19 @@ class MainWindow(QMainWindow):
         thumbnail_panel = ThumbnailPanel(self)
         for image_panel, graph_panel, thumbnail in self.image_history:
             thumbnail_panel.add_thumbnail(thumbnail)
-        thumbnail_panel.setStyleSheet("color: #f3f2f0; border-radius: 5px; padding: 20px;")
         return thumbnail_panel
     
     # Draws the image, graph and thumbnail panels
     def render_panels(self, left_panel, right_panel, thumbnail_panel):
-        unit = self.unit
         new_layout = QGridLayout()
-        new_layout.addWidget(left_panel, 0, 0, unit, unit)
-        new_layout.addWidget(right_panel, 0, unit, unit, unit)
-        new_layout.addWidget(thumbnail_panel, unit, 0, 2, 2*unit)
-        new_layout.setColumnStretch(0, unit)
-        new_layout.setColumnStretch(unit, unit)
+        new_layout.addWidget(left_panel, 0, 0, 1, 1)
+        new_layout.addWidget(right_panel, 0, 1, 1, 1)
+        new_layout.addWidget(thumbnail_panel, 1, 0, 1, 1)
+        new_layout.setColumnStretch(0, 1)
+        new_layout.setColumnStretch(1, 1)
+        new_layout.setRowStretch(0, 500)
+        new_layout.setRowStretch(1, 1)
+
         self.central_widget.setLayout(new_layout)
 
     # Sets the initial empty placeholder panels
@@ -130,11 +128,19 @@ class MainWindow(QMainWindow):
                 image_panel, graph_panel, thumbnail = self.image_history[0]
                 thumbnail_panel = self.create_thumbnail_panel()
                 self.render_panels(image_panel, graph_panel, thumbnail_panel)
+
+                self.image_panel = image_panel
+                self.graph_panel = graph_panel
+                self.thumbnail_panel = thumbnail_panel
             case _:
-                graph_panel_1 = self.image_history[0][1]
-                graph_panel_2 = self.image_history[1][1]
+                graph_panel_left = self.image_history[0][1]
+                graph_panel_right = self.image_history[1][1]
                 thumbnail_panel = self.create_thumbnail_panel()
-                self.render_panels(graph_panel_1, graph_panel_2, thumbnail_panel)
+                self.render_panels(graph_panel_left, graph_panel_right, thumbnail_panel)
+
+                self.graph_panel_left = graph_panel_left 
+                self.graph_panel_right = graph_panel_right
+                self.thumbnail_panel = thumbnail_panel
 
     
 

@@ -6,7 +6,7 @@ from PyQt6.QtCore import Qt
 class Thumbnail(QWidget):
     def __init__(self, image_path = None):
         super().__init__()
-        
+    
         self.image_path = image_path
         
         # Set up the layout
@@ -24,4 +24,5 @@ class Thumbnail(QWidget):
     def load_image(self):
         # Load the image and resize it to thumbnail size
         pixmap = QPixmap(self.image_path)
+        self.image_label.resize(100, 100)
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))

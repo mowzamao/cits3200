@@ -9,14 +9,13 @@ class ThumbnailPanel(QWidget):
         super().__init__(parent)
 
         self.count = 0
-        self.max_count = 14
         self.layout = QGridLayout()
         self.setLayout(self.layout)
-        
-        self.setGeometry(0, 0, 400, 300)  # Initial size of the main window
+
+        self.layout.setColumnStretch(0, 1)
+    
 
     def add_thumbnail(self, thumbnail):
-        if self.count <= self.max_count:
-            self.layout.addWidget(thumbnail, 0, self.count, 3, 1)
-            self.count += 1
+        self.layout.addWidget(thumbnail, 0, self.count, 1, 1)
+        self.count += 1
     
