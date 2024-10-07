@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.max_images = 2  # Limit to two images at a time
         self.num_images = 0  # The number of active images i.e. 0, 1,..., or max_images
                         
-        unit = 10  # main panel height - used as a refernce unit
+        unit = 7  # main panel height - used as a refernce unit
         self.unit = unit
 
         # Set window properties
@@ -110,6 +110,8 @@ class MainWindow(QMainWindow):
         new_layout.addWidget(left_panel, 0, 0, unit, unit)
         new_layout.addWidget(right_panel, 0, unit, unit, unit)
         new_layout.addWidget(thumbnail_panel, unit, 0, 2, 2*unit)
+        new_layout.setColumnStretch(0, unit)
+        new_layout.setColumnStretch(unit, unit)
         self.central_widget.setLayout(new_layout)
 
     # Sets the initial empty placeholder panels

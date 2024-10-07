@@ -17,6 +17,6 @@ class ThumbnailPanel(QWidget):
 
     def add_thumbnail(self, thumbnail):
         if self.count <= self.max_count:
-            self.layout.addWidget(thumbnail, 0, self.count, 1, 2)
+            self.layout.addWidget(thumbnail, 0, self.count, 3, 1)
             self.count += 1
     
