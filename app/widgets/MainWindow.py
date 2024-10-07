@@ -1,14 +1,17 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea
+    QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea
 )
 from PyQt6.QtGui import QPixmap
-import pandas as pd
+import pandas as pd 
+from time import sleep
 
 from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
+from app.widgets.ThumbnailPanel import ThumbnailPanel
+from app.widgets.Thumbnail import Thumbnail
 
 
 class MainWindow(QMainWindow):
@@ -17,107 +20,126 @@ class MainWindow(QMainWindow):
         """Initialize the main window and setup UI components."""
         super().__init__()
 
-        # State to track images and graphs (store only 2 sets at a time)
-        self.image_history = []  # Track pairs of images and graph panels
+        # State to track images, graphs and thumbnails 
+        self.image_history = []  # Track triples of images panels, graph panels and thumbnails
         self.max_images = 2  # Limit to two images at a time
+        self.num_images = 0  # The number of active images i.e. 0, 1,..., or max_images
+                        
+        unit = 10  # main panel height - used as a refernce unit
+        self.unit = unit
 
         # Set window properties
         self.set_window_properties()
 
-        # Create scroll area for horizontal scrolling
-        self.scroll_area = QScrollArea(self)
-        self.scroll_area.setWidgetResizable(True)  # Allow widget resizing within the scroll area
-
-        # Create a widget to hold the actual layout and panels
-        self.scroll_widget = QWidget()
-        self.scroll_area.setWidget(self.scroll_widget)
-
-        # Main layout for side-by-side images and graphs
-        self.main_layout = QHBoxLayout(self.scroll_widget)
-
-        # Set the scroll area as the central widget of the main window
-        self.setCentralWidget(self.scroll_area)
+        # Main layout 
+        self.reset_central_widget()
 
         # Initialize toolbar and menu
         self.toolbar = Toolbar(self)
         self.menu = Menu(self)
+        self.thumbnail_panel = ThumbnailPanel(self)
 
         # Add toolbar and menu
         self.addToolBar(self.toolbar)
         self.setMenuBar(self.menu)
 
-        # Add placeholder panels for image and graph at initialization
-        self.image_panel_1 = ImagePanel(self)
-        self.graph_panel_1 = GraphPanel(self)
+        # References to panel objects
+        self.image_panel = None
+        self.graph_panel = None
+        self.graph_panel_left = None
+        self.graph_panel_right = None
+        self.thumbnail_panel = None
 
-        # Add the placeholder panels to the layout
-        self.main_layout.addWidget(self.image_panel_1, stretch=5)
-        self.main_layout.addWidget(self.graph_panel_1, stretch=5)
+        ## Rendering the default empty panels
+        self.set_empty_panels()
 
+    # Resets the existing central widget 
+    # Used prior to re-rendering the panels
+    def reset_central_widget(self):
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+        self.main_layout = QGridLayout()
+
+    # Called by Menu when an image is loaded
+    # creates the two panels (image and graph) and the thumbnail
+    # Adds these to the image history and resets the central panels
     def add_image_and_graph_panel(self, image_path, df):
-        """Handle image and graph upload, replacing placeholders and adding them side by side."""
-        if len(self.image_history) < self.max_images:
-            # First or second image being uploaded, add it to the layout
-            self.replace_placeholder(image_path, df)
-        else:
-            # More than two images, replace the oldest one
-            self.replace_oldest_image_and_graph(image_path, df)
+        """Handle image and graph upload."""
+        image_panel = self.create_image_panel(image_path)
+        graph_panel = self.create_graph_panel(df)
+        thumbnail = self.create_thumbnail(image_path)
 
-    def replace_placeholder(self, image_path, df):
-        """Replace the placeholders with actual image and graph."""
-        # Create and display the image panel
+        self.image_history.append([image_panel, graph_panel, thumbnail])
+
+        self.reset_central_widget()
+        self.load_panels()
+        self.num_images += 1
+
+
+    # Creates an instance of the image panel
+    def create_image_panel(self, image_path):
         image_panel = ImagePanel(self)
         pixmap = QPixmap(image_path)
         image_panel.set_image(pixmap)
+        return image_panel
 
-        # Create and display the graph panel for the image
+    # Creates an instance of the graph panel
+    def create_graph_panel(self, df):
         graph_panel = GraphPanel(self, df)
         graph_panel.init_ui()
+        return graph_panel
 
-        # Replace the placeholders if it's the first image being uploaded
-        if len(self.image_history) == 0:
-            # Replace the first placeholder panels with actual panels
-            self.main_layout.replaceWidget(self.image_panel_1, image_panel)
-            self.main_layout.replaceWidget(self.graph_panel_1, graph_panel)
+    # Creates an instance of a thumbnail
+    def create_thumbnail(self, image_path):
+        thumbnail = Thumbnail(image_path)
+        return thumbnail
+    
+    # Creates a thumbnail panel using the existing thumbnails 
+    # stored in the image_history
+    def create_thumbnail_panel(self):
+        thumbnail_panel = ThumbnailPanel(self)
+        for image_panel, graph_panel, thumbnail in self.image_history:
+            thumbnail_panel.add_thumbnail(thumbnail)
+        thumbnail_panel.setStyleSheet("color: #f3f2f0; border-radius: 5px; padding: 20px;")
+        return thumbnail_panel
+    
+    # Draws the image, graph and thumbnail panels
+    def render_panels(self, left_panel, right_panel, thumbnail_panel):
+        unit = self.unit
+        new_layout = QGridLayout()
+        new_layout.addWidget(left_panel, 0, 0, unit, unit)
+        new_layout.addWidget(right_panel, 0, unit, unit, unit)
+        new_layout.addWidget(thumbnail_panel, unit, 0, 2, 2*unit)
+        self.central_widget.setLayout(new_layout)
 
-            # Delete the placeholders
-            self.image_panel_1.deleteLater()
-            self.graph_panel_1.deleteLater()
-        else:
-            # Add the second set of image/graph side by side
-            self.main_layout.addWidget(image_panel, stretch=5)
-            self.main_layout.addWidget(graph_panel, stretch=5)
-
-        # Store the image and graph panels in history
-        self.image_history.append((image_panel, graph_panel))
-
-    def replace_oldest_image_and_graph(self, image_path, df):
-        """Replace the oldest image and graph when a third or more images are uploaded."""
-        # Remove the oldest image and graph
-        old_image, old_graph = self.image_history.pop(0)
-        self.main_layout.removeWidget(old_image)
-        self.main_layout.removeWidget(old_graph)
-        old_image.deleteLater()
-        old_graph.deleteLater()
-
-        # Create and display the new image and graph
+    # Sets the initial empty placeholder panels
+    def set_empty_panels(self):
         image_panel = ImagePanel(self)
-        pixmap = QPixmap(image_path)
-        image_panel.set_image(pixmap)
+        graph_panel = GraphPanel(self)
+        thumbnail_panel = self.create_thumbnail_panel()
+        self.render_panels(image_panel, graph_panel, thumbnail_panel)
 
-        graph_panel = GraphPanel(self, df)
-        graph_panel.init_ui()
 
-        # Add the new image and graph back into the layout
-        self.main_layout.addWidget(image_panel, stretch=5)
-        self.main_layout.addWidget(graph_panel, stretch=5)
+    # Loads panels based on the state of the image history and the 
+    # num_images state variable
+    def load_panels(self):
+        match self.num_images:
+            case 0:
+                image_panel, graph_panel, thumbnail = self.image_history[0]
+                thumbnail_panel = self.create_thumbnail_panel()
+                self.render_panels(image_panel, graph_panel, thumbnail_panel)
+            case _:
+                graph_panel_1 = self.image_history[0][1]
+                graph_panel_2 = self.image_history[1][1]
+                thumbnail_panel = self.create_thumbnail_panel()
+                self.render_panels(graph_panel_1, graph_panel_2, thumbnail_panel)
 
-        # Store the new image and graph
-        self.image_history.append((image_panel, graph_panel))
+    
 
     def set_window_properties(self):
         """Set properties for the main window."""
         self.setWindowTitle("Image Analysis Tool")
+        self.setGeometry(100, 100, 800, 600) 
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
 
