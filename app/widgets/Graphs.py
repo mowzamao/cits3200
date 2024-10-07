@@ -18,7 +18,7 @@ class Graphs(QWidget):
         self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
         
         self.layers_graph.layers_axes.sharey(self.colours_graph.axes_left)
-
+        
         self.init_ui()
 
     def init_ui(self):
