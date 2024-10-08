@@ -128,4 +128,17 @@ class MainWindow(QMainWindow):
             else:
                 self.statusBar().showMessage("No data available to export.")
 
+    def run_ceilab_analysis(self):
+        self.graph_panel.graphs.colours_graph.analysis_type = 'lab'
+        self.redraw_colours_graph()
+
+    def run_rgb_analysis(self):
+        self.graph_panel.graphs.colours_graph.analysis_type = 'rgb'
+        self.redraw_colours_graph()
+
+    def redraw_colours_graph(self):
+        self.graph_panel.graphs.colours_graph.clearSubplots()
+        self.graph_panel.graphs.colours_graph.plotColourData()
+        self.graph_panel.graphs.colours_graph.draw_idle()
+
  

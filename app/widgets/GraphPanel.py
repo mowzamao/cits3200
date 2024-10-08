@@ -11,7 +11,7 @@ from app.widgets.GraphsToolbar import GraphsToolbar
 
 class GraphPanel(QWidget):
     """
-    The PyQt class that defines the panel showing the colour graphs
+    The PyQt class that defines the panel showing the graphs
     """
     
     def __init__(self, parent=None, df=None):

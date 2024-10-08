@@ -89,8 +89,13 @@ class Menu(QMenuBar):
                 # Process the core image to get the data (df)
                 data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
 
+                #setting up dataframe for the colours graph
+                rgb_df = data_dict['Colours']
+                lab_df = core_to_lab(rgb_df)
+                df = pd.merge(rgb_df,lab_df,on = 'Depth (mm)')
+
                 if data_dict != 0:  # If processing is successful
-                    self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
+                    self.parent.graph_panel.df = df  # Set the dataframe for the GraphPanel
                     self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
                 
                     self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")

@@ -5,6 +5,7 @@ from PyQt6.QtCore import Qt, QSize
 from app.utils.RandomDataGenerator import RandomDataGenerator 
 from app.widgets.ColoursGraph import ColoursGraph
 from app.widgets.LayersGraph import LayersGraph
+from app.widgets.Toolbar import Toolbar
 
 class Graphs(QWidget):
     """The pyqt class that defines the panel containing the colour graphs
@@ -14,11 +15,9 @@ class Graphs(QWidget):
         self.df = df
 
         #generate instances of the sediment graphs
-        self.colours_graph = ColoursGraph(self,dpi=100, df = self.df)
+        self.colours_graph = ColoursGraph(self,dpi=100, df = self.df, analysis_type= 'rgb')
         self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
-        
         self.layers_graph.layers_axes.sharey(self.colours_graph.axes_left)
-        
         self.init_ui()
 
     def init_ui(self):
