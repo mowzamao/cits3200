@@ -23,9 +23,12 @@ class LayersGraph(FigureCanvasQTAgg):
         df = df[self.getAnalysisType(df)]
 
         self.core_as_grid = self.createCore_as_grid(df,height, width)
-        top,bottom = self.getColoursGraphCoordinates(parent) 
+        top,bottom = self.parent.colours_graph.setTopBottomCoordinates()
         self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
+
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
+
+        
         
         super(LayersGraph, self).__init__(self.layers_fig)
 
@@ -70,7 +73,6 @@ class LayersGraph(FigureCanvasQTAgg):
         layers_axes.clear()
         layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
         layers_axes.set_xlim([0, 1])
-        layers_axes.set_ylim(0,100)
         layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
         layers_axes_top = layers_axes.twiny()
         layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
@@ -82,27 +84,19 @@ class LayersGraph(FigureCanvasQTAgg):
 
         for i, color in enumerate(self.core_as_grid):
             depth = depths[i]
-            rect = patches.Rectangle((0, depth), 1,  thickness, 
-                             facecolor=color)
+            rect = patches.Rectangle((0, depth), 1,  thickness, facecolor=color)
             layers_axes.add_patch(rect)
 
-
-        # layers_axes.scatter([50]*len(self.df), self.df['Depth (mm)'], c=self.core_as_grid)
-        #layers_axes.imshow(self.core_as_grid,aspect = 'auto',extent=[0,100,0,100],origin = 'upper')
+        layers_axes.invert_yaxis()
 
         #add title
         layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
 
         #hiding ticks and their labels
-        layers_axes.get_xaxis().set_ticks([])
-        layers_axes.get_yaxis().set_ticks([])
-        layers_axes.yaxis.set_tick_params(labelleft=False)
+        layers_axes.yaxis.set_tick_params(which='both',labelleft=False,left = False)
+        layers_axes.xaxis.set_tick_params(which='both',labelleft=False,left = False)
         layers_axes_top.get_xaxis().set_ticks([])
         return layers_fig,layers_axes,layers_axes_top
-
-    def getColoursGraphCoordinates(self,parent):
-        top,bottom = parent.colours_graph.getLineHeightRelativeCoordinates()
-        return top[1],bottom[1]
 
     def resizeEvent(self, event):
         """
@@ -120,11 +114,11 @@ class LayersGraph(FigureCanvasQTAgg):
     def delayed_resize_logic(self):
         """ This method handles the delayed resizing logic. """
         if self.verifyDimensions():
-            top, bottom = self.getColoursGraphCoordinates(self.parent)
+            top, bottom = self.parent.colours_graph.setTopBottomCoordinates()
             self.layers_axes.set_position([0.1, bottom, 0.8, (top - bottom)])
+            self.layers_axes.invert_yaxis()
             self.setFontSize()
         self.draw_idle()
-
 
     def setFontSize(self):
         """

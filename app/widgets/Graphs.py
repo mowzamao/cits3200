@@ -18,7 +18,7 @@ class Graphs(QWidget):
         self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
         
         self.layers_graph.layers_axes.sharey(self.colours_graph.axes_left)
-
+        
         self.init_ui()
 
     def init_ui(self):
@@ -34,7 +34,6 @@ class Graphs(QWidget):
         main_layout = QHBoxLayout()
         main_layout.addLayout(layers_layout,stretch=2)
         main_layout.addLayout(colours_layout,stretch=8)
-
 
         #Set the layout of this instance of the Graph Panel
         self.setLayout(main_layout)
