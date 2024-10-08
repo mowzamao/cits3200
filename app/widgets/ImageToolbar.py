@@ -34,5 +34,7 @@ class ImageToolbar(QToolBar):
             new_depths = graph_panel.df['Depth (mm)'].apply(lambda x: max_depth - x)
             
             graph_panel.df['Depth (mm)'] = new_depths
+            
             graph_panel.init_ui()
+            graph_panel.graphs.layers_graph.flipTopBottomLabels() #flip the top and bottom labels on the layers graph around
     
