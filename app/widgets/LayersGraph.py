@@ -84,8 +84,7 @@ class LayersGraph(FigureCanvasQTAgg):
 
         for i, color in enumerate(self.core_as_grid):
             depth = depths[i]
-            rect = patches.Rectangle((0, depth), 1,  thickness, 
-                             facecolor=color)
+            rect = patches.Rectangle((0, depth), 1,  thickness, facecolor=color)
             layers_axes.add_patch(rect)
 
         layers_axes.invert_yaxis()
