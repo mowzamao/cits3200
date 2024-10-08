@@ -20,10 +20,9 @@ class LayersGraph(FigureCanvasQTAgg):
         self.df = df[['Depth (mm)','Red',"Green",'Blue']] 
         height = len(df)
         width = 1
-
         self.core_as_grid = self.createCore_as_grid(height, width)
         top,bottom = self.parent.colours_graph.setTopBottomCoordinates()
-        self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
+        self.setLayersFigure(dpi,top,bottom)
 
         self.layers_fig.canvas.mpl_connect('resize_event',self.resizeEvent)
         
@@ -47,38 +46,53 @@ class LayersGraph(FigureCanvasQTAgg):
         return core_as_grid
     
     def setLayersFigure(self,dpi,top,bottom):
-        #define the figure the plot will be rendered in
-        layers_fig = Figure(dpi=dpi)
+        self.layers_fig = Figure(dpi=dpi)
+        self.setLayerPlotAxes(top,bottom)
+        self.plotLayers()
+        self.layers_axes.invert_yaxis()
+        self.layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
+        self.setTopBottomLabels(fontweight = 'bold',labelpad = 10)
+        self.setCustomTicks(which='both',labelleft=False,left=False,labelbottom=False,bottom=False)
 
-        #set axis
-        layers_axes = layers_fig.add_subplot(111) 
-        layers_axes.clear()
-        layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
-        layers_axes.set_xlim([0, 1])
-        layers_axes.set_xlabel('Bottom',fontweight = 'bold',labelpad = 10)
-        layers_axes_top = layers_axes.twiny()
-        layers_axes_top.set_xlabel('Top',fontweight = 'bold',labelpad = 10)
+    def setLayerPlotAxes(self,top:float,bottom:float):
+        """
+        Function defining the axes of the layers graph. 
+        """
+        self.layers_axes = self.layers_fig.add_subplot(111) 
+        self.layers_axes.clear()
+        self.layers_axes.set_position([0.1,bottom,0.8,(top-bottom)])
+        self.layers_axes.set_xlim([0, 1])
+    
+    def setTopBottomLabels(self,fontweight:str = 'bold',labelpad:float = 10):
+        """
+        Function setting the labels for the layers graph which indicate the top and bottom of the core (and thus 
+        the direction of image processing / scanning).
+        """
+        self.layers_axes.set_xlabel('Bottom',fontweight = fontweight,labelpad = labelpad)
+        self.layers_axes_top = self.layers_axes.twiny()
+        self.layers_axes_top.set_xlabel('Top',fontweight = fontweight,labelpad = labelpad)
 
-        #render image 
-        #Loop through RGB colors and plot each layer
+
+    def setCustomTicks(self,which:str,labelleft:bool,left:bool,labelbottom:bool,bottom:bool):
+        """
+        Function setting custom tick parameters for the layers plot. 
+        """
+        self.layers_axes.yaxis.set_tick_params(which = which,labelleft = labelleft,left = left)
+        self.layers_axes.xaxis.set_tick_params(which = which,labelbottom = labelbottom,bottom = bottom)
+        self.layers_axes_top.get_xaxis().set_ticks([])
+
+
+    def plotLayers(self):
+        """
+        Function iterating through core as gird variable and plotting coloured rectangles
+        onto the layer plot axes to represent the core laminations. 
+        """
         depths = list(self.df['Depth (mm)'])
         thickness = depths[1] - depths[0]
-
         for i, color in enumerate(self.core_as_grid):
             depth = depths[i]
             rect = patches.Rectangle((0, depth), 1,  thickness, facecolor=color)
-            layers_axes.add_patch(rect)
-
-        layers_axes.invert_yaxis()
-
-        #add title
-        layers_fig.suptitle("Colour Layers",fontsize = 8, fontweight='bold',y = 0.97)
-
-        #hiding ticks and their labels
-        layers_axes.yaxis.set_tick_params(which='both',labelleft=False,left = False)
-        layers_axes.xaxis.set_tick_params(which='both',labelleft=False,left = False)
-        layers_axes_top.get_xaxis().set_ticks([])
-        return layers_fig,layers_axes,layers_axes_top
+            self.layers_axes.add_patch(rect)
 
     def resizeEvent(self, event):
         """
