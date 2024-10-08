@@ -16,13 +16,12 @@ class LayersGraph(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, dpi=100, df = None):
         self.dpi = dpi
-        self.parent = parent 
+        self.parent = parent
+        self.df = df[['Depth (mm)','Red',"Green",'Blue']] 
         height = len(df)
         width = 1
-        self.df = df
-        df = df[self.getAnalysisType(df)]
 
-        self.core_as_grid = self.createCore_as_grid(df,height, width)
+        self.core_as_grid = self.createCore_as_grid(height, width)
         top,bottom = self.parent.colours_graph.setTopBottomCoordinates()
         self.layers_fig,self.layers_axes,self.layers_axes_top = self.setLayersFigure(dpi,top,bottom)
 
@@ -30,7 +29,7 @@ class LayersGraph(FigureCanvasQTAgg):
         
         super(LayersGraph, self).__init__(self.layers_fig)
 
-    def createCore_as_grid(self,df:pd.DataFrame,height:int,width:int):
+    def createCore_as_grid(self,height:int,width:int):
         """
         Function to add RGB data to the core_as_grid variable for the Layers plot. 
         The array has every row as a specific layer / colour and each column shows 
@@ -44,23 +43,8 @@ class LayersGraph(FigureCanvasQTAgg):
         for row in range(height):
             for col in range(width):
                 for channel in range(3):
-                    core_as_grid[row][col][channel] = int(df.loc[row, df.columns[channel+1]])/255
+                    core_as_grid[row][col][channel] = int(self.df.loc[row, self.df.columns[channel+1]])/255
         return core_as_grid
-    
-    def getAnalysisType(self,df:pd.DataFrame):
-        """
-        Function which returns a list of column names in the order of depth, R,G,B so that 
-        imshow is given the correct colour values as inputs. For later development, this function can 
-        be used to handle and setup CEILAB analysis.
-
-        parameters:
-            df(pd.Dataframe): pandas dataframe containing the data to be plotted.
-        """
-        df_columns = df.columns
-        if 'Blue' in df_columns and 'Red' in df_columns and 'Green' in df_columns:
-            return ['Depth (mm)','Red',"Green",'Blue']
-        else:
-            return None
     
     def setLayersFigure(self,dpi,top,bottom):
         #define the figure the plot will be rendered in
