@@ -4,6 +4,10 @@ from PyQt6.QtGui import QPixmap, QAction,QTransform, QIcon
 from app.widgets.GraphPanel import GraphPanel
 
 class ImageToolbar(QToolBar):
+
+    layers_graph_top_axes_label = 'Top'
+    layers_graph_bottom_axes_label = 'Bottom'
+
     def __init__(self, parent=None):
         super().__init__(parent)
         self.init_ui()
@@ -36,5 +40,19 @@ class ImageToolbar(QToolBar):
             graph_panel.df['Depth (mm)'] = new_depths
             
             graph_panel.init_ui()
-            graph_panel.graphs.layers_graph.flipTopBottomLabels() #flip the top and bottom labels on the layers graph around
+
+            self.flipTopBottomLabels()
+
+            graph_panel.graphs.layers_graph.layers_axes.set_xlabel(self.layers_graph_bottom_axes_label)
+            graph_panel.graphs.layers_graph.layers_axes_top.set_xlabel(self.layers_graph_top_axes_label)  
+
+    def flipTopBottomLabels(self):
+        """
+        Function to flip the location of the top and bottom labels on the layers graph.
+        """
+        self.layers_graph_top_axes_label = self.getNewLabel(self.layers_graph_top_axes_label)
+        self.layers_graph_bottom_axes_label = self.getNewLabel(self.layers_graph_bottom_axes_label)
+
+    def getNewLabel(self, label):
+        return {'Top': 'Bottom', 'Bottom': 'Top'}.get(label, '')
     

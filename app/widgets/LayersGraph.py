@@ -149,15 +149,8 @@ class LayersGraph(FigureCanvasQTAgg):
         """
         width, height = self.layers_fig.get_size_inches()
         return width > 0 and height > 0 
-    
-    def flipTopBottomLabels(self):
-        """
-        Function to flip the location of the top and bottom labels on the layers graph.
-        """
-        old_bottom_xlabel = self.layers_axes.get_xlabel()
-        old_top_label = self.layers_axes_top.get_xlabel()
-        self.layers_axes_top.set_xlabel(old_bottom_xlabel)
-        self.layers_axes.set_xlabel(old_top_label)
+
+
     
 
 
