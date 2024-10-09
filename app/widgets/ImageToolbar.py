@@ -11,15 +11,20 @@ class ImageToolbar(QToolBar):
     def init_ui(self):
         """Create the controls panel for images."""
 
-      # Fullscreen button for toggling view
+        # Fullscreen button for toggling view
         icon = QIcon.fromTheme(f"{getcwd()}/app/style/rotate.svg")
-
         self.rotate = QAction("Rotate Image", self, icon=icon)
         self.rotate.triggered.connect(self.rotate_image)
         self.addAction(self.rotate)
 
-    def rotate_image(self):
+        # Calibrate image
+        icon = QIcon.fromTheme(f"{getcwd()}/app/style/calibrate.svg")
+        self.calibrate = QAction("Calibrate", self, icon=icon)
+        self.calibrate.triggered.connect(self.calibrate_image)
+        self.addAction(self.calibrate)
 
+
+    def rotate_image(self):
         # Flipping the image in the image panel
         transform = QTransform().rotate(180) 
         img = self.parent().image
@@ -35,4 +40,9 @@ class ImageToolbar(QToolBar):
             
             graph_panel.df['Depth (mm)'] = new_depths
             graph_panel.init_ui()
+
+
+    def calibrate_image(self):
+        return None # Needs to be implemented
+
     
