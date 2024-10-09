@@ -196,8 +196,9 @@ def process_core_image(image: np.array, core_width_mm: int,
     Function for processing a sediment core image.
 
     Steps:
-    1. Finds the largest sediment core in an image. If `from_bounding_box` is `True`,
-        the function extracts the sediment core from the bounding box.
+    1. Finds the largest sediment core in an image. 
+        If `from_bounding_box` is `True`, the function 
+        extracts the sediment core from the bounding box.
     2. Crops the image to the sediment core.
     3. Finds the length of the sediment core in millimeters.
     4. Rotates the sediment core so that it is vertical.
@@ -223,6 +224,7 @@ def process_core_image(image: np.array, core_width_mm: int,
             scale, and bounding box of the sediment core.
     """
     extract_core = ExtractCore(image, core_width_mm)
+
     core_data = extract_core.extract_core(from_bounding_box=from_bounding_box, bounding_box=bounding_box)
     if core_data == 0: return 0
     image = core_data['Image']

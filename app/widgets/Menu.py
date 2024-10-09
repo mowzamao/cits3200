@@ -78,9 +78,9 @@ class Menu(QMenuBar):
             if image is not None:
                 # Process the image (assuming orient_array and process_core_image are your utility functions)
                 oriented_image = orient_array(image)
-                
+
                 # Assuming process_core_image returns a data dictionary with color data
-                data_dict = process_core_image(oriented_image, 77, True)  # Example core width 77mm
+                data_dict = process_core_image(oriented_image, 77)  # Example core width 77mm
 
                 if data_dict != 0:
                     df = data_dict["Colours"]  # Assuming the processed data is in 'Colours'
