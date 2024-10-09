@@ -20,7 +20,7 @@ class GraphsToolbar(NavigationToolbar):
         self.save_actions = [None, None, None, None]
 
         self.add_grid_button()
-        self._add_unit_button()
+        self.add_unit_button()
         self.add_save_buttons()
         self.remove_buttons(["Subplots", "Customize", "Save"])
 
@@ -132,7 +132,7 @@ class GraphsToolbar(NavigationToolbar):
             if df is not None:
                 df.to_excel(file_name, index=False)
 
-    def _add_unit_button(self):
+    def add_unit_button(self):
         
         icon = QIcon.fromTheme(f"{getcwd()}/app/style/grid.svg")
 
@@ -140,9 +140,9 @@ class GraphsToolbar(NavigationToolbar):
 
         self.insertAction(self.actions()[6],self.unit_action)
 
-        self.unit_action.triggered.connect(self._toggle_units)
+        self.unit_action.triggered.connect(self.toggle_units)
     
-    def _toggle_units(self):
+    def toggle_units(self):
         self.parent.graphs.colours_graph.units = self.getNewUnit(self.parent.graphs.colours_graph.units)
         self.parent.graphs.colours_graph.clearSubplots()
         self.parent.graphs.colours_graph.plotColourData()
