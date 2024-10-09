@@ -46,8 +46,10 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.df = df
         self.analysis_type = analysis_type
         self.fig = Figure(dpi=dpi)
+        self.hline = None
         self.createSubplots()
         self.plotColourData()
+        self.fig.canvas.mpl_connect('button_press_event', self.onClick)
         self.fig.canvas.mpl_connect('resize_event',self.resizeEvent) #connecting resize event to graph
         super(ColoursGraph, self).__init__(self.fig)
     
@@ -300,4 +302,22 @@ class ColoursGraph(FigureCanvasQTAgg):
         
         # Normalize based on the figure's bounding box size
         return (data_point[0] / width, data_point[1] / height)
+    
+    def onClick(self, event):
+        if event.inaxes is None:
+            # Click occurred outside any axes
+            return
+        if self.hline is None:
+            # No line exists; create it
+            ydata = event.ydata
+            self.hline = []
+            for ax in self.fig.axes:
+                line = ax.axhline(y=ydata, color='grey',alpha = 0.5)
+                self.hline.append(line)
+        else:
+            # Line exists; remove it
+            for line in self.hline:
+                line.remove()
+            self.hline = None
+        self.fig.canvas.draw_idle()
 
