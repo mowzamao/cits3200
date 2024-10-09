@@ -217,20 +217,21 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage("No data available to export.")
 
     def run_ceilab_analysis(self):
-        self.graph_panel_left.graphs.colours_graph.analysis_type = 'lab'
-        self.graph_panel_right.graphs.colours_graph.analysis_type = 'lab'
-        self.redraw_colours_graph(self.graph_panel_left.graphs.colours_graph)
-        self.redraw_colours_graph(self.graph_panel_right.graphs.colours_graph)
+        if hasattr(self.graph_panel_left,'graphs'):
+            self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'lab')
+        if hasattr(self.graph_panel_right,'graphs'):
+            self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'lab')
 
     def run_rgb_analysis(self):
-        self.graph_panel_left.graphs.colours_graph.analysis_type = 'rgb'
-        self.graph_panel_right.graphs.colours_graph.analysis_type = 'rgb'
-        self.redraw_colours_graph(self.graph_panel_left.graphs.colours_graph)
-        self.redraw_colours_graph(self.graph_panel_right.graphs.colours_graph)
+        if hasattr(self.graph_panel_left,'graphs'):
+            self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'rgb')
+        if hasattr(self.graph_panel_right,'graphs'):
+            self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'rgb')
 
-    def redraw_colours_graph(self,graph):
-        graph.clearSubplots()
-        graph.plotColourData()
-        graph.draw_idle()
+    def redraw_graph(self,graph_panel,analysis_type):
+        graph_panel.analysis_type = analysis_type
+        graph_panel.clearSubplots()
+        graph_panel.plotColourData()
+        graph_panel.draw_idle()
 
  

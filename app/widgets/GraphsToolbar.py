@@ -20,8 +20,8 @@ class GraphsToolbar(NavigationToolbar):
         self.save_actions = [None, None, None, None]
 
         self.add_grid_button()
-        self.add_unit_button()
         self.add_save_buttons()
+        self.add_unit_button()
         self.remove_buttons(["Subplots", "Customize", "Save"])
 
         self.setStyleSheet("""
@@ -136,9 +136,10 @@ class GraphsToolbar(NavigationToolbar):
         
         icon = QIcon.fromTheme(f"{getcwd()}/app/style/grid.svg")
 
-        self.unit_action = QAction('Chnage Units',self,icon = icon)
+        self.unit_action = QAction('Change Units',self,icon = icon)
 
         self.insertAction(self.actions()[6],self.unit_action)
+
 
         self.unit_action.triggered.connect(self.toggle_units)
     
