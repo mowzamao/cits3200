@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import (
     QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea
 )
 from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt
 import pandas as pd 
 from time import sleep
 
@@ -104,10 +105,10 @@ class MainWindow(QMainWindow):
         new_layout = QGridLayout()
         new_layout.addWidget(left_panel, 0, 0, 1, 1)
         new_layout.addWidget(right_panel, 0, 1, 1, 1)
-        new_layout.addWidget(thumbnail_panel, 1, 0, 1, 1)
+        new_layout.addWidget(thumbnail_panel, 1, 0, 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
         new_layout.setColumnStretch(0, 1)
         new_layout.setColumnStretch(1, 1)
-        new_layout.setRowStretch(0, 500)
+        new_layout.setRowStretch(0, 5)
         new_layout.setRowStretch(1, 1)
 
         self.central_widget.setLayout(new_layout)
