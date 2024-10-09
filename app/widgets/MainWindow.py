@@ -147,8 +147,8 @@ class MainWindow(QMainWindow):
 
     def set_window_properties(self):
         """Set properties for the main window."""
-        self.setWindowTitle("Image Analysis Tool")
-        self.setGeometry(100, 100, 800, 600)
+        self.setWindowTitle("Sediment Core Analysis Tool")
+        self.setGeometry(100, 100, 800, 600) 
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
 
