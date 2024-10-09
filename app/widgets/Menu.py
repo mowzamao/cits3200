@@ -91,6 +91,7 @@ class Menu(QMenuBar):
 
                 if data_dict != 0:  # If processing is successful
                     self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
+                    self.parent.graph_panel.image = data_dict["Image"]  # Save the image data in the GraphPanel for future access
                     self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
                 
                     self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")

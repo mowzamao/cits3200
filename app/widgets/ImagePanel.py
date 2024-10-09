@@ -1,5 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QTransform
+import numpy as np
 
 from app.widgets.ImageToolbar import ImageToolbar
 
@@ -31,4 +33,3 @@ class ImagePanel(QWidget):
         """Set the given QPixmap on the image label."""
         self.image = pixmap
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
-        
