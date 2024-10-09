@@ -97,6 +97,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.setPlotXlabel()
 
     def setPlotXlabel(self):
+        """
+        Function setting xlabel for the x-axis of the Colours Plot. 
+        """
         if self.analysis_type == 'rgb':
             xlabel_str = 'Intensity (%)'
         elif self.analysis_type == 'lab':
@@ -106,6 +109,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         self.axes_center.set_xlabel(xlabel_str,fontweight = 'bold')
 
     def setPlotXlim(self,ax):
+        """
+        Function setting limit for x values on the x axis. 
+        """
         if self.analysis_type == 'rgb':
             ax.set_xlim(0,100)
             return ax
@@ -115,6 +121,15 @@ class ColoursGraph(FigureCanvasQTAgg):
             return ax
 
     def getPlotData(self):
+        """
+        Function preparing data to be plotted in the Colours Graph.
+
+        Returns:
+            depth(pd.Series): depth of sample from geological core for row of data.
+            colour_data_list(list[pd.Series]): list of pd.Series objects containing the data for each colour channel of analysis.
+            colour_name_list(list[str]): the name of each colour channel in the analysis - used as headings for the colours graph subplots.
+            plot_line_colour_list(list[str]): a list of strings passed to plt.plot to set the colour of the lines on the plot.
+        """
         if self.analysis_type == 'rgb':
             depth = self.df['Depth (mm)']
             colour_name_list = ['Red',"Green",'Blue']
