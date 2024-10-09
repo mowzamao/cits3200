@@ -85,7 +85,6 @@ class Menu(QMenuBar):
                 # Process the image (assuming orient_array and process_core_image are your utility functions)
                 oriented_image = orient_array(image)
                 display_image = QPixmap(file_name)
-                self.parent.image_panel.set_image(display_image)
 
                 # Process the core image to get the data (df)
                 data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
