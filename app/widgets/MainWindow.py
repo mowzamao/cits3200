@@ -1,10 +1,10 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea
+    QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea, QDialog, QPushButton, QLabel
 )
 from PyQt6.QtGui import QPixmap
 from PyQt6.QtCore import Qt
-import pandas as pd 
+import pandas as pd
 from time import sleep
 
 from app.widgets.Menu import Menu
@@ -21,15 +21,18 @@ class MainWindow(QMainWindow):
         """Initialize the main window and setup UI components."""
         super().__init__()
 
-        # State to track images, graphs and thumbnails 
-        self.image_history = []  # Track triples of images panels, graph panels and thumbnails
-        self.max_images = 2  # Limit to two images at a time
-        self.num_images = 0  # The number of active images i.e. 0, 1,..., or max_images
+        # State to track images, graphs, and thumbnails
+        self.image_history = []  # Track triples of image panels, graph panels, and thumbnails
+        self.num_images = 0  # The number of active images i.e. 0, 1,..., or more
+
+        # Initialize graph panel references
+        self.graph_panel_left = None  # Initialize left graph panel
+        self.graph_panel_right = None  # Initialize right graph panel
 
         # Set window properties
         self.set_window_properties()
 
-        # Main layout 
+        # Main layout
         self.reset_central_widget()
 
         # Initialize toolbar and menu
@@ -44,23 +47,17 @@ class MainWindow(QMainWindow):
         # References to panel objects
         self.image_panel = None
         self.graph_panel = None
-        self.graph_panel_left = None
-        self.graph_panel_right = None
         self.thumbnail_panel = None
 
-        ## Rendering the default empty panels
+        # Render the default empty panels
         self.set_empty_panels()
 
-    # Resets the existing central widget 
-    # Used prior to re-rendering the panels
     def reset_central_widget(self):
+        """Reset the existing central widget."""
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.main_layout = QGridLayout()
 
-    # Called by Menu when an image is loaded
-    # creates the two panels (image and graph) and the thumbnail
-    # Adds these to the image history and resets the central panels
     def add_image_and_graph_panel(self, image_path, df):
         """Handle image and graph upload."""
         image_panel = self.create_image_panel(image_path)
@@ -69,39 +66,39 @@ class MainWindow(QMainWindow):
 
         self.image_history.append([image_panel, graph_panel, thumbnail])
 
-        self.reset_central_widget()
-        self.load_panels()
         self.num_images += 1
 
+        # Update the central widget layout with new thumbnails and panels
+        self.reset_central_widget()
+        self.load_panels()
 
-    # Creates an instance of the image panel
     def create_image_panel(self, image_path):
+        """Create an instance of the image panel."""
         image_panel = ImagePanel(self)
         pixmap = QPixmap(image_path)
         image_panel.set_image(pixmap)
         return image_panel
 
-    # Creates an instance of the graph panel
     def create_graph_panel(self, df):
+        """Create an instance of the graph panel."""
         graph_panel = GraphPanel(self, df)
         graph_panel.init_ui()
         return graph_panel
 
-    # Creates an instance of a thumbnail
     def create_thumbnail(self, image_path):
-        thumbnail = Thumbnail(image_path)
+        """Create an instance of a thumbnail."""
+        thumbnail = Thumbnail(image_path, main_window=self)  # Pass main window reference
         return thumbnail
-    
-    # Creates a thumbnail panel using the existing thumbnails 
-    # stored in the image_history
+
     def create_thumbnail_panel(self):
+        """Create a thumbnail panel using the existing thumbnails."""
         thumbnail_panel = ThumbnailPanel(self)
-        for image_panel, graph_panel, thumbnail in self.image_history:
+        for _, _, thumbnail in self.image_history:
             thumbnail_panel.add_thumbnail(thumbnail)
         return thumbnail_panel
-    
-    # Draws the image, graph and thumbnail panels
+
     def render_panels(self, left_panel, right_panel, thumbnail_panel):
+        """Draw the image, graph, and thumbnail panels."""
         new_layout = QGridLayout()
         new_layout.addWidget(left_panel, 0, 0, 1, 1)
         new_layout.addWidget(right_panel, 0, 1, 1, 1)
@@ -113,44 +110,48 @@ class MainWindow(QMainWindow):
 
         self.central_widget.setLayout(new_layout)
 
-    # Sets the initial empty placeholder panels
     def set_empty_panels(self):
+        """Set the initial empty placeholder panels."""
         image_panel = ImagePanel(self)
         graph_panel = GraphPanel(self)
         thumbnail_panel = self.create_thumbnail_panel()
         self.render_panels(image_panel, graph_panel, thumbnail_panel)
 
-
-    # Loads panels based on the state of the image history and the 
-    # num_images state variable
     def load_panels(self):
-        match self.num_images:
-            case 0:
-                image_panel, graph_panel, thumbnail = self.image_history[0]
-                thumbnail_panel = self.create_thumbnail_panel()
-                self.render_panels(image_panel, graph_panel, thumbnail_panel)
+        """Load panels based on the current state of the image history."""
+        # Reload thumbnails and graph panels
+        thumbnail_panel = self.create_thumbnail_panel()
 
-                self.image_panel = image_panel
-                self.graph_panel = graph_panel
-                self.thumbnail_panel = thumbnail_panel
-            case _:
-                graph_panel_left = self.image_history[0][1]
-                graph_panel_right = self.image_history[1][1]
-                thumbnail_panel = self.create_thumbnail_panel()
-                self.render_panels(graph_panel_left, graph_panel_right, thumbnail_panel)
+        if self.graph_panel_left is None:
+            self.graph_panel_left = GraphPanel(self)
+        if self.graph_panel_right is None:
+            self.graph_panel_right = GraphPanel(self)
 
-                self.graph_panel_left = graph_panel_left 
-                self.graph_panel_right = graph_panel_right
-                self.thumbnail_panel = thumbnail_panel
+        # Render the panels with left and right graphs and thumbnails
+        self.render_panels(self.graph_panel_left, self.graph_panel_right, thumbnail_panel)
 
-    
+    def update_graph_panel(self, image_path, panel_side):
+        """Update the graph in the specified panel based on thumbnail click."""
+        # Find the corresponding graph panel from image history
+        for image_panel, graph_panel, thumbnail in self.image_history:
+            if thumbnail.image_path == image_path:
+                if panel_side == "left":
+                    self.graph_panel_left = self.create_graph_panel(graph_panel.df)
+                elif panel_side == "right":
+                    self.graph_panel_right = self.create_graph_panel(graph_panel.df)
+                break
+
+        # Re-render the panels with updated graphs
+        self.reset_central_widget()  # Clear the central widget
+        self.load_panels()  # Redraw panels with updated graphs
 
     def set_window_properties(self):
         """Set properties for the main window."""
         self.setWindowTitle("Image Analysis Tool")
-        self.setGeometry(100, 100, 800, 600) 
+        self.setGeometry(100, 100, 800, 600)
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
+
 
     def export_graphs_as_pdf(self):
         """Export the graphs displayed in the graph panel as a PDF file."""
