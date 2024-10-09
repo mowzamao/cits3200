@@ -10,7 +10,7 @@ import cv2 as cv
 import numpy as np
 import pandas as pd
 
-import ImageTransforming as transform
+import app.utils.ImageTransforming as transform
 
 class Scaling():
     """ 
