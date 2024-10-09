@@ -25,9 +25,9 @@ class GraphPanel(QWidget):
 
 
     def init_empty(self):
-        self.label = QLabel("Data analysis results will be displayed here.")
+        self.label = QLabel("")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
+        self.label.setStyleSheet("border: 1px solid lightgrey; background-color: white;")
         
         # Set the layout
         self.layout.addWidget(self.label)
