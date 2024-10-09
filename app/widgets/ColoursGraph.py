@@ -316,6 +316,10 @@ class ColoursGraph(FigureCanvasQTAgg):
         return (data_point[0] / width, data_point[1] / height)
     
     def onClick(self, event):
+        """
+        Function which adds a grey line onto the Colours Graphs subplots when 
+        they are clicked on.
+        """
         if event.inaxes is None:
             # Click occurred outside any axes
             return
