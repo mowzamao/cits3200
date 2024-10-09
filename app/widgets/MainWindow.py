@@ -11,8 +11,10 @@ from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
+from app.widgets.ColoursGraph import ColoursGraph
 from app.widgets.ThumbnailPanel import ThumbnailPanel
 from app.widgets.Thumbnail import Thumbnail
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 class MainWindow(QMainWindow):
