@@ -174,6 +174,8 @@ class MainWindow(QMainWindow):
                 if colours_graph:
                     pdf.savefig(colours_graph.fig)
 
+            self.statusBar().showMessage(f"Graphs saved to: {file_name}")
+
     def export_data_to_csv(self):
         """Export the raw data to a CSV file."""
         file_name, _ = QFileDialog.getSaveFileName(
@@ -190,6 +192,9 @@ class MainWindow(QMainWindow):
             df = self.graph_panel.df
             if df is not None:
                 df.to_csv(file_name, index=False)
+                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
+            else:
+                self.statusBar().showMessage("No data available to export.")
 
     def export_data_to_excel(self):
         """Export the raw data to an Excel file."""
@@ -207,3 +212,6 @@ class MainWindow(QMainWindow):
             df = self.graph_panel.df
             if df is not None:
                 df.to_excel(file_name, index=False)
+                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
+            else:
+                self.statusBar().showMessage("No data available to export.")
