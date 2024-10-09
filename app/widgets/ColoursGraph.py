@@ -100,7 +100,7 @@ class ColoursGraph(FigureCanvasQTAgg):
         if self.analysis_type == 'rgb':
             xlabel_str = 'Intensity (%)'
         elif self.analysis_type == 'lab':
-            xlabel_str = ''
+            xlabel_str = 'Intensity (%)'
         else:
             xlabel_str = ''
         self.axes_center.set_xlabel(xlabel_str,fontweight = 'bold')
@@ -118,12 +118,14 @@ class ColoursGraph(FigureCanvasQTAgg):
         if self.analysis_type == 'rgb':
             depth = self.df['Depth (mm)']
             colour_name_list = ['Red',"Green",'Blue']
-            colour_data_list = [round(100*self.df[colour_name]/255,4) for colour_name in colour_name_list]
+            colour_data_list = [round(100*(self.df[colour_name])/255,4) for colour_name in colour_name_list]
             plot_line_colour_list = ['r',"g",'b']
         if self.analysis_type =='lab':
             depth = self.df['Depth (mm)']
             colour_name_list = ['L*',"A*",'B*']
-            colour_data_list = [self.df[colour_name] for colour_name in ['L','a','b']]
+            colour_data_list = [self.df['L']]
+            for data in [round(100*(self.df[colour_name]+128)/255,4) for colour_name in ['a','b']]:
+                colour_data_list.append(data)
             plot_line_colour_list = ['b','b','b']
         return depth,colour_data_list,colour_name_list,plot_line_colour_list
 
