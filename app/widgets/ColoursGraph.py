@@ -32,7 +32,7 @@ class ColoursGraph(FigureCanvasQTAgg):
     axes_min_width = 0.35
     base_font_size = 10
 
-    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None,analysis_type = 'rgb'):
+    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None,analysis_type:str = 'rgb',units:str = '%'):
         """ 
         Initialisation function for the ColourGraph PyQt Widget.
 
@@ -45,8 +45,9 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         self.df = df
         self.analysis_type = analysis_type
-        self.fig = Figure(dpi=dpi)
         self.hline = None
+        self.units = units 
+        self.fig = Figure(dpi=dpi)
         self.createSubplots()
         self.plotColourData()
         self.fig.canvas.mpl_connect('button_press_event', self.onClick)
@@ -102,10 +103,14 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         Function setting xlabel for the x-axis of the Colours Plot. 
         """
-        if self.analysis_type == 'rgb':
+        if self.analysis_type == 'rgb' and self.units == '%':
             xlabel_str = 'Intensity (%)'
-        elif self.analysis_type == 'lab':
+        elif self.analysis_type == 'rgb' and self.units == '.':
+            xlabel_str = ' RGB Colour Values'
+        elif self.analysis_type == 'lab' and self.units == '%':
             xlabel_str = 'Intensity (%)'
+        elif self.analysis_type == 'lab' and self.units == '.':
+            xlabel_str = 'CIELAB Values'
         else:
             xlabel_str = ''
         self.axes_center.set_xlabel(xlabel_str,fontweight = 'bold')
@@ -114,12 +119,11 @@ class ColoursGraph(FigureCanvasQTAgg):
         """
         Function setting limit for x values on the x axis. 
         """
-        if self.analysis_type == 'rgb':
+        if self.analysis_type == '%':
             ax.set_xlim(0,100)
             return ax
-        elif self.analysis_type == 'lab':
-            return ax
         else:
+            ax.autoscale(True,axis='x')
             return ax
 
     def getPlotData(self):
@@ -135,16 +139,24 @@ class ColoursGraph(FigureCanvasQTAgg):
         if self.analysis_type == 'rgb':
             depth = self.df['Depth (mm)']
             colour_name_list = ['Red',"Green",'Blue']
-            colour_data_list = [round(100*(self.df[colour_name])/255,4) for colour_name in colour_name_list]
+            colour_data_list = [self.setDataUnits(self.df[colour_name]) for colour_name in colour_name_list]
             plot_line_colour_list = ['r',"g",'b']
         if self.analysis_type =='lab':
             depth = self.df['Depth (mm)']
             colour_name_list = ['L*',"A*",'B*']
             colour_data_list = [self.df['L']]
-            for data in [round(100*(self.df[colour_name]+128)/255,4) for colour_name in ['a','b']]:
+            for data in [self.setDataUnits(self.df[colour_name],colour_name) for colour_name in ['a','b']]:
                 colour_data_list.append(data)
             plot_line_colour_list = ['b','b','b']
         return depth,colour_data_list,colour_name_list,plot_line_colour_list
+    
+    def setDataUnits(self,data:pd.Series,colour_name:str = None)->pd.Series:
+        if self.analysis_type =='rgb' and self.units == '%':
+            return round(100*data/255,4)
+        elif self.analysis_type =='lab' and self.units == '%' and (colour_name =='a' or colour_name == 'b'):
+            return round(100*(data + 128)/255,4)
+        else:
+            return data
 
     def getColumnNames(self,analysis_type:str):
         """
