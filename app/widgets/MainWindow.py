@@ -49,6 +49,10 @@ class MainWindow(QMainWindow):
         self.graph_panel = None
         self.thumbnail_panel = None
 
+        # Track the currently assigned thumbnails for the left and right panels
+        self.thumbnail_left = None
+        self.thumbnail_right = None
+
         # Render the default empty panels
         self.set_empty_panels()
 
@@ -131,19 +135,53 @@ class MainWindow(QMainWindow):
         self.render_panels(self.graph_panel_left, self.graph_panel_right, thumbnail_panel)
 
     def update_graph_panel(self, image_path, panel_side):
-        """Update the graph in the specified panel based on thumbnail click."""
-        # Find the corresponding graph panel from image history
+        
+
+        # Clear the current thumbnail indicator for the selected panel before assigning the new one
+        if panel_side == "left" and self.thumbnail_left is not None:
+            self.thumbnail_left.reset_indicator()  # Clear indicator for the previously assigned left thumbnail
+
+        if panel_side == "right" and self.thumbnail_right is not None:
+            self.thumbnail_right.reset_indicator()  # Clear indicator for the previously assigned right thumbnail
+
+        # Find the corresponding graph panel for the new thumbnail
         for image_panel, graph_panel, thumbnail in self.image_history:
             if thumbnail.image_path == image_path:
+
+                # Assign the new graph to the appropriate panel and update the indicator
                 if panel_side == "left":
                     self.graph_panel_left = self.create_graph_panel(graph_panel.df)
+                    thumbnail.set_indicator("left")  # Set the new indicator for the new thumbnail
+                    self.thumbnail_left = thumbnail  # Track the thumbnail assigned to the left panel
+
                 elif panel_side == "right":
                     self.graph_panel_right = self.create_graph_panel(graph_panel.df)
-                break
+                    thumbnail.set_indicator("right")  # Set the new indicator for the new thumbnail
+                    self.thumbnail_right = thumbnail  # Track the thumbnail assigned to the right panel
+
+                break  # Break after updating the selected panel
 
         # Re-render the panels with updated graphs
         self.reset_central_widget()  # Clear the central widget
         self.load_panels()  # Redraw panels with updated graphs
+
+    def clear_indicator_for_existing_panel(self, panel_side):
+
+        # Clear the indicator for the thumbnail in the left panel
+        if panel_side == "left":
+            if self.graph_panel_left is not None:
+                for _, other_graph_panel, other_thumbnail in self.image_history:
+                    if other_graph_panel == self.graph_panel_left:
+                        other_thumbnail.reset_indicator()  # Clear the indicator
+                        break
+
+        # Clear the indicator for the thumbnail in the right panel
+        elif panel_side == "right":
+            if self.graph_panel_right is not None:
+                for _, other_graph_panel, other_thumbnail in self.image_history:
+                    if other_graph_panel == self.graph_panel_right:
+                        other_thumbnail.reset_indicator()  # Clear the indicator
+                        break
 
     def set_window_properties(self):
         """Set properties for the main window."""
