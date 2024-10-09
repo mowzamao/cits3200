@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QDialog, QPushButton, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QGridLayout, QLabel, QFrame, QDialog, QPushButton, QVBoxLayout
 from PyQt6.QtGui import QPixmap, QFontMetrics
 from PyQt6.QtCore import Qt
 
@@ -74,16 +74,16 @@ class Thumbnail(QFrame):
     def show_panel_selection_dialog(self):
         dialog = QDialog(self)
         dialog.setWindowTitle("Select Panel")
-        layout = QVBoxLayout()
+        layout = QGridLayout()
 
-        label = QLabel("Select a panel to display the graph:")
-        layout.addWidget(label)
+        label = QLabel("Select a panel to display the graph ")
+        layout.addWidget(label, 0, 0, 1, 2)
 
         left_button = QPushButton("Left Panel")
         right_button = QPushButton("Right Panel")
 
-        layout.addWidget(left_button)
-        layout.addWidget(right_button)
+        layout.addWidget(left_button, 1, 0, 1, 1)
+        layout.addWidget(right_button, 1, 1, 1, 1)
 
         left_button.clicked.connect(lambda: self.select_panel("left", dialog))
         right_button.clicked.connect(lambda: self.select_panel("right", dialog))
