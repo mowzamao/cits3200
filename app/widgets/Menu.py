@@ -81,7 +81,7 @@ class Menu(QMenuBar):
                 display_image = QPixmap(file_name)
 
                 # Process the core image to get the data (df)
-                data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
+                data_dict = process_core_image(oriented_image, 77)  # Use 77mm as core width
 
                 #setting up dataframe for the colours graph
                 rgb_df = data_dict['Colours']

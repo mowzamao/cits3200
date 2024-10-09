@@ -5,11 +5,12 @@ Analysis project for CITS3200 at UWA.
 Author: Sophie Mowe
 Date: September 2024
 """
+import os
 import cv2 as cv
 import numpy as np
 import pandas as pd
 
-from . import ImageTransforming as transform
+import app.utils.ImageTransforming as transform
 
 class Scaling():
     """ 
@@ -19,22 +20,12 @@ class Scaling():
         core_width_in_mm (int): the width of the sediment core in millimeters
     """
     def __init__(self, core_width_in_mm: int):
-        """
-        Constructor for the Scaling class.
-
-        Parameters:
-            core_width_in_mm (int): the width of the sediment core in millimeters
-        """
         self.core_width_in_mm = core_width_in_mm
     
-    def get_mm_scale(self, core_width: int) -> float:
-        """ 
-        Returns the number of pixels per millimeter for the sediment core.
-
-        Parameters:
-            core_width (int): the width of the sediment core in pixels
-        """
-        self.scale = self.core_width_in_mm / core_width
+    def get_mm_scale(self, core_width_px: int) -> float:
+        """ Returns the number of pixels per millimeter for the sediment core. """
+        self.scale = self.core_width_in_mm / core_width_px
+        return self.scale
     
     def get_core_length(self, core: list) -> float:
         """ 
@@ -59,20 +50,12 @@ class ExtractCore():
     Attributes:
         filepath (str): the file path of the image
         core_width_mm (int): the width of the sediment core in millimeters
-        img (numpy.ndarray): the image as an array
+        image (numpy.ndarray): the image as an array
         core (dict): the extracted sediment core
     """
-    def __init__(self, img: np.array, core_width_mm: int, show=False):
-        """
-        Constructor for the ExtractCore class.
-        
-        Parameters:
-            filepath (str): the file path of the image
-            core_width_mm (int): the width of the sediment core in millimeters
-        """
+    def __init__(self, image: np.array, core_width_mm: int):
         self.core_width_mm = core_width_mm
-        self.img = img
-        self.show = show
+        self.image = image
 
     def find_cores(self) -> list:
         """
@@ -82,8 +65,8 @@ class ExtractCore():
         Returns:
             cores (list): a list of the sediment cores in the image
         """
-        no_greys = transform.remove_greys(self.img, show=False) # colour segmentation
-        contours = transform.get_contours(no_greys, show=False)
+        no_greys = transform.remove_greys(self.image) # colour segmentation
+        contours = transform.get_contours(no_greys)
 
         # find contours that correspond to sediment cores
         cores = []
@@ -97,13 +80,8 @@ class ExtractCore():
     
     def get_largest_core(self, cores: list) -> list:
         """
-        Returns the largest sediment core in an array of sediment cores.
-
-        Parameters:
-            cores (list): a list of sediment cores
-
-        Returns:
-            largest_core (list): the largest sediment core's x and y coordinates, width, and height
+        Returns the largest sediment core's x coordinate, y coordinate, width and height
+        from an array of sediment cores. in an array of sediment cores.
         """
         largest_core = cores[0]
         for core in cores:
@@ -113,28 +91,37 @@ class ExtractCore():
                 largest_core = core
         return largest_core
 
-    def extract_core(self) -> dict:
+    def get_bounding_box(self) -> list:
+        """ Returns the bounding box of the largest sediment core in an image """
+        bounding_boxes = self.find_cores()
+        num_cores = len(bounding_boxes)
+        if num_cores == 0:
+            return 0
+        elif num_cores == 1:
+            bounding_box = bounding_boxes[0]
+        else:
+            bounding_box = self.get_largest_core(bounding_boxes)
+        return bounding_box
+
+    def extract_core(self, from_bounding_box=False, bounding_box=None) -> dict:
         """
         Extracts the largest sediment core in an image.
         
         Returns:
-            core (dict): a dictionary containing the length of the sediment core in millimeters
-            and the cropped image of the sediment core
+            core (dict): a dictionary containing the length of the sediment core in millimeters (`'Length'`), 
+            the scale (`'Scale'`), the cropped image (`'Image'`) and the bounding box (`'Bounding Box'`) 
+            of the sediment core
         """
-        cores = self.find_cores()
-
-        num_cores = len(cores)
-        if num_cores == 0: return 0
-        elif num_cores == 1: core = cores[0]
-        else: core = self.get_largest_core(cores)
-        
-        x, y, width, height = core
+        if from_bounding_box == False:
+            bounding_box = self.get_bounding_box()
+        if bounding_box == None or bounding_box == 0:
+            return 0
         scaling = Scaling(self.core_width_mm)
         self.core = {
-            "Length": scaling.get_core_length(core),
+            "Length": scaling.get_core_length(bounding_box),
             "Scale" : scaling.scale,
-            "Image": transform.orient_array(transform.crop_img(self.img, x, y, width, height)),
-            "Bounding Box": core
+            "Image": transform.orient_array(transform.crop_image(self.image, bounding_box)),
+            "Bounding Box": bounding_box
         }
         return self.core
 
@@ -143,21 +130,15 @@ class Colours():
     A class for determining the colour of each layer in a sediment core.
     
     Attributes:
-        img (numpy.ndarray): the image of the sediment core
+        image (numpy.ndarray): the image of the sediment core
         height (int): the height of the sediment core in pixels
         width (int): the width of the sediment core in pixels
         colour (int): the number of colour channels in the image
         weights (numpy.ndarray): the weights for the weighted average of the colour channels
     """
-    def __init__(self, img: np.array, scale: float):
-        """
-        Constructor for the Colours class.
-        
-        Parameters:
-            img (numpy.ndarray): the image of the sediment core
-        """
-        self.img = transform.orient_array(img)
-        self.height, self.width, self.colour = self.img.shape
+    def __init__(self, image: np.array, scale: float):
+        self.image = transform.orient_array(image)
+        self.height, self.width, self.colour = self.image.shape
         self.weights = None
         self.scale = scale
     
@@ -171,6 +152,7 @@ class Colours():
             right_weights = np.flip(left_weights[:-1])
         weights = np.concatenate((left_weights, right_weights))
         self.weights = weights
+        return weights
     
     def get_weighted_avg_colour_channel(self, colour_values: np.array) -> np.array:
         """ Returns the rounded weighted average for a colour channel"""
@@ -190,7 +172,7 @@ class Colours():
         self.get_weights()
         weighted_avgs = []
         for y in range(0, self.height):
-            row = self.img[y, :]
+            row = self.image[y, :]
             channel_avgs = []
             for c in range(0, self.colour):
                 colour_values = row[:, c]
@@ -207,33 +189,43 @@ class Colours():
         return np.array(weighted_avgs)
 
 
-def process_core_image(img: np.array, core_width_mm: int, df: bool=True, show: bool=False) -> dict:
+def process_core_image(image: np.array, core_width_mm: int, 
+                       from_bounding_box: bool=False, bounding_box: list=None,
+                       df: bool=True) -> dict:
     """ 
     Function for processing a sediment core image.
 
     Steps:
-    1. Finds the largest sediment core in an image.
+    1. Finds the largest sediment core in an image. 
+        If `from_bounding_box` is `True`, the function 
+        extracts the sediment core from the bounding box.
     2. Crops the image to the sediment core.
     3. Finds the length of the sediment core in millimeters.
     4. Rotates the sediment core so that it is vertical.
     5. Determines the colour of each layer in the sediment core.
 
     If a sediment core is not found, the function returns 0.
-    Otherwise, returns a dictionary with the following:
-    - Image: the cropped colour image of the sediment core
-    - Length: the length of the sediment core in millimeters
-    - Colours: the weighted average colours of each layer of the sediment core 
+    Otherwise, returns a pandas `DataFrame` with the following:
+    - `'Image'`: the cropped colour image of the sediment core
+    - `'Length (mm)'`: the length of the sediment core in millimeters
+    - `'Colours'`: the weighted average colours of each layer of the sediment core 
     (as a pandas `DataFrame` if the parameter `df` is set to `True`)
+    - `'Scale'`: the number of pixels per millimeter
+    - `'Bounding Box'`: the bounding box (`[x, y, width, height]`) of the sediment core in the image
 
     Parameters:
-        filepath (str): the file path of the image
+        image (numpy.ndarray): the image of the sediment core
         core_width_mm (int): the width of the sediment core in millimeters
-        df (bool): whether to return the colours as a pandas DataFrame
-    
+        from_bounding_box (bool): whether to extract the sediment core from a bounding box
+        bounding_box (list): the bounding box of the sediment core (if `from_bounding_box` is `True`)
+
     Returns:
-        core (dict): a dictionary containing the image, length, and colours of the sediment core
+        core (pd.DataFrame): a `DataFrame` containing the image, length, colours, 
+            scale, and bounding box of the sediment core.
     """
-    core_data = ExtractCore(img, core_width_mm, show=True).extract_core()
+    extract_core = ExtractCore(image, core_width_mm)
+
+    core_data = extract_core.extract_core(from_bounding_box=from_bounding_box, bounding_box=bounding_box)
     if core_data == 0: return 0
     image = core_data['Image']
     scale = core_data['Scale']
@@ -247,9 +239,9 @@ def process_core_image(img: np.array, core_width_mm: int, df: bool=True, show: b
     }
     return core
 
-def show_bounding_box(img, bounding_box):
-    """ Displays the bounding box of a sediment core """
+def show_bounding_box(image, bounding_box):
+    """ Draws a bounding box around a sediment core in an image """
     x, y, w, h = bounding_box
-    img_with_bb = img.copy()
-    cv.rectangle(img_with_bb, (x, y), (x+w, y+h), (0, 255, 0), 10)
-    return img_with_bb
+    image_with_bb = image.copy()
+    cv.rectangle(image_with_bb, (x, y), (x+w, y+h), (0, 255, 0), 10)
+    return image_with_bb
