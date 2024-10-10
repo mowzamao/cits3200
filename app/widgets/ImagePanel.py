@@ -1,5 +1,7 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QImage, QTransform
+import numpy as np
 
 from app.widgets.ImageToolbar import ImageToolbar
 

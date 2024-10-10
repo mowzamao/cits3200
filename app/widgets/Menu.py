@@ -84,7 +84,8 @@ class Menu(QMenuBar):
 
                 if data_dict != 0:
                     df = data_dict["Colours"]  # Assuming the processed data is in 'Colours'
-
+                    image = data_dict["Image"]
+                    
                     # Call the MainWindow method to add the image and its graph
                     self.parent.add_image_and_graph_panel(file_name, df)
 
