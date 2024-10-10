@@ -78,7 +78,8 @@ class MainWindow(QMainWindow):
 
         # Update the central widget layout with new thumbnails and panels
         self.reset_central_widget()
-        self.load_panels()
+        thumbnail_panel = self.create_thumbnail_panel()
+        self.render_panels(image_panel,  graph_panel, thumbnail_panel)
 
     def create_image_panel(self, image_path):
         """Create an instance of the image panel."""
@@ -205,9 +206,6 @@ class MainWindow(QMainWindow):
         self.reset_central_widget()
         self.load_panels()
 
-
-
-
     def clear_indicator_for_existing_panel(self, panel_side):
 
         # Clear the indicator for the thumbnail in the left panel
@@ -234,21 +232,28 @@ class MainWindow(QMainWindow):
         self.setStyleSheet(open('./app/style/style.css').read())
 
     def run_ceilab_analysis(self):
-        if hasattr(self.graph_panel_left,'graphs'):
-            self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'lab')
-        if hasattr(self.graph_panel_right,'graphs'):
-            self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'lab')
+        if isinstance(self.graph_panel_left,GraphPanel):
+            if self.graph_panel_left.graphs != None:
+                self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'lab')
+        print(type(self.graph_panel_right))
+        if isinstance(self.graph_panel_right,GraphPanel):
+            if self.graph_panel_right.graphs != None:
+                self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'lab')
 
     def run_rgb_analysis(self):
-        if hasattr(self.graph_panel_left,'graphs'):
-            self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'rgb')
-        if hasattr(self.graph_panel_right,'graphs'):
-            self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'rgb')
+        if isinstance(self.graph_panel_left,GraphPanel):
+            if self.graph_panel_left.graphs != None:
+                self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'rgb')
+
+        if isinstance(self.graph_panel_right,GraphPanel):
+            if self.graph_panel_right.graphs != None:
+                self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'rgb')
 
     def redraw_graph(self,graph_panel,analysis_type):
         graph_panel.analysis_type = analysis_type
         graph_panel.clearSubplots()
         graph_panel.plotColourData()
         graph_panel.draw_idle()
+        return graph_panel
 
  
