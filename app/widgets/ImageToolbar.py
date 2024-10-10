@@ -85,16 +85,19 @@ class ImageToolbar(QToolBar):
         """
         Creates PyQt6 QInputDialog to prompt user for width of sediment core, then reloads graph display with the new width
         """
-        image_data = self.parent().parent().parent().graph_panel.image
-        if not image_data is None:
-            text, ok = QInputDialog.getText(self, "Sediment Core Analysis", "Please input the width of the core in the image (in mm):")
-            if ok:
-                if text and text.isdigit():
-                    new_data = process_core_image(image_data, int(text), True)
-                    if new_data != 0:
-                        self.parent().parent().parent().graph_panel.df = new_data["Colours"]
-                        self.parent().parent().parent().graph_panel.init_ui()
-                else:
-                    self.parent().parent().parent().statusBar().showMessage(f"Input '{text}' is not a number")
+        if self.parent().parent().parent().is_single_image_analysis:
+            image_data = self.parent().parent().parent().graph_panel_right.image
+            if not image_data is None:
+                text, ok = QInputDialog.getText(self, "Sediment Core Analysis", "Please input the width of the core in the image (in mm):")
+                if ok:
+                    if text and text.isdigit():
+                        new_data = process_core_image(image_data, int(text), df=True)
+                        if new_data != 0:
+                            self.parent().parent().parent().graph_panel_right.df = new_data["Colours"]
+                            self.parent().parent().parent().render_panels(self.parent().parent().parent().image_panel_left, self.parent().parent().parent().graph_panel_right, self.parent().parent().parent().create_thumbnail_panel())
+                    else:
+                        self.parent().parent().parent().statusBar().showMessage(f"Input '{text}' is not a number")
+            else:
+                self.parent().parent().parent().statusBar().showMessage("No image opened")
         else:
-            self.parent().parent().parent().statusBar().showMessage("No image opened")
+            self.parent().parent().parent().statusBar().showMessage("Application needs to be in single image analysis")

@@ -45,13 +45,6 @@ class GraphPanel(QWidget):
             if widget:
                 widget.setParent(None)  # Remove old widget
 
-        # Fullscreen button for toggling view
-        # fullscreen_icon = QIcon.fromTheme("view-fullscreen")
-        # fullscreen_button = QPushButton(self, icon=fullscreen_icon)
-        # fullscreen_button.setFixedSize(QSize(20, 20))
-        # fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
-
-
         # Ensure the dataframe (df) is used to generate the graphs
         if self.df is not None:
             self.graphs = Graphs(df=self.df)  # Pass the dataframe to the graph widget

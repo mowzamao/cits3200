@@ -66,10 +66,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.main_layout = QGridLayout()
 
-    def add_image_and_graph_panel(self, image_path, df):
+    def add_image_and_graph_panel(self, image_path, df, image):
         """Handle image and graph upload."""
         image_panel = self.create_image_panel(image_path)
-        graph_panel = self.create_graph_panel(df)
+        graph_panel = self.create_graph_panel(df, image)
         thumbnail = self.create_thumbnail(image_path)
 
         self.image_history.append([image_panel, graph_panel, thumbnail])
@@ -88,9 +88,9 @@ class MainWindow(QMainWindow):
         image_panel.set_image(pixmap)
         return image_panel
 
-    def create_graph_panel(self, df):
+    def create_graph_panel(self, df, image):
         """Create an instance of the graph panel."""
-        graph_panel = GraphPanel(self, df)
+        graph_panel = GraphPanel(self, df, image)
         graph_panel.init_ui()
         return graph_panel
 
@@ -171,7 +171,7 @@ class MainWindow(QMainWindow):
         # Find the corresponding graph panel for the image and assign it to the right
             for _, graph_panel, thumbnail in self.image_history:
                 if thumbnail.image_path == image_path:
-                    self.graph_panel_right = self.create_graph_panel(graph_panel.df)
+                    self.graph_panel_right = self.create_graph_panel(graph_panel.df, graph_panel.image)
                     break
 
         # Re-render the panels with the new layout
@@ -190,16 +190,17 @@ class MainWindow(QMainWindow):
         for _, graph_panel, thumbnail in self.image_history:
             if thumbnail.image_path == image_path:
                 df = graph_panel.df  # Retrieve the dataframe from the graph panel
+                image = graph_panel.image
                 break
 
     # Existing logic for left or right panel
         if panel_side == "left":
             self.clear_indicator_for_existing_panel("left")
-            self.graph_panel_left = self.create_graph_panel(df)  # Use the retrieved `df`
+            self.graph_panel_left = self.create_graph_panel(df, image)  # Use the retrieved `df`
             self.thumbnail_left = thumbnail
         elif panel_side == "right":
             self.clear_indicator_for_existing_panel("right")
-            self.graph_panel_right = self.create_graph_panel(df)  # Use the retrieved `df`
+            self.graph_panel_right = self.create_graph_panel(df, image)  # Use the retrieved `df`
             self.thumbnail_right = thumbnail
 
     # Re-render the panels

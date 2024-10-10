@@ -87,7 +87,7 @@ class Menu(QMenuBar):
                     image = data_dict["Image"]
                     
                     # Call the MainWindow method to add the image and its graph
-                    self.parent.add_image_and_graph_panel(file_name, df)
+                    self.parent.add_image_and_graph_panel(file_name, df, image)
 
             #         # Optionally, show a success message in the status bar
             #         self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
