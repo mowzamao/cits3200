@@ -85,25 +85,29 @@ class Thumbnail(QFrame):
             self.show_panel_selection_dialog()
 
     def show_panel_selection_dialog(self):
-        """Show the dialog to choose Left or Right panel."""
+        """Show the dialog to choose Left, Right, or Single Image Analysis panel."""
         dialog = QDialog(self)
         dialog.setWindowTitle("Select Panel")
         layout = QVBoxLayout()
 
-        label = QLabel("Select a panel to display the graph:")
+        label = QLabel("Select a panel to display:")
         layout.addWidget(label)
 
         left_button = QPushButton("Left Panel")
         right_button = QPushButton("Right Panel")
+        single_analysis_button = QPushButton("Single Image Analysis")  # New button
 
         layout.addWidget(left_button)
         layout.addWidget(right_button)
+        layout.addWidget(single_analysis_button)  # Add the third button
 
         left_button.clicked.connect(lambda: self.select_panel("left", dialog))
         right_button.clicked.connect(lambda: self.select_panel("right", dialog))
+        single_analysis_button.clicked.connect(lambda: self.select_panel("single", dialog))  # Handle single image analysis
 
         dialog.setLayout(layout)
         dialog.exec()
+
 
     def select_panel(self, panel_side, dialog):
         """Update the graph panel based on the selected side (left or right)."""

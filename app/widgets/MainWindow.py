@@ -11,8 +11,10 @@ from app.widgets.Menu import Menu
 from app.widgets.ImagePanel import ImagePanel
 from app.widgets.Toolbar import Toolbar
 from app.widgets.GraphPanel import GraphPanel
+from app.widgets.ColoursGraph import ColoursGraph
 from app.widgets.ThumbnailPanel import ThumbnailPanel
 from app.widgets.Thumbnail import Thumbnail
+from matplotlib.backends.backend_pdf import PdfPages
 
 
 class MainWindow(QMainWindow):
@@ -55,6 +57,8 @@ class MainWindow(QMainWindow):
 
         # Render the default empty panels
         self.set_empty_panels()
+        self.is_single_image_analysis = False  # Tracks whether in single image analysis mode
+
 
     def reset_central_widget(self):
         """Reset the existing central widget."""
@@ -104,15 +108,22 @@ class MainWindow(QMainWindow):
     def render_panels(self, left_panel, right_panel, thumbnail_panel):
         """Draw the image, graph, and thumbnail panels."""
         new_layout = QGridLayout()
+    
+    # Always add left and right panels (whether image or graph)
         new_layout.addWidget(left_panel, 0, 0, 1, 1)
         new_layout.addWidget(right_panel, 0, 1, 1, 1)
+    
+    # Thumbnails at the bottom
         new_layout.addWidget(thumbnail_panel, 1, 0, 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
+    
         new_layout.setColumnStretch(0, 1)
         new_layout.setColumnStretch(1, 1)
         new_layout.setRowStretch(0, 5)
         new_layout.setRowStretch(1, 1)
 
         self.central_widget.setLayout(new_layout)
+
+
 
     def set_empty_panels(self):
         """Set the initial empty placeholder panels."""
@@ -134,36 +145,68 @@ class MainWindow(QMainWindow):
         # Render the panels with left and right graphs and thumbnails
         self.render_panels(self.graph_panel_left, self.graph_panel_right, thumbnail_panel)
 
-    def update_graph_panel(self, image_path, panel_side):
+    def clear_single_image_analysis(self):
+        """Clear the image panel from single image analysis mode and restore the graph panels."""
+        if self.is_single_image_analysis:
+        # Reset the panels back to left and right graph panels
+            self.graph_panel_left = GraphPanel(self)
+            self.graph_panel_right = GraphPanel(self)
         
+            self.reset_central_widget()  # Clear the central widget
+            self.load_panels()  # Reload the left and right graph panels
+        
+        # Update the mode
+            self.is_single_image_analysis = False
 
-        # Clear the current thumbnail indicator for the selected panel before assigning the new one
-        if panel_side == "left" and self.thumbnail_left is not None:
-            self.thumbnail_left.reset_indicator()  # Clear indicator for the previously assigned left thumbnail
 
-        if panel_side == "right" and self.thumbnail_right is not None:
-            self.thumbnail_right.reset_indicator()  # Clear indicator for the previously assigned right thumbnail
-
-        # Find the corresponding graph panel for the new thumbnail
-        for image_panel, graph_panel, thumbnail in self.image_history:
-            if thumbnail.image_path == image_path:
-
-                # Assign the new graph to the appropriate panel and update the indicator
-                if panel_side == "left":
-                    self.graph_panel_left = self.create_graph_panel(graph_panel.df)
-                    thumbnail.set_indicator("left")  # Set the new indicator for the new thumbnail
-                    self.thumbnail_left = thumbnail  # Track the thumbnail assigned to the left panel
-
-                elif panel_side == "right":
+    def update_graph_panel(self, image_path, panel_side):
+        """Update the panels based on the selected option."""
+    
+    # Handle Single Image Analysis
+        if panel_side == "single":
+        # Create an image panel for the left
+            self.image_panel_left = self.create_image_panel(image_path)
+        
+        # Find the corresponding graph panel for the image and assign it to the right
+            for _, graph_panel, thumbnail in self.image_history:
+                if thumbnail.image_path == image_path:
                     self.graph_panel_right = self.create_graph_panel(graph_panel.df)
-                    thumbnail.set_indicator("right")  # Set the new indicator for the new thumbnail
-                    self.thumbnail_right = thumbnail  # Track the thumbnail assigned to the right panel
+                    break
 
-                break  # Break after updating the selected panel
+        # Re-render the panels with the new layout
+            self.reset_central_widget()
+            self.render_panels(self.image_panel_left, self.graph_panel_right, self.create_thumbnail_panel())
 
-        # Re-render the panels with updated graphs
-        self.reset_central_widget()  # Clear the central widget
-        self.load_panels()  # Redraw panels with updated graphs
+        # Mark the mode as Single Image Analysis
+            self.is_single_image_analysis = True
+            return  # Exit early since this is single image analysis
+
+    # If we are currently in single image analysis mode, we need to clear it first
+        if self.is_single_image_analysis:
+            self.clear_single_image_analysis()
+
+    # Find the `df` (dataframe) for the selected image based on the thumbnail
+        for _, graph_panel, thumbnail in self.image_history:
+            if thumbnail.image_path == image_path:
+                df = graph_panel.df  # Retrieve the dataframe from the graph panel
+                break
+
+    # Existing logic for left or right panel
+        if panel_side == "left":
+            self.clear_indicator_for_existing_panel("left")
+            self.graph_panel_left = self.create_graph_panel(df)  # Use the retrieved `df`
+            self.thumbnail_left = thumbnail
+        elif panel_side == "right":
+            self.clear_indicator_for_existing_panel("right")
+            self.graph_panel_right = self.create_graph_panel(df)  # Use the retrieved `df`
+            self.thumbnail_right = thumbnail
+
+    # Re-render the panels
+        self.reset_central_widget()
+        self.load_panels()
+
+
+
 
     def clear_indicator_for_existing_panel(self, panel_side):
 
@@ -189,70 +232,6 @@ class MainWindow(QMainWindow):
         self.setGeometry(100, 100, 800, 600) 
         self.showMaximized()
         self.setStyleSheet(open('./app/style/style.css').read())
-
-
-    def export_graphs_as_pdf(self):
-        """Export the graphs displayed in the graph panel as a PDF file."""
-        file_name, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Graphs as PDF",
-            "",
-            "PDF Files (*.pdf)"
-        )
-
-        if file_name:
-            if not file_name.endswith('.pdf'):
-                file_name += '.pdf'
-
-            # Assuming ColoursGraph is within the graph panel
-            graphs_widget = self.graph_panel.layout.itemAt(1).widget()
-            colours_graph = graphs_widget.findChild(ColoursGraph)
-
-            with PdfPages(file_name) as pdf:
-                if colours_graph:
-                    pdf.savefig(colours_graph.fig)
-
-            self.statusBar().showMessage(f"Graphs saved to: {file_name}")
-
-    def export_data_to_csv(self):
-        """Export the raw data to a CSV file."""
-        file_name, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Raw Data as CSV",
-            "",
-            "CSV Files (*.csv)"
-        )
-
-        if file_name:
-            if not file_name.endswith('.csv'):
-                file_name += '.csv'
-
-            df = self.graph_panel.df
-            if df is not None:
-                df.to_csv(file_name, index=False)
-                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
-            else:
-                self.statusBar().showMessage("No data available to export.")
-
-    def export_data_to_excel(self):
-        """Export the raw data to an Excel file."""
-        file_name, _ = QFileDialog.getSaveFileName(
-            self,
-            "Save Raw Data as Excel",
-            "",
-            "Excel Files (*.xlsx)"
-        )
-
-        if file_name:
-            if not file_name.endswith('.xlsx'):
-                file_name += '.xlsx'
-
-            df = self.graph_panel.df
-            if df is not None:
-                df.to_excel(file_name, index=False)
-                self.statusBar().showMessage(f"Raw data saved to: {file_name}")
-            else:
-                self.statusBar().showMessage("No data available to export.")
 
     def run_ceilab_analysis(self):
         if hasattr(self.graph_panel_left,'graphs'):
