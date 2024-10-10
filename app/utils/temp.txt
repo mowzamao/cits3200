@@ -1,1 +1,0 @@
-The app/utils/ directory is where we put the machine vision code, colour chart code etc.

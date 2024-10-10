@@ -3,6 +3,8 @@ Lib/
 Scripts/
 pyvenv.cfg
 .venv/
+venv
+venv/share
 .gitignore
 .pycache/
 .vscode/

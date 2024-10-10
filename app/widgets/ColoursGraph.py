@@ -233,30 +233,29 @@ class ColoursGraph(FigureCanvasQTAgg):
         greater than 0 inches.
         """
         width, height = self.fig.get_size_inches()
-        return width > 0 and height > 0 
+        return width > 0 and height > 0
+
+    def setTopBottomCoordinates(self)->tuple:
+        """
+        Function returning normalised display coordinates for the hight of the edge of the y-axis.
+        """
+        lower_y_coords = self.fig.axes[0].get_ybound()[0]
+        upper_y_coords = self.fig.axes[0].get_ybound()[1]
+        norm_lower_y_coords = self.getNormalisedCoords((0,lower_y_coords))[1]
+        norm_upper_y_coords = self.getNormalisedCoords((0,upper_y_coords))[1]
+        return norm_upper_y_coords,norm_lower_y_coords
     
-    def getLineHeightRelativeCoordinates(self):
+    def getNormalisedCoords(self, data_point)->tuple:
         """
-        Function that gets the height display coordinates for the first and last data points 
-        on the first subplot of the ColoursGraph. This is called by Layers Graph to align the layers 
-        with the ColoursGraph.
+        Function that converts a matplotlib data coordinates into normalized figure coordinates.
         """
-        first_data_point = (self.df.iloc[0,1],self.df.iloc[0,0])
-        last_data_point = (self.df.iloc[-1,1],self.df.iloc[-1,0])
+        # Get the figure's bounding box in display (pixel) coordinates
+        bbox = self.fig.bbox
+        width, height = bbox.width, bbox.height
         
-        first_data_point = self.getNormalisedCoords(first_data_point)
-        last_data_point = self.getNormalisedCoords(last_data_point)
-        return first_data_point, last_data_point
-    
-    def getNormalisedCoords(self,data_point):
-        """
-        Function that converts a matplotlib data coordinates into display coordinates.
-
-        parameters:
-            data_point(tuple): the x and y data coordinates of a point on a matplotlib graph/axes
-        """
-        width,height = self.fig.get_size_inches()
-        data_point = self.fig.axes[0].transData.transform(data_point) 
-        return (data_point[0]/(width*self.dpi),data_point[1]/(height*self.dpi))
-
+        # Transform the data point to display coordinates
+        data_point = self.fig.axes[0].transData.transform(data_point)
+        
+        # Normalize based on the figure's bounding box size
+        return (data_point[0] / width, data_point[1] / height)
 

@@ -6,3 +6,7 @@ Start the application
 ```
 
 ## License
+
+
+
+Icons are from Bootstrap under a free and open-source MiT License

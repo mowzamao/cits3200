@@ -7,6 +7,7 @@ from matplotlib.backends.backend_qtagg import NavigationToolbar2QT as Navigation
 
 from app.widgets.ColoursGraph import ColoursGraph
 from app.widgets.LayersGraph import LayersGraph
+from app.widgets.GraphsToolbar import GraphsToolbar
 
 class GraphPanel(QWidget):
     """
@@ -25,9 +26,9 @@ class GraphPanel(QWidget):
 
 
     def init_empty(self):
-        self.label = QLabel("Data analysis results will be displayed here.")
+        self.label = QLabel("")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
+        self.label.setStyleSheet("border: 1px solid lightgrey; background-color: white;")
         
         # Set the layout
         self.layout.addWidget(self.label)
@@ -57,7 +58,7 @@ class GraphPanel(QWidget):
         else:
             print("No dataframe provided. Please upload and process an image.")
         
-        self.toolbar = NavigationToolbar(self.graphs.colours_graph, self)
+        self.toolbar = GraphsToolbar(self.graphs.colours_graph, self)
         self.layout.addWidget(self.toolbar)
         self.layout.addWidget(self.graphs)
 

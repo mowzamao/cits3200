@@ -15,21 +15,20 @@ class ImagePanel(QWidget):
         """Create a core image display panel"""
         """Create and return the QLabel for displaying the sediment core image."""
         # Initialize the QLabel
-        self.image_label = QLabel("Sediment core image will be displayed here.")
+        self.image_label = QLabel("")
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setStyleSheet("border: 1px solid black; color: black; background-color: white;")
-        
+        self.image_label.setStyleSheet("border: 1px solid lightgrey; background-color: white;")
         self.toolbar = ImageToolbar(self)
         
         # Set the layout
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
-        layout.addWidget(self.toolbar)
-        layout.addWidget(self.image_label)
+        self.layout.addWidget(self.image_label)
 
-        self.setLayout(layout)
+        self.setLayout(self.layout)
     
     def set_image(self, pixmap):
         """Set the given QPixmap on the image label."""
         self.image = pixmap
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
+        self.layout.insertWidget(0, self.toolbar)

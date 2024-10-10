@@ -28,18 +28,12 @@ class Menu(QMenuBar):
         """Create the File menu and add actions."""
         file_menu = QMenu("File", self)
         open_action = QAction("Open", self)
-        export_csv_action = QAction("Export as CSV", self)  # New action for CSV export
-        export_excel_action = QAction("Export to Excel", self)  # New action for Excel export
         exit_action = QAction("Exit", self)
 
         open_action.triggered.connect(self.open_image)
-        export_csv_action.triggered.connect(self.parent.export_data_to_csv)  # Link to export function
-        export_excel_action.triggered.connect(self.parent.export_data_to_excel)
         exit_action.triggered.connect(self.parent.close)
 
         file_menu.addAction(open_action)
-        file_menu.addAction(export_csv_action)  # Add CSV export option to the menu
-        file_menu.addAction(export_excel_action)
         file_menu.addSeparator()
         file_menu.addAction(exit_action)
         
@@ -68,34 +62,38 @@ class Menu(QMenuBar):
         return help_menu
 
     def open_image(self):
-        """Open an image file and display it in the ImagePanel."""
+        """Open an image file and process it to display the image and its corresponding graph."""
+        # Open a file dialog to select an image file
         file_name, _ = QFileDialog.getOpenFileName(
             self, 
             "Open Image", 
             "", 
             "Images (*.png *.jpg *.bmp)"
         )
-    
+
         if file_name:
-            # Load the image using OpenCV
+            # Read the image using OpenCV
             image = cv.imread(file_name)
 
             if image is not None:
-                # Format the image and display it in ImagePanel
+                # Process the image (assuming orient_array and process_core_image are your utility functions)
                 oriented_image = orient_array(image)
-                display_image = QPixmap(file_name)
-                self.parent.image_panel.set_image(display_image)
 
-                # Process the core image to get the data (df)
-                data_dict = process_core_image(oriented_image, 77, True)  # Use 77mm as core width
+                # Assuming process_core_image returns a data dictionary with color data
+                data_dict = process_core_image(oriented_image, 77)  # Example core width 77mm
 
-                if data_dict != 0:  # If processing is successful
-                    self.parent.graph_panel.df = data_dict["Colours"]  # Set the dataframe for the GraphPanel
-                    self.parent.graph_panel.image = data_dict["Image"]  # Save the image data in the GraphPanel for future access
-                    self.parent.graph_panel.init_ui()  # Reinitialize the graphs with the new data
-                
-                    self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
-            else:
-                self.parent.statusBar().showMessage("Failed to load image.")
+                if data_dict != 0:
+                    df = data_dict["Colours"]  # Assuming the processed data is in 'Colours'
+                    image = data_dict["Image"]
+                    
+                    # Call the MainWindow method to add the image and its graph
+                    self.parent.add_image_and_graph_panel(file_name, df)
 
-   
+            #         # Optionally, show a success message in the status bar
+            #         self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
+            #     else:
+            #         # Handle processing failure
+            #         self.parent.statusBar().showMessage("Failed to process the image.")
+            # else:
+            #     # Handle case where the image could not be read
+            #     self.parent.statusBar().showMessage("Failed to load the image.")
