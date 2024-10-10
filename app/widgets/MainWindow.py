@@ -78,7 +78,8 @@ class MainWindow(QMainWindow):
 
         # Update the central widget layout with new thumbnails and panels
         self.reset_central_widget()
-        self.load_panels()
+        thumbnail_panel = self.create_thumbnail_panel()
+        self.render_panels(image_panel,  graph_panel, thumbnail_panel)
 
     def create_image_panel(self, image_path):
         """Create an instance of the image panel."""
