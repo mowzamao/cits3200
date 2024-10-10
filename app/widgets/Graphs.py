@@ -14,8 +14,8 @@ class Graphs(QWidget):
         self.df = df
 
         #generate instances of the sediment graphs
-        self.colours_graph = ColoursGraph(self,dpi=100, df = self.df)
-        self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
+        self.colours_graph = ColoursGraph(self,dpi=60, df = self.df)
+        self.layers_graph  = LayersGraph(self, dpi=60, df = self.df)
         
         self.layers_graph.layers_axes.sharey(self.colours_graph.axes_left)
         
