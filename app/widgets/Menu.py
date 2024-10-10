@@ -88,11 +88,11 @@ class Menu(QMenuBar):
                     # Call the MainWindow method to add the image and its graph
                     self.parent.add_image_and_graph_panel(file_name, df)
 
-                    # Optionally, show a success message in the status bar
-                    self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
-                else:
-                    # Handle processing failure
-                    self.parent.statusBar().showMessage("Failed to process the image.")
-            else:
-                # Handle case where the image could not be read
-                self.parent.statusBar().showMessage("Failed to load the image.")
+            #         # Optionally, show a success message in the status bar
+            #         self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
+            #     else:
+            #         # Handle processing failure
+            #         self.parent.statusBar().showMessage("Failed to process the image.")
+            # else:
+            #     # Handle case where the image could not be read
+            #     self.parent.statusBar().showMessage("Failed to load the image.")

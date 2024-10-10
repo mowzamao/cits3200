@@ -2,11 +2,10 @@ from os import getcwd
 from PyQt6.QtGui import QAction
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from PyQt6.QtGui import QAction, QIcon
-from PyQt6.QtWidgets import (QFileDialog)
+from PyQt6.QtWidgets import QFileDialog
+from PyQt6.QtCore import pyqtSignal, QObject, QTimer 
 from matplotlib.backends.backend_pdf import PdfPages
-
 from app.widgets.ColoursGraph import ColoursGraph
-
 
 
 class GraphsToolbar(NavigationToolbar):
@@ -14,13 +13,18 @@ class GraphsToolbar(NavigationToolbar):
 
         super().__init__(canvas, parent)  # Initialize the canvas
         
+        self.canvas = canvas
         self.grid_visible = True
-
         self.save_actions = [None, None, None, None]
+        self.pan()
 
         self.add_grid_button()
         self.add_save_buttons()
         self.remove_buttons(["Subplots", "Customize", "Save"])
+
+        # Connecting the canvas's motion_notify_event to an empty function
+        # to remove the (x, y) = (..., ...) on the right side of the panel
+        self.canvas.mpl_connect("motion_notify_event", self.on_mouse_move)
 
         self.setStyleSheet("""
                             QToolBar {
@@ -37,7 +41,7 @@ class GraphsToolbar(NavigationToolbar):
                            }
                            """
                            )
-
+        
 
     def remove_buttons(self, labels):
         """Removes buttons from the toolbar by their labels."""
@@ -131,3 +135,11 @@ class GraphsToolbar(NavigationToolbar):
                 df.to_excel(file_name, index=False)
 
 
+    def on_mouse_move(self, event):
+        # We do not need to display anything on mouse movement
+        pass  # Simply do nothing on mouse movement
+
+
+    def set_message(self, s):
+        # Override to do nothing, effectively preventing any message display
+        pass  # No operation, so no text will be shown

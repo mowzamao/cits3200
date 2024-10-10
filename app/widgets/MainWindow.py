@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
 
         self.central_widget.setLayout(new_layout)
 
-
+        self.showMaximized() # Fixes issue with window going out of bounds 
 
     def set_empty_panels(self):
         """Set the initial empty placeholder panels."""
@@ -156,7 +156,7 @@ class MainWindow(QMainWindow):
             self.load_panels()  # Reload the left and right graph panels
         
         # Update the mode
-            self.is_single_image_analysis = False
+            self.is_single_image_analysis = False 
 
 
     def update_graph_panel(self, image_path, panel_side):
@@ -204,7 +204,6 @@ class MainWindow(QMainWindow):
     # Re-render the panels
         self.reset_central_widget()
         self.load_panels()
-
 
 
 
