@@ -231,6 +231,31 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Sediment Core Analysis Tool")
         self.setGeometry(100, 100, 800, 600) 
         self.showMaximized()
-        self.setStyleSheet(open('./app/style/style.css').read())
+        self.setStyleSheet("""
+                            QMainWindow {background-color: #eaeaea;}
+
+                            QMenuBar {
+                                color: #f3f2f0;
+                                padding: 3px;
+                                font-weight: 650;
+                                background-color: #8a4c57;
+                            }
+                            QToolBar {
+                                background-color: #f3f2f0;
+                                padding: 7px;
+                            }
+                            QToolButton {
+                                color: #080808;
+                                background-color: #f3f2f0;
+                                border-radius: 5px;
+                                padding: 10px;
+                                font-weight: 400;
+                            }
+                            QToolButton:hover {
+                                color: #FAF7F7;
+                                background-color: #8a4c57;
+                            }
+                           """
+                           )
 
 
