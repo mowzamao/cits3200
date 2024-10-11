@@ -16,10 +16,13 @@ class GraphsToolbar(NavigationToolbar):
         
         self.canvas = canvas
         self.grid_visible = True
+        self.parent = parent
+
         self.save_actions = [None, None, None, None]
 
         self.add_grid_button()
         self.add_save_buttons()
+        self.add_unit_button()
         self.remove_buttons(["Subplots", "Customize", "Save"])
         self.replace_icons()
 
@@ -184,11 +187,29 @@ class GraphsToolbar(NavigationToolbar):
             if df is not None:
                 df.to_excel(file_name, index=False)
 
+    def add_unit_button(self):
+        
+        icon = QIcon.fromTheme(f"{getcwd()}/app/style/grid.svg")
 
+        self.unit_action = QAction('Change Units',self,icon = icon)
+
+        self.insertAction(self.actions()[6],self.unit_action)
+
+
+        self.unit_action.triggered.connect(self.toggle_units)
+    
+    def toggle_units(self):
+        self.parent.graphs.colours_graph.units = self.getNewUnit(self.parent.graphs.colours_graph.units)
+        self.parent.graphs.colours_graph.clearSubplots()
+        self.parent.graphs.colours_graph.plotColourData()
+        self.parent.graphs.colours_graph.draw_idle()
+
+    def getNewUnit(self, unit):
+        return {'%': '.', '.': '%'}.get(unit, '')
+    
     def on_mouse_move(self, event):
         # We do not need to display anything on mouse movement
         pass  # Simply do nothing on mouse movement
-
 
     def set_message(self, s):
         # Override to do nothing, effectively preventing any message display

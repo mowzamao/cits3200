@@ -32,8 +32,7 @@ class ColoursGraph(FigureCanvasQTAgg):
     axes_min_width = 0.35
     base_font_size = 10
 
-
-    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None):
+    def __init__(self, parent:classmethod=None, dpi:int=100, df:pd.DataFrame = None,analysis_type:str = 'rgb',units:str = '%'):
         """ 
         Initialisation function for the ColourGraph PyQt Widget.
 
@@ -44,67 +43,134 @@ class ColoursGraph(FigureCanvasQTAgg):
             dpi(int): matplotlib resolution settings - Dots Per Inch. 
             df(pd.Dataframe): A Pandas Dataframe containing the data to be displayed. 
         """
-        self.df = df 
-        self.dpi = dpi 
-        self.fig = Figure(dpi=self.dpi)
-        self.plotColourData(df)
-
-        #connecting resize event to graph
-        self.fig.canvas.mpl_connect('resize_event',self.resizeEvent)
-
+        self.df = df
+        self.analysis_type = analysis_type
+        self.hline = None
+        self.units = units 
+        self.fig = Figure(dpi=dpi)
+        self.createSubplots()
+        self.plotColourData()
+        self.fig.canvas.mpl_connect('button_press_event', self.onClick)
+        self.fig.canvas.mpl_connect('resize_event',self.resizeEvent) #connecting resize event to graph
         super(ColoursGraph, self).__init__(self.fig)
-
     
-    def plotColourData(self,df:pd.DataFrame):
+    def createSubplots(self):
+        """
+        Defining three subplots, one for each colour channel
+        """
+        self.axes_left = self.fig.add_subplot(131)
+        self.axes_center = self.fig.add_subplot(132, sharex=self.axes_left, sharey=self.axes_left)
+        self.axes_right = self.fig.add_subplot(133, sharex=self.axes_left, sharey=self.axes_left)
+
+    def clearSubplots(self):
+        """
+        Function to clear the data from all axes in the Colours Plot. 
+        """
+        for ax in self.fig.axes:
+            ax.cla()
+    
+    def plotColourData(self):
         """
         Function which iterative plots data from an inputted pandas dataframe onto three subplots.
 
         parameters:
             df(pd.Dataframe): the pandas dataframe with the colour data to be plotted
         """
-        # Drawing three subplots, one for each colour channel
-        self.axes_left = self.fig.add_subplot(131)
-        self.axes_center = self.fig.add_subplot(132, sharex=self.axes_left, sharey=self.axes_left)
-        self.axes_right = self.fig.add_subplot(133, sharex=self.axes_left, sharey=self.axes_left)
-        
-        column_names = self.getAnalysisType(df)
+        depth,colour_data_list,colour_name_list,plot_line_colour_list = self.getPlotData()
 
-        for ax,column_name in zip(self.fig.axes,column_names):
-            #get colour arrays to be plotted 
-            color_data = round(100*df[column_name]/255,  4)
-            depth = df['Depth (mm)']
-            color_component = column_name
+        for ax, colour_data,colour_name,plot_line_colour in zip(self.fig.axes,colour_data_list,colour_name_list,plot_line_colour_list):
 
-            ax.plot(color_data, depth, color = color_component.lower())
+            ax.plot(colour_data, depth,color = plot_line_colour)
 
-            #set graphical parameters for each subplot
-            ax.set_title(color_component, fontweight='bold',pad = 10)
+            ax.set_title(colour_name, fontweight='bold',pad = 10)
+
             ax = self.setCustomTicks(ax,20,4,4,2)
+
             ax.grid(axis = 'both',visible=True)
-            ax.set_xlim(0,100)
+
+            ax = self.setPlotXlim(ax)
+
             ax.invert_yaxis()
         
         #add title to figure 
-        self.addFigureTitle(df = df)
+        self.addFigureTitle()
 
         #adding headings for the entire ColoursGraph figure
         self.axes_left.set_ylabel('Depth (mm)',fontweight = 'bold')
-        self.axes_center.set_xlabel('Intensity (%)',fontweight = 'bold')
+        self.setPlotXlabel()
 
+    def setPlotXlabel(self):
+        """
+        Function setting xlabel for the x-axis of the Colours Plot. 
+        """
+        if self.analysis_type == 'rgb' and self.units == '%':
+            xlabel_str = 'Intensity (%)'
+        elif self.analysis_type == 'rgb' and self.units == '.':
+            xlabel_str = ' RGB Colour Values'
+        elif self.analysis_type == 'lab' and self.units == '%':
+            xlabel_str = 'Intensity (%)'
+        elif self.analysis_type == 'lab' and self.units == '.':
+            xlabel_str = 'CIELAB Values'
+        else:
+            xlabel_str = ''
+        self.axes_center.set_xlabel(xlabel_str,fontweight = 'bold')
 
+    def setPlotXlim(self,ax):
+        """
+        Function setting limit for x values on the x axis. 
+        """
+        if self.analysis_type == '%':
+            ax.set_xlim(0,100)
+            return ax
+        else:
+            ax.autoscale(True,axis='x')
+            return ax
 
-    def getAnalysisType(self,df:pd.DataFrame):
+    def getPlotData(self):
+        """
+        Function preparing data to be plotted in the Colours Graph.
+
+        Returns:
+            depth(pd.Series): depth of sample from geological core for row of data.
+            colour_data_list(list[pd.Series]): list of pd.Series objects containing the data for each colour channel of analysis.
+            colour_name_list(list[str]): the name of each colour channel in the analysis - used as headings for the colours graph subplots.
+            plot_line_colour_list(list[str]): a list of strings passed to plt.plot to set the colour of the lines on the plot.
+        """
+        if self.analysis_type == 'rgb':
+            depth = self.df['Depth (mm)']
+            colour_name_list = ['Red',"Green",'Blue']
+            colour_data_list = [self.setDataUnits(self.df[colour_name]) for colour_name in colour_name_list]
+            plot_line_colour_list = ['r',"g",'b']
+        if self.analysis_type =='lab':
+            depth = self.df['Depth (mm)']
+            colour_name_list = ['L*',"A*",'B*']
+            colour_data_list = [self.df['L']]
+            for data in [self.setDataUnits(self.df[colour_name],colour_name) for colour_name in ['a','b']]:
+                colour_data_list.append(data)
+            plot_line_colour_list = ['b','b','b']
+        return depth,colour_data_list,colour_name_list,plot_line_colour_list
+    
+    def setDataUnits(self,data:pd.Series,colour_name:str = None)->pd.Series:
+        if self.analysis_type =='rgb' and self.units == '%':
+            return round(100*data/255,4)
+        elif self.analysis_type =='lab' and self.units == '%' and (colour_name =='a' or colour_name == 'b'):
+            return round(100*(data + 128)/255,4)
+        else:
+            return data
+
+    def getColumnNames(self,analysis_type:str):
         """
         Function which returns the column names of the colour data to be plotted. 
         The list is order according to what is rendered on the GUI. This function can 
         later be used to handle and setup CEILAB analysis. 
 
         parameters:
-            df(pd.Dataframe): pandas dataframe containing the data to be plotted.
+            analysis_type(str): a string either 'rgb' or 'lab' indicating the analysis to be done. 
         """
-        df_columns = df.columns
-        if 'Blue' in df_columns and 'Red' in df_columns and 'Green' in df_columns:
+        if analysis_type == 'rgb':
             return ['Red',"Green",'Blue']
+        elif analysis_type == 'lab':
+            return ['L','a','b']
         else:
             return None
 
@@ -137,28 +203,18 @@ class ColoursGraph(FigureCanvasQTAgg):
         return ax
         
 
-    def addFigureTitle(self,figure_title:str=None,df:pd.DataFrame = None,fontsize:int = 16):
+    def addFigureTitle(self,figure_title:str=None,fontsize:int = 16):
         """
-        Function to add a title to the entire ColoursGraph Matplotlib figure. The string
-        to be rendered as a title can be generated through two methods. 1) using the first letter 
-        of the 2nd - 4th column names of a pandas dataframe passed to the function, 2)using a string
-        passed into the function. 
-
-        parameters:
-            df(pd.Dataframe - optional): A pandas dataframe containing the plotted data. The column names of the dataframe are used for the title
-            fontsize(int): Parameter setting the size of the title.
-            title(str - optional): A string which will be rendered as the matplotlib figure's title.
+        Add a title to the Colours Plot based of the type on analysis being visualised. 
         """
-        #if no title string is provided generate a title string based of df column names
-        if df is not None and figure_title is None:
-            columns = self.getAnalysisType(df)
-            if columns == ['Red',"Green","Blue"]:
-                figure_title = 'RGB Colour Space Plot'
-            else:
-                figure_title = 'Colour Space Plot'
-
-        #render new title onto matplotlib figure  
-        self.fig.suptitle(figure_title, fontweight='bold',fontsize = fontsize)
+        if self.analysis_type == 'rgb':
+            figure_title = 'RGB Colour Space Plot'
+        elif self.analysis_type == 'lab':
+            figure_title = 'CIELAB Colour Space Plot'
+        else:
+            figure_title = ''
+        self.fig.suptitle(figure_title, fontweight='bold',fontsize = fontsize) 
+        
     
     def resizeEvent(self,event):
         """
@@ -258,4 +314,29 @@ class ColoursGraph(FigureCanvasQTAgg):
         
         # Normalize based on the figure's bounding box size
         return (data_point[0] / width, data_point[1] / height)
+    
+    def onClick(self, event):
+        """
+        Function which adds a grey line onto the Colours Graphs subplots when 
+        they are clicked on.
+        """
+        if event.inaxes is None:
+            # Click occurred outside any axes
+            return
+        if self.hline is None:
+            # No line exists; create it
+            ydata = event.ydata
+            self.hline = []
+            for ax in self.fig.axes:
+                line = ax.axhline(y=ydata, color='grey',alpha = 0.5)
+                self.hline.append(line)
+        else:
+            # Line exists; remove it
+            for line in self.hline:
+                line.remove()
+            self.hline = None
+        self.fig.canvas.draw_idle()
+    
+    def setNewAnalysisType(self):
+        self.analysis_type = {'lab':'rgb','rgb':'lab'}.get(self.analysis_type)
 

@@ -78,12 +78,17 @@ class Menu(QMenuBar):
             if image is not None:
                 # Process the image (assuming orient_array and process_core_image are your utility functions)
                 oriented_image = orient_array(image)
+                display_image = QPixmap(file_name)
 
-                # Assuming process_core_image returns a data dictionary with color data
-                data_dict = process_core_image(oriented_image, 77)  # Example core width 77mm
+                # Process the core image to get the data (df)
+                data_dict = process_core_image(oriented_image, 77)  # Use 77mm as core width
+
+                #setting up dataframe for the colours graph
+                rgb_df = data_dict['Colours']
+                lab_df = core_to_lab(rgb_df)
+                df = pd.merge(rgb_df,lab_df,on = 'Depth (mm)')
 
                 if data_dict != 0:
-                    df = data_dict["Colours"]  # Assuming the processed data is in 'Colours'
                     image = data_dict["Image"]
                     
                     # Call the MainWindow method to add the image and its graph

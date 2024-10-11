@@ -1,8 +1,10 @@
 from PyQt6.QtWidgets import QToolBar, QPushButton
-from PyQt6.QtGui import QPixmap, QAction  
+from PyQt6.QtGui import QPixmap, QAction
+from PyQt6.QtCore import pyqtSignal
+from app.widgets.ColoursGraph import ColoursGraph
 
 class Toolbar(QToolBar):
-    def __init__(self, parent=None):
+    def __init__(self,parent=None):
         super().__init__(parent)
         self.init_ui()
 
@@ -11,12 +13,15 @@ class Toolbar(QToolBar):
 
         self.calibrate_image = QAction("Calibrate Image", self)
         self.run_rgb = QAction("Run RGB Analysis", self)
-        self.rub_cielab = QAction("Run CIELAB Analysis", self)
+        self.run_cielab = QAction("Run CIELAB Analysis", self)
        
         self.addAction(self.calibrate_image)
         self.addAction(self.run_rgb)
-        self.addAction(self.rub_cielab)
+        self.addAction(self.run_cielab)
 
+        self.run_cielab.triggered.connect(self.parent().analysis_swap)
+        self.run_rgb.triggered.connect(self.parent().analysis_swap)
+        
 
 
 

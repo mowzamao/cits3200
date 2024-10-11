@@ -246,4 +246,23 @@ QToolButton:hover {
   color: #FAF7F7;
   background-color: #B2737F;
 }
-""")
+""")    
+
+    def analysis_swap(self):
+        """
+        Function called when 'run CieLab' or 'run RGB' buttons are clicked in the GUI.
+        This function replots graph panels through switiching the graph's analyis type and then replotting 
+        the data. This is achieved through:
+            1). Iterating over the two panels in the main window.
+            2). Checking if these panels are GraphPanels (not Image Panels) and have been initialised.
+            3). Reploting graph panels according to the new type of analysis. 
+        """
+        for panel in [self.panel_left,self.panel_right]:
+            if isinstance(panel,GraphPanel) and panel.graphs is not None:
+                panel.graphs.colours_graph.setNewAnalysisType()
+                panel.graphs.colours_graph.clearSubplots()
+                panel.graphs.colours_graph.plotColourData()
+                panel.graphs.colours_graph.draw_idle()
+    
+
+ 

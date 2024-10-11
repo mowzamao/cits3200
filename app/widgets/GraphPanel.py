@@ -11,7 +11,7 @@ from app.widgets.GraphsToolbar import GraphsToolbar
 
 class GraphPanel(QWidget):
     """
-    The PyQt class that defines the panel showing the colour graphs
+    The PyQt class that defines the panel showing the graphs
     """
     
     def __init__(self, parent=None, df=None, image=None):
@@ -19,6 +19,7 @@ class GraphPanel(QWidget):
         The initialization function for the GraphPanel class/PyQt widget.
         """
         super().__init__(parent)
+        self.graphs = None
         self.df = df  # Store the dataframe directly
         self.image = image
         self.layout = QVBoxLayout(self)  # Create a layout for the GraphPanel
