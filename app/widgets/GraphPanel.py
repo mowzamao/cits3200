@@ -14,7 +14,7 @@ class GraphPanel(QWidget):
     The PyQt class that defines the panel showing the graphs
     """
     
-    def __init__(self, parent=None, df=None, image=None):
+    def __init__(self, parent=None, df=None, image=None, width=None, box=None):
         """
         The initialization function for the GraphPanel class/PyQt widget.
         """
@@ -22,6 +22,8 @@ class GraphPanel(QWidget):
         self.graphs = None
         self.df = df  # Store the dataframe directly
         self.image = image
+        self.w = width
+        self.box = box
         self.layout = QVBoxLayout(self)  # Create a layout for the GraphPanel
         self.init_empty()
 

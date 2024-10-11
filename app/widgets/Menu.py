@@ -87,12 +87,11 @@ class Menu(QMenuBar):
                 rgb_df = data_dict['Colours']
                 lab_df = core_to_lab(rgb_df)
                 df = pd.merge(rgb_df,lab_df,on = 'Depth (mm)')
-
-                if data_dict != 0:
-                    image = data_dict["Image"]
+                image = data_dict["Image"]
+                box = data_dict["Bounding Box"]
                     
-                    # Call the MainWindow method to add the image and its graph
-                    self.parent.add_image_and_graph_panel(file_name, df, image)
+                # Call the MainWindow method to add the image and its graph
+                self.parent.add_image_and_graph_panel(file_name, df, image, 77, box)
 
             #         # Optionally, show a success message in the status bar
             #         self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")

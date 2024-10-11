@@ -99,7 +99,23 @@ class ImageToolbar(QToolBar):
 
 
     def crop_image(self):
-        pass # Need to implement (Josh)
+        """
+        Creates a box on the image panel to be moved and submitted for selecting a new crop of the image
+        """
+        main_window = self.parent().parent().parent()
+        image_panel = main_window.panel_left
+        graph_panel = main_window.panel_right
+
+        if image_panel != None: #Replace the next few lines with the box creation, moving, and submitting
+            image_panel.draw_box(graph_panel.box[0], graph_panel.box[1], graph_panel.box[2], graph_panel.box[3])
+            # new_data = process_core_image(graph_panel.image, graph_panel.w, from_bounding_box=True, bounding_box=new_box, df=True)
+            # if new_data != 0:
+            #     new_df = new_data["Colours"] 
+            #     new_image = new_data["Image"]
+
+            #     # Resets the graph_panel object/s correpsonding to the file_path/s 
+            #     main_window.reset_data(image_panel.image_path, new_df, new_image, main_window.panel_right)
+            #     main_window.update_graph_panel(image_panel.image_path, "single")
 
     def calibrate_image(self):
         """
@@ -109,7 +125,8 @@ class ImageToolbar(QToolBar):
         image_path = main_window.panel_left.image_path
         image = main_window.panel_right.image
 
-        if image_path:
+        if main_window.panel_right != None:
+            image = main_window.panel_right.image
             text, ok = QInputDialog.getText(self, "Sediment Core Analysis", "Please input the width of the core in the image (in mm):")
             if text and ok:
                 if text.isdigit():
@@ -118,5 +135,5 @@ class ImageToolbar(QToolBar):
                         new_df = new_data["Colours"] 
 
                         # Resets the graph_panel object/s correpsonding to the file_path/s 
-                        self.parent().parent().parent().reset_data(image_path, new_df, image)
-                        self.parent().parent().parent().update_graph_panel(image_path, "single")
+                        main_window.reset_data(image_path, new_df, image, int(text))
+                        main_window.update_graph_panel(image_path, "single")

@@ -1,6 +1,6 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QImage, QTransform
+from PyQt6.QtCore import Qt, QRect
+from PyQt6.QtGui import QImage, QTransform, QPainter, QColor
 import numpy as np
 
 from app.widgets.ImageToolbar import ImageToolbar
@@ -35,3 +35,10 @@ class ImagePanel(QWidget):
         self.image = pixmap
         self.image_label.setPixmap(pixmap.scaled(self.image_label.size(), Qt.AspectRatioMode.KeepAspectRatio))
         self.layout.insertWidget(0, self.toolbar)
+
+    def draw_box(self, x: int, y: int, width: int, height: int):
+        rect = QRect(x, y, width, height)
+        painter = QPainter(self.image)
+        painter.setPen(QColor(255, 0, 0, 127))
+        painter.drawRect(rect)
+        painter.end()

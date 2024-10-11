@@ -58,7 +58,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
         self.main_layout = QGridLayout()
 
-    def add_image_and_graph_panel(self, image_path, df, image):
+    def add_image_and_graph_panel(self, image_path, df, image, width, box):
         """Handle image and graph upload."""
 
         # Setting the self.thumbnail_panel before rendering
@@ -66,7 +66,7 @@ class MainWindow(QMainWindow):
         self.thumbnail_panel = self.create_thumbnail_panel() 
                                                              
         image_panel = self.create_image_panel(image_path)
-        graph_panel = self.create_graph_panel(df, image)
+        graph_panel = self.create_graph_panel(df, image, width, box)
         self.image_history.append([image_panel, graph_panel, thumbnail])
 
         self.render_panels()
@@ -82,9 +82,9 @@ class MainWindow(QMainWindow):
         image_panel.image_path = image_path
         return image_panel
 
-    def create_graph_panel(self, df, image):
+    def create_graph_panel(self, df, image, width, box):
         """Create an instance of the graph panel."""
-        graph_panel = GraphPanel(self, df, image)
+        graph_panel = GraphPanel(self, df, image, width, box)
         graph_panel.init_ui()
         return graph_panel
 
@@ -152,7 +152,7 @@ class MainWindow(QMainWindow):
             # Find the corresponding graph panel for the image and assign it to the right
             for _, graph_panel, thumbnail in self.image_history:
                 if thumbnail.image_path == image_path:
-                    self.panel_right = self.create_graph_panel(graph_panel.df, graph_panel.image)
+                    self.panel_right = self.create_graph_panel(graph_panel.df, graph_panel.image, graph_panel.w, graph_panel.box)
                     break
 
             # Re-render the panels with the new layout
@@ -168,15 +168,17 @@ class MainWindow(QMainWindow):
             if thumbnail.image_path == image_path:
                 df = graph_panel.df  # Retrieve the dataframe from the graph panel
                 image = graph_panel.image
+                width = graph_panel.w
+                box = graph_panel.box
                 break
 
         # Existing logic for left or right panel
         if panel_side == "left":
-            self.panel_left = self.create_graph_panel(df, image)  # Use the retrieved `df`
+            self.panel_left = self.create_graph_panel(df, image, width, box)  # Use the retrieved `df`
             self.thumbnail_panel = self.create_thumbnail_panel()
 
         elif panel_side == "right":
-            self.panel_right = self.create_graph_panel(df, image)  # Use the retrieved `df`
+            self.panel_right = self.create_graph_panel(df, image, width, box)  # Use the retrieved `df`
             self.thumbnail_panel = self.create_thumbnail_panel()
     
 
@@ -184,12 +186,12 @@ class MainWindow(QMainWindow):
         self.render_panels()
 
 
-    def reset_data(self, image_path, new_df, image):
+    def reset_data(self, image_path, new_df, image, width, box):
         index = 0
         for image_panel, _, _ in self.image_history:
             if (image_panel.image_path == image_path):
 
-                self.image_history[index][1] = GraphPanel(self, new_df, image)
+                self.image_history[index][1] = GraphPanel(self, new_df, image, width, box)
                 self.panel_right = self.image_history[index][1]
                 break
 
