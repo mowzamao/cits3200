@@ -235,7 +235,7 @@ class MainWindow(QMainWindow):
         if isinstance(self.graph_panel_left,GraphPanel):
             if self.graph_panel_left.graphs != None:
                 self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'lab')
-        print(type(self.graph_panel_right))
+
         if isinstance(self.graph_panel_right,GraphPanel):
             if self.graph_panel_right.graphs != None:
                 self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'lab')
