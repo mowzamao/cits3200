@@ -15,8 +15,9 @@ class Graphs(QWidget):
         self.df = df
 
         #generate instances of the sediment graphs
-        self.colours_graph = ColoursGraph(self,dpi=100, df = self.df, analysis_type= 'rgb')
-        self.layers_graph  = LayersGraph(self, dpi=100, df = self.df)
+        self.colours_graph = ColoursGraph(self,dpi=60, df = self.df)
+        self.layers_graph  = LayersGraph(self, dpi=60, df = self.df)
+        
         self.layers_graph.layers_axes.sharey(self.colours_graph.axes_left)
         self.init_ui()
 
@@ -35,4 +36,6 @@ class Graphs(QWidget):
         main_layout.addLayout(colours_layout,stretch=8)
 
         #Set the layout of this instance of the Graph Panel
+        main_layout.setContentsMargins(3, 5, 5, 3)
+        main_layout.setSpacing(3)   
         self.setLayout(main_layout)

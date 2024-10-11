@@ -14,13 +14,14 @@ class GraphPanel(QWidget):
     The PyQt class that defines the panel showing the graphs
     """
     
-    def __init__(self, parent=None, df=None):
+    def __init__(self, parent=None, df=None, image=None):
         """
         The initialization function for the GraphPanel class/PyQt widget.
         """
         super().__init__(parent)
         self.graphs = None
         self.df = df  # Store the dataframe directly
+        self.image = image
         self.layout = QVBoxLayout(self)  # Create a layout for the GraphPanel
         self.init_empty()
 
@@ -28,10 +29,12 @@ class GraphPanel(QWidget):
     def init_empty(self):
         self.label = QLabel("")
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.label.setStyleSheet("border: 1px solid lightgrey; background-color: white;")
+        self.label.setStyleSheet("background-color: white;")
         
         # Set the layout
         self.layout.addWidget(self.label)
+        self.layout.setContentsMargins(0, 5, 5, 0)
+        self.layout.setSpacing(3)   
         self.setLayout(self.layout)
 
 
@@ -44,13 +47,6 @@ class GraphPanel(QWidget):
             widget = self.layout.itemAt(i).widget()
             if widget:
                 widget.setParent(None)  # Remove old widget
-
-        # Fullscreen button for toggling view
-        # fullscreen_icon = QIcon.fromTheme("view-fullscreen")
-        # fullscreen_button = QPushButton(self, icon=fullscreen_icon)
-        # fullscreen_button.setFixedSize(QSize(20, 20))
-        # fullscreen_button.clicked.connect(self.switch_graph_fullscreen)
-
 
         # Ensure the dataframe (df) is used to generate the graphs
         if self.df is not None:

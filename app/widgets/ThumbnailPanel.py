@@ -11,7 +11,7 @@ class ThumbnailPanel(QWidget):
         self.count = 0
         self.layout = QHBoxLayout()
         self.setLayout(self.layout)
-    
+
 
     def add_thumbnail(self, thumbnail):
         self.layout.addWidget(thumbnail, alignment=Qt.AlignmentFlag.AlignLeft)
