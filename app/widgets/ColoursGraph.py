@@ -337,6 +337,4 @@ class ColoursGraph(FigureCanvasQTAgg):
             self.hline = None
         self.fig.canvas.draw_idle()
     
-    def setNewAnalysisType(self):
-        self.analysis_type = {'lab':'rgb','rgb':'lab'}.get(self.analysis_type)
 
