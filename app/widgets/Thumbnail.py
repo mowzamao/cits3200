@@ -1,5 +1,5 @@
 import sys
-from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QDialog, QPushButton, QVBoxLayout
+from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QDialog, QPushButton, QVBoxLayout, QStackedLayout, QGridLayout
 from PyQt6.QtGui import QPixmap, QFontMetrics
 from PyQt6.QtCore import Qt
 
@@ -12,27 +12,29 @@ class Thumbnail(QFrame):
         self.indicator = None  # Indicator for "Left" or "Right"
 
         # Set up the layout (Vertical stacking: indicator, image, and name)
-        self.layout = QVBoxLayout()
+        self.layout = QGridLayout()
+        self.layout.setContentsMargins(0, 0, 0, 0)
+        self.layout.setSpacing(0)   
         self.setLayout(self.layout)
 
         # Top element: Left/Right indicator
         self.indicator_label = QLabel(self)
         self.indicator_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.indicator_label.setStyleSheet("font-weight: bold; color: black; padding: 5px;")
+        self.indicator_label.setStyleSheet("")
 
         # Middle element: Image display
         self.image = QLabel(self)
         self.image.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.image.setStyleSheet("border: none; padding: 5px; margin: 0;  background-color: rgba(255, 255, 255, 150);")
 
         # Bottom element: Image name
         self.caption = QLabel(self)
         self.caption.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.caption.setStyleSheet("font-weight: bold; color: black; padding: 5px;")
 
         # Add widgets to the layout in order
-        self.layout.addWidget(self.indicator_label)  # First: Indicator
-        self.layout.addWidget(self.image, stretch=5)  # Second: Image
-        self.layout.addWidget(self.caption, stretch=1)  # Third: Caption
+        self.layout.addWidget(self.indicator_label, 0,0,1,200)  # First: Indicator
+        self.layout.addWidget(self.image, 0, 0, 200, 500)  # Second: Image
+        self.layout.addWidget(self.caption, 200, 0, 1, 500)  # Third: Caption
 
         # Caption setup
         name = image_path.split("/")[-1].split(".")[0] if image_path else image_path
@@ -42,21 +44,16 @@ class Thumbnail(QFrame):
 
         # Set the style for the frame
         self.setStyleSheet("""
-        QFrame {
-            background-color: rgba(255, 255, 255, 150);
-            border-radius: 0px;
-        }
-        QFrame:hover {
-            background-color: lightgray;
-        }
-        QLabel {
-            font-size: 14px;
-            color: black;
-        }
+            QFrame {
+                background-color: rgba(255, 255, 255, 150);
+                border: 4px solid rgba(255, 255, 255, 150); 
+                padding: 0;
+                margin: 2px;    
+            }
         """)
 
         # Load the image
-        self.load_image()
+        self.load_image()      
 
     def load_image(self):
         pixmap = QPixmap(self.image_path)
@@ -65,14 +62,23 @@ class Thumbnail(QFrame):
 
     def set_indicator(self, panel_side=None):
         """Set or clear the indicator for this thumbnail."""
+
         if panel_side == "left":
             self.indicator = "left"
             self.indicator_label.setText("Left")
+            self.indicator_label.setStyleSheet("border: none; padding: 0; margin: 0; font-size: 12px; font-weight: 500; color: white;  background-color: #8a4c57;")
+            self.indicator_label.raise_()
+
         elif panel_side == "right":
             self.indicator = "right"
             self.indicator_label.setText("Right")
+            self.indicator_label.setStyleSheet("border: none; padding: 0; margin: 0;  font-size: 12px; font-weight: 500; color: white;  background-color: #8a4c57;")
+            self.indicator_label.raise_()
+
         else:
             self.reset_indicator()  # If no side is passed, reset the indicator
+            self.indicator_label.setStyleSheet("background-color: rgba(255, 255, 255, 255);")
+            self.indicator_label.lower()
 
     def reset_indicator(self):
         """Clear the indicator for this thumbnail."""
