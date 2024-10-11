@@ -36,4 +36,6 @@ class Graphs(QWidget):
         main_layout.addLayout(colours_layout,stretch=8)
 
         #Set the layout of this instance of the Graph Panel
+        main_layout.setContentsMargins(3, 5, 5, 3)
+        main_layout.setSpacing(3)   
         self.setLayout(main_layout)

@@ -18,11 +18,13 @@ class ImagePanel(QWidget):
         # Initialize the QLabel
         self.image_label = QLabel("")
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setStyleSheet("border: 1px solid lightgrey; background-color: white;")
+        self.image_label.setStyleSheet("border: 20px solid white; background-color: white;")
         self.toolbar = ImageToolbar(self)
         
         # Set the layout
         self.layout = QVBoxLayout()
+        self.layout.setContentsMargins(5, 7, 5, 3)
+        self.layout.setSpacing(5)   
 
         self.layout.addWidget(self.image_label)
 

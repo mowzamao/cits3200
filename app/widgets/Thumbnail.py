@@ -14,7 +14,7 @@ class Thumbnail(QFrame):
         # Set up the layout (Vertical stacking: indicator, image, and name)
         self.layout = QGridLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
-        self.layout.setSpacing(0)   
+        self.layout.setSpacing(2)   
         self.setLayout(self.layout)
 
         # Top element: Left/Right indicator
@@ -93,19 +93,17 @@ class Thumbnail(QFrame):
     def show_panel_selection_dialog(self):
         """Show the dialog to choose Left, Right, or Single Image Analysis panel."""
         dialog = QDialog(self)
-        dialog.setWindowTitle("Select Panel")
-        layout = QVBoxLayout()
+        dialog.resize(200, 80) 
+        dialog.setWindowTitle("Select panel to display:")
+        layout = QGridLayout()
 
-        label = QLabel("Select a panel to display:")
-        layout.addWidget(label)
+        left_button = QPushButton("Left graph")
+        right_button = QPushButton("Right graph")
+        single_analysis_button = QPushButton("Image and graph")  # New button
 
-        left_button = QPushButton("Left Panel")
-        right_button = QPushButton("Right Panel")
-        single_analysis_button = QPushButton("Single Image Analysis")  # New button
-
-        layout.addWidget(left_button)
-        layout.addWidget(right_button)
-        layout.addWidget(single_analysis_button)  # Add the third button
+        layout.addWidget(left_button, 0, 0, 1, 1)
+        layout.addWidget(right_button, 0, 1, 1, 1)
+        layout.addWidget(single_analysis_button, 1, 0, 1, 0)  # Add the third button
 
         left_button.clicked.connect(lambda: self.select_panel("left", dialog))
         right_button.clicked.connect(lambda: self.select_panel("right", dialog))

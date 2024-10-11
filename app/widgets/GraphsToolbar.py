@@ -17,7 +17,6 @@ class GraphsToolbar(NavigationToolbar):
         self.canvas = canvas
         self.grid_visible = True
         self.save_actions = [None, None, None, None]
-        self.pan()
 
         self.add_grid_button()
         self.add_save_buttons()
@@ -36,6 +35,7 @@ class GraphsToolbar(NavigationToolbar):
                                 color: #080808;
                                 background-color: #f3f2f0;
                                 font-weight: 400;
+                                margin: 0;
                             }
                             QToolButton:hover {
                                 color: white;

@@ -125,6 +125,9 @@ class MainWindow(QMainWindow):
         new_layout.setRowStretch(0, 5)
         new_layout.setRowStretch(1, 1)
 
+        new_layout.setContentsMargins(0, 0, 0, 0)
+        new_layout.setSpacing(3)   
+
         self.central_widget.setLayout(new_layout)
 
         self.showMaximized() # Fixes issue with window going out of bounds 
