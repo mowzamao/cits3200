@@ -247,29 +247,14 @@ QToolButton:hover {
   background-color: #B2737F;
 }
 """)    
-    def run_ceilab_analysis(self):
-        if isinstance(self.graph_panel_left,GraphPanel):
-            if self.graph_panel_left.graphs != None:
-                self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'lab')
 
-        if isinstance(self.graph_panel_right,GraphPanel):
-            if self.graph_panel_right.graphs != None:
-                self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'lab')
-
-    def run_rgb_analysis(self):
-        if isinstance(self.graph_panel_left,GraphPanel):
-            if self.graph_panel_left.graphs != None:
-                self.redraw_graph(self.graph_panel_left.graphs.colours_graph,'rgb')
-
-        if isinstance(self.graph_panel_right,GraphPanel):
-            if self.graph_panel_right.graphs != None:
-                self.redraw_graph(self.graph_panel_right.graphs.colours_graph,'rgb')
-
-    def redraw_graph(self,graph_panel,analysis_type):
-        graph_panel.analysis_type = analysis_type
-        graph_panel.clearSubplots()
-        graph_panel.plotColourData()
-        graph_panel.draw_idle()
-        return graph_panel
+    def analysis_swap(self):
+        for panel in [self.panel_left,self.panel_right]:
+            if isinstance(panel,GraphPanel) and panel.graphs is not None:
+                panel.graphs.colours_graph.setNewAnalysisType()
+                panel.graphs.colours_graph.clearSubplots()
+                panel.graphs.colours_graph.plotColourData()
+                panel.graphs.colours_graph.draw_idle()
+    
 
  

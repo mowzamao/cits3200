@@ -19,8 +19,8 @@ class Toolbar(QToolBar):
         self.addAction(self.run_rgb)
         self.addAction(self.run_cielab)
 
-        self.run_cielab.triggered.connect(self.parent().run_ceilab_analysis)
-        self.run_rgb.triggered.connect(self.parent().run_rgb_analysis)
+        self.run_cielab.triggered.connect(self.parent().analysis_swap)
+        self.run_rgb.triggered.connect(self.parent().analysis_swap)
         
 
 
