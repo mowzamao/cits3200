@@ -1,6 +1,6 @@
 ## Usage
 
-Start the application
+Start the application through a bash window/command shell located within the root folder for this project
 ```sh
     python main.py
 ```
