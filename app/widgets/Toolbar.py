@@ -11,11 +11,9 @@ class Toolbar(QToolBar):
     def init_ui(self):
         """Create the controls panel with buttons for various functions."""
 
-        self.calibrate_image = QAction("Calibrate Image", self)
         self.run_rgb = QAction("Run RGB Analysis", self)
         self.run_cielab = QAction("Run CIELAB Analysis", self)
        
-        self.addAction(self.calibrate_image)
         self.addAction(self.run_rgb)
         self.addAction(self.run_cielab)
 
