@@ -46,6 +46,8 @@ class Menu(QMenuBar):
         about_action = QAction("About", self)
 
         user_guide_action.triggered.connect(self.open_user_guide)
+        user_guide_action.triggered.connect(self.open_about)
+
 
 
         help_menu.addAction(user_guide_action)
@@ -57,6 +59,14 @@ class Menu(QMenuBar):
         """Open the user guide in the default web browser."""
         # Replace with the actual URL where the user guide is hosted
         url = "https://docs.google.com/document/d/1Ut9xIydCe57XhlXjVJ60JIHLIcsG98q0NrMVG0WW0_U/edit?usp=sharing"  # Use the actual URL
+
+        # Open the URL in the default browser
+        QDesktopServices.openUrl(QUrl(url))
+
+    def open_about(self):
+        """Open the user guide in the default web browser."""
+        # Replace with the actual URL where the user guide is hosted
+        url = "https://github.com/mowzamao/cits3200"  # Use the actual URL
 
         # Open the URL in the default browser
         QDesktopServices.openUrl(QUrl(url))
