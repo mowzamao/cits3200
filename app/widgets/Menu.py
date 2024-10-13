@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu
 from PyQt6.QtGui import QPixmap, QAction  
 from PyQt6.QtCore import Qt
+from PyQt6.QtGui import QDesktopServices
+from PyQt6.QtCore import QUrl
 import cv2 as cv
 import numpy as np
 from app.utils.ImageTransforming import * 
@@ -43,10 +45,21 @@ class Menu(QMenuBar):
         user_guide_action = QAction("User Guide", self)
         about_action = QAction("About", self)
 
+        user_guide_action.triggered.connect(self.open_user_guide)
+
+
         help_menu.addAction(user_guide_action)
         help_menu.addAction(about_action)
 
         return help_menu
+    
+    def open_user_guide(self):
+        """Open the user guide in the default web browser."""
+        # Replace with the actual URL where the user guide is hosted
+        url = "https://docs.google.com/document/d/1Ut9xIydCe57XhlXjVJ60JIHLIcsG98q0NrMVG0WW0_U/edit?usp=sharing"  # Use the actual URL
+
+        # Open the URL in the default browser
+        QDesktopServices.openUrl(QUrl(url))
 
     def open_image(self):
         """Open an image file and process it to display the image and its corresponding graph."""
