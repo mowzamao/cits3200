@@ -16,11 +16,9 @@ class Menu(QMenuBar):
     def init_ui(self):
         """Create a menu to select image files"""
         file_menu = self.create_file_menu()
-        settings_menu = self.create_settings_menu()
         help_menu = self.create_help_menu()
 
         self.addMenu(file_menu) 
-        self.addMenu(settings_menu) 
         self.addMenu(help_menu) 
 
 
@@ -38,17 +36,6 @@ class Menu(QMenuBar):
         file_menu.addAction(exit_action)
         
         return file_menu
-
-    def create_settings_menu(self):
-        """Create the Settings menu and add actions."""
-        settings_menu = QMenu("Settings", self)
-        adjust_params_action = QAction("Adjust Parameters", self)
-        calibration_action = QAction("Calibration", self)
-
-        settings_menu.addAction(adjust_params_action)
-        settings_menu.addAction(calibration_action)
-
-        return settings_menu
 
     def create_help_menu(self):
         """Create the Help menu and add actions."""
