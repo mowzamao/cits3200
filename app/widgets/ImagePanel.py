@@ -23,8 +23,8 @@ class ImagePanel(QWidget):
         
         # Set the layout
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(5, 7, 5, 3)
-        self.layout.setSpacing(5)   
+        self.layout.setContentsMargins(5, 5, 3, 3)
+        self.layout.setSpacing(7)   
 
         self.layout.addWidget(self.image_label)
 

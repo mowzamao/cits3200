@@ -48,16 +48,15 @@ class Menu(QMenuBar):
     
     def open_user_guide(self):
         """Open the user guide in the default web browser."""
-        # Replace with the actual URL where the user guide is hosted
-        url = "https://docs.google.com/document/d/1Ut9xIydCe57XhlXjVJ60JIHLIcsG98q0NrMVG0WW0_U/edit?usp=sharing"  # Use the actual URL
+        
+        url = "https://docs.google.com/document/d/1Ut9xIydCe57XhlXjVJ60JIHLIcsG98q0NrMVG0WW0_U/edit?usp=sharing"  
 
         # Open the URL in the default browser
         QDesktopServices.openUrl(QUrl(url))
 
     def open_about(self):
         """Open the user guide in the default web browser."""
-        # Replace with the actual URL where the user guide is hosted
-        url = "https://github.com/mowzamao/cits3200"  # Use the actual URL
+        url = "https://github.com/mowzamao/cits3200"  
 
         # Open the URL in the default browser
         QDesktopServices.openUrl(QUrl(url))
@@ -102,7 +101,8 @@ class Menu(QMenuBar):
     
     def analysis_fail_popup(self):
         msg = QMessageBox()
-        msg.setWindowTitle('Analysis Failure')
-        msg.setText('Core not detected in image.')
+        msg.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        msg.setWindowTitle('Error')
+        msg.setText('   No core was detected            ')
         msg.exec()
 
