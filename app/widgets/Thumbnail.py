@@ -1,6 +1,6 @@
 import sys
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QLabel, QFrame, QDialog, QPushButton, QVBoxLayout, QStackedLayout, QGridLayout
-from PyQt6.QtGui import QPixmap, QFontMetrics
+from PyQt6.QtGui import QPixmap, QFontMetrics, QPixmap, QTransform
 from PyQt6.QtCore import Qt
 
 class Thumbnail(QFrame):
@@ -57,6 +57,16 @@ class Thumbnail(QFrame):
 
     def load_image(self):
         pixmap = QPixmap(self.image_path)
+
+        # Rotating pixmap 90 degrees if it is taller than it is wide
+        if pixmap.height() > pixmap.width():
+            # Create a transformation object
+            transform = QTransform()
+            # Rotate the pixmap by 90 degrees
+            transform.rotate(90)
+            # Apply the transformation and return the rotated pixmap
+            pixmap = pixmap.transformed(transform)
+
         self.image.resize(100, 200)
         self.image.setPixmap(pixmap.scaled(self.image.size(), Qt.AspectRatioMode.KeepAspectRatio))
 
