@@ -28,11 +28,6 @@ class ImageToolbar(QToolBar):
     def init_ui(self):
         """Create the controls panel for images."""
 
-        crop_svg = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-aspect-ratio" viewBox="0 0 16 16"><rect width="100%" height="100%" fill="#f3f2f0" /><path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5z"/><path d="M2 4.5a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1H3v2.5a.5.5 0 0 1-1 0zm12 7a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1 0-1H13V8.5a.5.5 0 0 1 1 0z"/></svg>"""
-        self.crop = QAction("Crop image", self, icon=self.svg_to_icon(crop_svg))
-        self.crop.triggered.connect(self.crop_image)
-        self.addAction(self.crop)
-
         flip_svg = """<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-hr" viewBox="0 0 16 16"><rect width="100%" height="100%" fill="#f3f2f0" /><path d="M12 3H4a1 1 0 0 0-1 1v2.5H2V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2.5h-1V4a1 1 0 0 0-1-1M2 9.5h1V12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V9.5h1V12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zm-1.5-2a.5.5 0 0 0 0 1h15a.5.5 0 0 0 0-1z"/></svg>"""
         self.flip = QAction("Flip image", self, icon=self.svg_to_icon(flip_svg))
         self.flip.triggered.connect(self.flip_image)
@@ -96,10 +91,6 @@ class ImageToolbar(QToolBar):
 
     def getNewLabel(self, label):
         return {'Top': 'Bottom', 'Bottom': 'Top'}.get(label, '')
-
-
-    def crop_image(self):
-        pass # Need to implement (Josh)
 
     def calibrate_image(self):
         """
