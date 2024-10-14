@@ -49,7 +49,7 @@ class Menu(QMenuBar):
     def open_user_guide(self):
         """Open the user guide in the default web browser."""
         
-        url = "https://docs.google.com/document/d/1Ut9xIydCe57XhlXjVJ60JIHLIcsG98q0NrMVG0WW0_U/edit?usp=sharing"  
+        url = "https://projectcits3200.github.io/User_Guide/"  
 
         # Open the URL in the default browser
         QDesktopServices.openUrl(QUrl(url))
