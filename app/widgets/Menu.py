@@ -37,7 +37,7 @@ class Menu(QMenuBar):
         about_action = QAction("About", self)
 
         user_guide_action.triggered.connect(self.open_user_guide)
-        user_guide_action.triggered.connect(self.open_about)
+        about_action.triggered.connect(self.open_about)
 
 
 
