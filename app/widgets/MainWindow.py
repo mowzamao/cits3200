@@ -1,8 +1,8 @@
 import sys
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QFileDialog, QScrollArea, QDialog, QPushButton, QLabel
+    QApplication, QMainWindow, QVBoxLayout, QGridLayout, QHBoxLayout, QWidget, QSizePolicy, QFileDialog, QScrollArea, QDialog, QPushButton, QLabel
 )
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QGuiApplication
 from PyQt6.QtCore import Qt
 import pandas as pd
 from time import sleep
@@ -22,6 +22,10 @@ class MainWindow(QMainWindow):
     def __init__(self):
         """Initialize the main window and setup UI components."""
         super().__init__()
+
+        # Ensuring window is always visible 
+        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
+        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
 
         # State to track images, graphs, and thumbnails
         self.image_history = []  # Track triples of image panels, graph panels, and thumbnails
@@ -105,12 +109,13 @@ class MainWindow(QMainWindow):
         """Draw the image, graph, and thumbnail panels."""
         self.reset_central_widget()
 
+        num_empty_panels = 0
         if self.panel_left is None:
             self.panel_left = GraphPanel(self)
+            num_empty_panels += 1
         if self.panel_right is None:
             self.panel_right = GraphPanel(self)
-
-        self.thumbnail_panel = self.create_thumbnail_panel()
+            num_empty_panels += 1
 
         new_layout = QGridLayout()
         # Always add left and right panels (whether image or graph)
@@ -118,6 +123,7 @@ class MainWindow(QMainWindow):
         new_layout.addWidget(self.panel_right, 0, 1, 1, 1)
     
         # Thumbnails at the bottom
+        self.thumbnail_panel = self.create_thumbnail_panel()
         new_layout.addWidget(self.thumbnail_panel, 1, 0, 1, 2, alignment=Qt.AlignmentFlag.AlignLeft)
     
         new_layout.setColumnStretch(0, 1)
@@ -132,6 +138,13 @@ class MainWindow(QMainWindow):
 
         self.showMaximized() # Fixes issue with window going out of bounds 
 
+        # Adjusting panel widths to be equal
+        if num_empty_panels == 2:
+            width_left = self.panel_left.width()
+            width_right = self.panel_right.width()
+            width_average = int(0.5*(width_left + width_right))
+            self.panel_left.setFixedWidth(width_average)
+            self.panel_right.setFixedWidth(width_average)
 
     def set_empty_panels(self):
         """Set the initial empty placeholder panels."""

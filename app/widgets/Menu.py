@@ -17,27 +17,18 @@ class Menu(QMenuBar):
 
     def init_ui(self):
         """Create a menu to select image files"""
-        file_menu = self.create_file_menu()
+        file_action = self.create_file_action()
         help_menu = self.create_help_menu()
 
-        self.addMenu(file_menu) 
+        self.addAction(file_action) 
         self.addMenu(help_menu) 
 
 
-    def create_file_menu(self):
-        """Create the File menu and add actions."""
-        file_menu = QMenu("File", self)
-        open_action = QAction("Open", self)
-        exit_action = QAction("Exit", self)
-
-        open_action.triggered.connect(self.open_image)
-        exit_action.triggered.connect(self.parent.close)
-
-        file_menu.addAction(open_action)
-        file_menu.addSeparator()
-        file_menu.addAction(exit_action)
-        
-        return file_menu
+    def create_file_action(self):
+        """Create the File actions."""
+        file_action = QAction("File", self)
+        file_action .triggered.connect(self.open_image)
+        return file_action 
 
     def create_help_menu(self):
         """Create the Help menu and add actions."""
@@ -103,12 +94,3 @@ class Menu(QMenuBar):
                     
                     # Call the MainWindow method to add the image and its graph
                     self.parent.add_image_and_graph_panel(file_name, df, image)
-
-            #         # Optionally, show a success message in the status bar
-            #         self.parent.statusBar().showMessage(f"Loaded and processed image: {file_name}")
-            #     else:
-            #         # Handle processing failure
-            #         self.parent.statusBar().showMessage("Failed to process the image.")
-            # else:
-            #     # Handle case where the image could not be read
-            #     self.parent.statusBar().showMessage("Failed to load the image.")

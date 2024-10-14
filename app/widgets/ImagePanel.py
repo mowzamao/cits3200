@@ -18,7 +18,7 @@ class ImagePanel(QWidget):
         # Initialize the QLabel
         self.image_label = QLabel("")
         self.image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.image_label.setStyleSheet("border: 20px solid white; background-color: white;")
+        self.image_label.setStyleSheet("padding: 20px; background-color: white;")
         self.toolbar = ImageToolbar(self)
         
         # Set the layout
