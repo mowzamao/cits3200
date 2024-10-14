@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu
+from PyQt6.QtWidgets import QWidget, QFileDialog, QMenuBar, QMenu, QMessageBox
 from PyQt6.QtGui import QPixmap, QAction  
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QDesktopServices
@@ -84,6 +84,11 @@ class Menu(QMenuBar):
                 # Process the core image to get the data (df)
                 data_dict = process_core_image(oriented_image, 76)  # Use 77mm as core width
 
+                #checking image has been correctly processed
+                if type(data_dict) != dict:
+                    self.analysis_fail_popup()
+                    return
+                
                 #setting up dataframe for the colours graph
                 rgb_df = data_dict['Colours']
                 lab_df = core_to_lab(rgb_df)
@@ -94,3 +99,10 @@ class Menu(QMenuBar):
                     
                     # Call the MainWindow method to add the image and its graph
                     self.parent.add_image_and_graph_panel(file_name, df, image)
+    
+    def analysis_fail_popup(self):
+        msg = QMessageBox()
+        msg.setWindowTitle('Analysis Failure')
+        msg.setText('Core not detected in image.')
+        msg.exec()
+
