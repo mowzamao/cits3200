@@ -102,7 +102,8 @@ class Menu(QMenuBar):
     
     def analysis_fail_popup(self):
         msg = QMessageBox()
-        msg.setWindowTitle('Analysis Failure')
-        msg.setText('Core not detected in image.')
+        msg.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        msg.setWindowTitle('Error')
+        msg.setText('   No core was detected            ')
         msg.exec()
 

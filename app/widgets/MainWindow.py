@@ -24,7 +24,6 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Ensuring window is always visible 
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
         self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
 
         # State to track images, graphs, and thumbnails
