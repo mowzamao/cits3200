@@ -138,6 +138,13 @@ class MainWindow(QMainWindow):
 
         self.showMaximized() # Fixes issue with window going out of bounds 
 
+        # Adjusting panel widths to be equal
+        if num_empty_panels == 2:
+            width_left = self.panel_left.width()
+            width_right = self.panel_right.width()
+            width_average = int(0.5*(width_left + width_right))
+            self.panel_left.setFixedWidth(width_average)
+            self.panel_right.setFixedWidth(width_average)
 
     def set_empty_panels(self):
         """Set the initial empty placeholder panels."""
