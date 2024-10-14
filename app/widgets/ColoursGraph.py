@@ -199,7 +199,10 @@ class ColoursGraph(FigureCanvasQTAgg):
         ax.tick_params(which='minor', length=2, color='grey')
         ax.tick_params(which='major', length=4, color='grey')
 
-        ax.yaxis.minorticks_on()
+        try:
+            ax.yaxis.minorticks_on()
+        except:
+            pass
         return ax
         
 
