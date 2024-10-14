@@ -24,7 +24,7 @@ class MainWindow(QMainWindow):
         super().__init__()
 
         # Ensuring window is always visible 
-        self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
+        # self.setWindowFlags(self.windowFlags() | Qt.WindowType.WindowStaysOnTopHint)
 
         # State to track images, graphs, and thumbnails
         self.image_history = []  # Track triples of image panels, graph panels, and thumbnails
