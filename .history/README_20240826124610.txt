@@ -1,7 +1,0 @@
-
-
-On a Mac/Linux computer run the command 
-source env/bin/activate
-
-On a Windows computer, run the command
-./.venv/Scripts/Activate.bat
