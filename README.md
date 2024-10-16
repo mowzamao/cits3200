@@ -10,3 +10,7 @@ Start the application through a bash window/command shell located within the roo
 
 
 Icons are from Bootstrap under a free and open-source MiT License
+
+
+## Documentation
+https://projectcits3200.github.io/User_Guide/
